@@ -2,15 +2,11 @@ package com.example.administrator.myapplicationsienke.activity;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,8 +16,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,8 +27,6 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 
-import org.apache.http.conn.ConnectTimeoutException;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -46,8 +38,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Created by Administrator on 2017/2/24 0024.
@@ -98,6 +88,7 @@ public class QueryActivity extends Activity {
         queryBtn.setOnClickListener(clickListener);
         radioButton1.setOnClickListener(clickListener);
         radioButton2.setOnClickListener(clickListener);
+
         radioButton1.setChecked(true);
         editText1.setEnabled(true);
         editText1.setFocusable(true);
@@ -191,7 +182,7 @@ public class QueryActivity extends Activity {
     public void showPopupwindow(){
         layoutInflater = LayoutInflater.from(QueryActivity.this);
         view = layoutInflater.inflate(R.layout.activity_loading,null);
-        popupWindow = new PopupWindow(view,300,300);
+        popupWindow = new PopupWindow(view,250,250);
         frameAnimation = (ImageView) view.findViewById(R.id.frame_animation);
         //popupWindow.setFocusable(true);
         //popupWindow.setOutsideTouchable(true);
@@ -253,7 +244,7 @@ public class QueryActivity extends Activity {
                     requireMyWorks("getUser.do", "meterNumber=" + editText2.getText().toString());
                 }
             }.start();
-        }
+    }
     }
 
     //请求网络数据
@@ -383,7 +374,6 @@ public class QueryActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     //返回当前页面的回调方法
