@@ -13,6 +13,7 @@
             android:id="@+id/security_check_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:padding="16dp"
             android:src="@mipmap/securit_back" />
 
@@ -31,7 +32,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:padding="16dp"
-            android:src="@mipmap/securit_go" />
+            android:src="@mipmap/more" />
     </RelativeLayout>
 
     <LinearLayout
@@ -139,46 +140,42 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
-
     </LinearLayout>
 
-    <LinearLayout
+    <RadioGroup
         android:layout_width="match_parent"
         android:layout_height="61dp"
-        android:background="#f0f0f0">
+        android:background="@color/gray_thin"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <LinearLayout
+        <RadioButton
+            android:id="@+id/text_option_btn"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:button="@null"
+            android:drawablePadding="5dp"
+            android:drawableTop="@mipmap/option_btn"
+            android:gravity="center"
+            android:text="选项"
+            android:textColor="#0088ff"
+            android:textSize="10sp" />
 
-            <TextView
-                android:id="@+id/text_option_btn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:drawableTop="@mipmap/option_btn"
-                android:gravity="center"
-                android:text="选项"
-                android:textColor="#0088ff"
-                android:textSize="10sp" />
-
-            <TextView
-                android:id="@+id/text_transfer"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:drawableTop="@mipmap/transfer"
-                android:gravity="center"
-                android:text="传输"
-                android:textColor="#747474"
-                android:textSize="10sp" />
-        </LinearLayout>
-
-    </LinearLayout>
-
+        <RadioButton
+            android:id="@+id/text_transfer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawablePadding="5dp"
+            android:drawableTop="@mipmap/transfer"
+            android:gravity="center"
+            android:text="传输"
+            android:textColor="#747474"
+            android:textSize="10sp" />
+    </RadioGroup>
 
 </LinearLayout>
