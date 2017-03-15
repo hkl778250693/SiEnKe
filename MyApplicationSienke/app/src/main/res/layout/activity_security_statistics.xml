@@ -241,25 +241,29 @@
         android:layout_height="5dp"
         android:background="@color/gray_thin" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
+
+    <Button
+        android:id="@+id/user_statistics_btn"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginLeft="11dp"
+        android:layout_marginRight="11dp"
         android:layout_marginTop="80dp"
-        android:background="@mipmap/bule_progress"
-        android:gravity="center"
+        android:background="@drawable/button_selector"
         android:text="按所有用户统计"
         android:textColor="@android:color/white"
-        android:textSize="20sp" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/task_statistics_btn"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginLeft="11dp"
+        android:layout_marginRight="11dp"
         android:layout_marginTop="20dp"
-        android:background="@mipmap/bule_progress"
-        android:gravity="center"
+        android:background="@drawable/button_selector"
         android:text="按任务分区统计"
         android:textColor="@android:color/white"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
 </LinearLayout>

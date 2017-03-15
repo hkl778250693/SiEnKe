@@ -17,7 +17,7 @@ public class MobileSecurityChooseActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_security_choose);
+        setContentView(R.layout.activity_security);
 
         bindView();
     }

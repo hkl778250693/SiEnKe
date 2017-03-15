@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_continue_security"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:drawablePadding="10dp"
+            android:drawableTop="@mipmap/continue_security"
+            android:gravity="center"
+            android:text="继续安检"
+            android:textColor="#0088ff"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/text_user_list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:drawablePadding="10dp"
+            android:drawableTop="@mipmap/user_list"
+            android:gravity="center"
+            android:text="用户列表"
+            android:textColor="#0088ff"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_no_check_user"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:drawablePadding="10dp"
+            android:drawableTop="@mipmap/no_check_user"
+            android:gravity="center"
+            android:text="未检用户"
+            android:textColor="#0088ff"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/text_new_paln"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:drawablePadding="10dp"
+            android:drawableTop="@mipmap/new_plan"
+            android:gravity="center"
+            android:text="新增计划"
+            android:textColor="#0088ff"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_security_statistics"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:drawablePadding="10dp"
+            android:drawableTop="@mipmap/securit_statistics"
+            android:gravity="center"
+            android:text="安检统计"
+            android:textColor="#0088ff"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/text_choose_mission"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:drawablePadding="10dp"
+            android:drawableTop="@mipmap/choose_mission"
+            android:gravity="center"
+            android:text="任务选择"
+            android:textColor="#0088ff"
+            android:textSize="16sp" />
+    </LinearLayout>
+</LinearLayout>
