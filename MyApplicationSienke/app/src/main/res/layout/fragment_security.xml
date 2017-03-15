@@ -20,7 +20,7 @@
             android:drawableTop="@mipmap/continue_security"
             android:gravity="center"
             android:text="继续安检"
-            android:textColor="#0088ff"
+            android:textColor="@color/text_blue"
             android:textSize="16sp" />
 
         <TextView
@@ -33,7 +33,7 @@
             android:drawableTop="@mipmap/user_list"
             android:gravity="center"
             android:text="用户列表"
-            android:textColor="#0088ff"
+            android:textColor="@color/text_blue"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -53,7 +53,7 @@
             android:drawableTop="@mipmap/no_check_user"
             android:gravity="center"
             android:text="未检用户"
-            android:textColor="#0088ff"
+            android:textColor="@color/text_blue"
             android:textSize="16sp" />
 
         <TextView
@@ -65,8 +65,13 @@
             android:drawablePadding="10dp"
             android:drawableTop="@mipmap/new_plan"
             android:gravity="center"
+<<<<<<< HEAD
             android:text="新增任务"
             android:textColor="#0088ff"
+=======
+            android:text="新增计划"
+            android:textColor="@color/text_blue"
+>>>>>>> hkl
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -86,7 +91,7 @@
             android:drawableTop="@mipmap/securit_statistics"
             android:gravity="center"
             android:text="安检统计"
-            android:textColor="#0088ff"
+            android:textColor="@color/text_blue"
             android:textSize="16sp" />
 
         <TextView
@@ -99,7 +104,7 @@
             android:drawableTop="@mipmap/choose_mission"
             android:gravity="center"
             android:text="任务选择"
-            android:textColor="#0088ff"
+            android:textColor="@color/text_blue"
             android:textSize="16sp" />
     </LinearLayout>
 </LinearLayout>

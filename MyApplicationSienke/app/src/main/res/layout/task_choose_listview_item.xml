@@ -18,9 +18,12 @@
             android:layout_centerVertical="true"
             android:drawableLeft="@mipmap/task_choose"
             android:drawablePadding="3dp"
-            android:text="苹果街" />
+            android:text="苹果街"
+            android:textSize="16sp"
+            android:textColor="@color/text_black"/>
 
         <CheckBox
+            android:id="@+id/is_checked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -42,12 +45,17 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="任务编号：" />
+                android:text="任务编号："
+                android:textSize="13sp"
+                android:textColor="@color/text_gray"/>
 
             <TextView
+                android:id="@+id/task_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="123455678" />
+                android:text="123455678"
+                android:textSize="13sp"
+                android:textColor="@color/text_gray"/>
         </LinearLayout>
 
         <LinearLayout
@@ -59,12 +67,17 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="安检类型：" />
+                android:text="安检类型："
+                android:textSize="13sp"
+                android:textColor="@color/text_gray"/>
 
             <TextView
+                android:id="@+id/check_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="年度安检" />
+                android:text="年度安检"
+                android:textSize="13sp"
+                android:textColor="@color/text_gray"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -83,12 +96,17 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="总  户  数：" />
+                android:text="总  户  数："
+                android:textSize="13sp"
+                android:textColor="@color/text_gray"/>
 
             <TextView
+                android:id="@+id/total_user_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3264户" />
+                android:text="3264户"
+                android:textSize="13sp"
+                android:textColor="@color/text_gray"/>
         </LinearLayout>
 
         <LinearLayout
@@ -100,12 +118,17 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="已检户数：" />
+                android:text="已检户数："
+                android:textSize="13sp"
+                android:textColor="@color/text_gray"/>
 
             <TextView
+                android:id="@+id/checked_user_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1752户" />
+                android:text="1752户"
+                android:textSize="13sp"
+                android:textColor="@color/text_gray"/>
         </LinearLayout>
     </LinearLayout>
 
