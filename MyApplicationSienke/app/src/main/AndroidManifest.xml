@@ -25,6 +25,9 @@
         <activity android:name=".activity.BusinessManageLoginActivity"/>
         <activity android:name=".activity.BusinessCheckActivity"/>
         <activity android:name=".activity.MoreSettingsActivity"/>
+
+        <activity android:name=".activity.MobileSecurityActivity"/>
+        <activity android:name=".activity.MobileSecurityChooseActivity"/>
     </application>
 
 </manifest>
