@@ -27,7 +27,7 @@
         <activity android:name=".activity.MoreSettingsActivity"/>
 
 
-        <activity android:name=".activity.MobileSecurityChooseActivity"/>
+        <activity android:name=".activity.SecurityChooseActivity"/>
     </application>
 
 </manifest>

@@ -11,7 +11,7 @@ import com.example.administrator.myapplicationsienke.R;
 /**
  * Created by Administrator on 2017/3/14.
  */
-public class MobileSecurityChooseActivity extends Activity {
+public class SecurityChooseActivity extends Activity {
     private ImageView security_check_back;
 
     @Override
@@ -34,7 +34,7 @@ public class MobileSecurityChooseActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.security_check_back:
-                    Intent intent = new Intent(MobileSecurityChooseActivity.this, MobileSecurityActivity.class);
+                    Intent intent = new Intent(SecurityChooseActivity.this, MobileSecurityActivity.class);
                     startActivity(intent);
                     finish();
                     break;
