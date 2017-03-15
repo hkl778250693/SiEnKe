@@ -425,13 +425,44 @@
                     android:layout_weight="1"
                     android:background="@drawable/check_hidden_danger_down_shape"
                     android:orientation="horizontal"
-                    android:padding="10dp">
+                    android:padding="10dp"
+                    android:gravity="center_vertical">
+                    <HorizontalScrollView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@mipmap/ic_launcher"
+                                android:layout_marginRight="5dp"/>
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@mipmap/ic_launcher"
+                                android:layout_marginRight="5dp"/>
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@mipmap/ic_launcher"
+                                android:layout_marginRight="5dp"/>
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@mipmap/ic_launcher"
+                                android:layout_marginRight="5dp"/>
+                        </LinearLayout>
+
+                    </HorizontalScrollView>
 
                     <ImageView
                         android:id="@+id/add_imgs"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@mipmap/add" />
+                        android:src="@mipmap/add"/>
                 </LinearLayout>
             </LinearLayout>
 

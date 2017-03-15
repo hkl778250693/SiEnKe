@@ -49,31 +49,31 @@
         android:orientation="horizontal">
 
         <RadioButton
-            android:id="@+id/text_option_btn"
+            android:id="@+id/option_rbt"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:button="@null"
             android:drawablePadding="5dp"
-            android:drawableTop="@mipmap/option_btn"
+            android:drawableTop="@drawable/radiogroup_task_choose_selector"
             android:gravity="center"
             android:text="选项"
-            android:textColor="#0088ff"
+            android:textColor="@drawable/radiogroup_text_selector"
             android:textSize="10sp" />
 
         <RadioButton
-            android:id="@+id/text_transfer"
+            android:id="@+id/data_transfer_rbt"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:button="@null"
             android:drawablePadding="5dp"
-            android:drawableTop="@mipmap/transfer"
+            android:drawableTop="@drawable/radiogroup_data_transfer_selector"
             android:gravity="center"
             android:text="传输"
-            android:textColor="#747474"
+            android:textColor="@drawable/radiogroup_text_selector"
             android:textSize="10sp" />
     </RadioGroup>
 
