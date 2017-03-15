@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.GuideActivity">
+        <activity android:name=".activity.MobileSecurityActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,7 +26,7 @@
         <activity android:name=".activity.BusinessCheckActivity"/>
         <activity android:name=".activity.MoreSettingsActivity"/>
 
-        <activity android:name=".activity.MobileSecurityActivity"/>
+
         <activity android:name=".activity.MobileSecurityChooseActivity"/>
     </application>
 
