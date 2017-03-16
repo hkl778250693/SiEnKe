@@ -29,7 +29,7 @@ public class SecurityStatisticsActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.security_statistics_back:
-                    Intent intent=new Intent(SecurityStatisticsActivity.this,SecurityActivity.class);
+                    Intent intent=new Intent(SecurityStatisticsActivity.this,SecurityChooseActivity.class);
                     startActivity(intent);
                     finish();
                     break;

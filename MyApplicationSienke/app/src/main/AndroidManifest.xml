@@ -32,9 +32,9 @@
         <activity android:name=".activity.CheckUserListActivity"/>
         <activity android:name=".activity.NewTaskActivity"/>
         <activity android:name=".activity.NoCheckUserListActivity"/>
-        <activity android:name=".activity.SecurityActivity"/>
         <activity android:name=".activity.TaskChooseActivity"/>
         <activity android:name=".activity.SecurityStatisticsActivity"/>
+        <activity android:name=".activity.UserDetailInfoActivity"/>
 
     </application>
 

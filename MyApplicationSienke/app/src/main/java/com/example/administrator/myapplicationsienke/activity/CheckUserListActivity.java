@@ -32,7 +32,7 @@ public class CheckUserListActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.security_check_back:
-                    Intent intent=new Intent(CheckUserListActivity.this,SecurityActivity.class);
+                    Intent intent=new Intent(CheckUserListActivity.this,SecurityChooseActivity.class);
                     startActivity(intent);
                     finish();
                     break;

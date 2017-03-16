@@ -38,12 +38,12 @@ public class NewTaskActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.newtask_back:
-                    Intent intent = new Intent(NewTaskActivity.this, SecurityActivity.class);
+                    Intent intent = new Intent(NewTaskActivity.this, SecurityChooseActivity.class);
                     startActivity(intent);
                     finish();
                     break;
                 case R.id.newplan_add_btn:
-                    Intent intent1 = new Intent(NewTaskActivity.this, SecurityActivity.class);
+                    Intent intent1 = new Intent(NewTaskActivity.this, SecurityChooseActivity.class);
                     startActivity(intent1);
                     finish();
                     break;
