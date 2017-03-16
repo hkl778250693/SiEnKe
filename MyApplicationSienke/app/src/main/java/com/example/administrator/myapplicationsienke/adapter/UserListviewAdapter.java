@@ -16,7 +16,6 @@ import java.util.List;
  * Created by Administrator on 2017/3/16.
  */
 public class UserListviewAdapter extends BaseAdapter {
-
     private Context context;
     private List<UserListviewItem> userListviewList;
     private LayoutInflater layoutInflater;
