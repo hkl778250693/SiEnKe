@@ -328,6 +328,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/security_check_case"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -359,6 +360,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/security_hidden_type"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -389,6 +391,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/security_hidden_reason"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
