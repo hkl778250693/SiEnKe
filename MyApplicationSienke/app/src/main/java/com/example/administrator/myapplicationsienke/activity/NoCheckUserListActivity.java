@@ -47,9 +47,7 @@ public class NoCheckUserListActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.security_nocheck_back:
-                    Intent intent = new Intent(NoCheckUserListActivity.this, SecurityChooseActivity.class);
-                    startActivity(intent);
-                    finish();
+                    NoCheckUserListActivity.this.finish();
                     break;
             }
         }

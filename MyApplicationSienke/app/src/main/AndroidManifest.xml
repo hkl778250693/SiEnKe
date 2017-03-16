@@ -35,6 +35,9 @@
         <activity android:name=".activity.TaskChooseActivity"/>
         <activity android:name=".activity.SecurityStatisticsActivity"/>
         <activity android:name=".activity.UserDetailInfoActivity"/>
+        <activity android:name=".activity.UserListActivity"/>
+        <activity android:name=".activity.UploadActivity"/>
+        <activity android:name=".activity.DownloadActivity"/>
 
     </application>
 

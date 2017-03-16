@@ -13,26 +13,27 @@ import com.example.administrator.myapplicationsienke.R;
  */
 public class SecurityStatisticsActivity extends Activity {
     private ImageView securityStatisticsBack;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_security_statistics);
         bindView();
     }
+
     //绑定控件
-    private void bindView(){
-        securityStatisticsBack= (ImageView) findViewById(R.id.security_statistics_back);
+    private void bindView() {
+        securityStatisticsBack = (ImageView) findViewById(R.id.security_statistics_back);
+        //点击事件
+        securityStatisticsBack.setOnClickListener(onClickListener);
     }
-    //点击事件
-    View.OnClickListener onClickListener=new View.OnClickListener() {
+
+    View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.security_statistics_back:
-                    Intent intent=new Intent(SecurityStatisticsActivity.this,SecurityChooseActivity.class);
-                    startActivity(intent);
-                    finish();
-                    break;
+                    SecurityStatisticsActivity.this.finish();
             }
         }
     };

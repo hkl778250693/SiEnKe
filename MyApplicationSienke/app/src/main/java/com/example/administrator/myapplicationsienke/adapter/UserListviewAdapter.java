@@ -16,7 +16,6 @@ import java.util.List;
  * Created by Administrator on 2017/3/16.
  */
 public class UserListviewAdapter extends BaseAdapter {
-
     private Context context;
     private List<UserListviewItem> userListviewList;
     private LayoutInflater layoutInflater;
@@ -24,7 +23,7 @@ public class UserListviewAdapter extends BaseAdapter {
     public UserListviewAdapter(Context context, List<UserListviewItem> userListviewList) {
         this.context = context;
         this.userListviewList = userListviewList;
-        if (context != null) {
+        if(context != null){
             layoutInflater = LayoutInflater.from(context);
         }
     }
@@ -63,7 +62,7 @@ public class UserListviewAdapter extends BaseAdapter {
 
         UserListviewItem userListviewItem = userListviewList.get(position);
 
-        return null;
+        return convertView;
     }
 
     class ViewHolder {

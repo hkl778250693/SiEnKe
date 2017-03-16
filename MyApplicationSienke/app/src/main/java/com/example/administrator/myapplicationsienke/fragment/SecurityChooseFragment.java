@@ -1,5 +1,6 @@
 package com.example.administrator.myapplicationsienke.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.administrator.myapplicationsienke.R;
+import com.example.administrator.myapplicationsienke.activity.NewTaskActivity;
+import com.example.administrator.myapplicationsienke.activity.NoCheckUserListActivity;
+import com.example.administrator.myapplicationsienke.activity.SecurityStatisticsActivity;
+import com.example.administrator.myapplicationsienke.activity.TaskChooseActivity;
+import com.example.administrator.myapplicationsienke.activity.UserListActivity;
 
 /**
  * Created by Administrator on 2017/3/16 0016.
@@ -52,14 +58,24 @@ public class SecurityChooseFragment extends Fragment {
                 case R.id.continue_security:
                     break;
                 case R.id.user_list:
+                    Intent intent=new Intent(getActivity(),UserListActivity.class);
+                    startActivity(intent);
                     break;
                 case R.id.no_check_user:
+                    Intent intent1=new Intent(getActivity(), NoCheckUserListActivity.class);
+                    startActivity(intent1);
                     break;
                 case R.id.new_task:
+                    Intent intent2=new Intent(getActivity(), NewTaskActivity.class);
+                    startActivity(intent2);
                     break;
                 case R.id.security_statistics:
+                    Intent intent3=new Intent(getActivity(), SecurityStatisticsActivity.class);
+                    startActivity(intent3);
                     break;
                 case R.id.task_choose:
+                    Intent intent4=new Intent(getActivity(), TaskChooseActivity.class);
+                    startActivity(intent4);
                     break;
             }
         }
