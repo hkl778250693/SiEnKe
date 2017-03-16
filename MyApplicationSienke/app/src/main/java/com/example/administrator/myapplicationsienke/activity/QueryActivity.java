@@ -181,7 +181,7 @@ public class QueryActivity extends Activity {
     //show弹出框
     public void showPopupwindow(){
         layoutInflater = LayoutInflater.from(QueryActivity.this);
-        view = layoutInflater.inflate(R.layout.activity_loading,null);
+        view = layoutInflater.inflate(R.layout.popupwindow_quury_loading,null);
         popupWindow = new PopupWindow(view,250,250);
         frameAnimation = (ImageView) view.findViewById(R.id.frame_animation);
         //popupWindow.setFocusable(true);
@@ -206,7 +206,6 @@ public class QueryActivity extends Activity {
     public void backgroundAlpha(float bgAlpha)
     {
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.flags = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
         lp.alpha = bgAlpha; //0.0-1.0
         getWindow().setAttributes(lp);
     }
