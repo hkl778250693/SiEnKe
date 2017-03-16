@@ -10,7 +10,7 @@
         android:background="@color/theme_colors">
 
         <ImageView
-            android:id="@+id/security_check_back"
+            android:id="@+id/security_nocheck_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="用户列表"
+            android:text="未检用户"
             android:textColor="@android:color/white"
             android:textSize="21sp" />
 

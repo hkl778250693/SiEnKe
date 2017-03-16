@@ -65,13 +65,8 @@
             android:drawablePadding="10dp"
             android:drawableTop="@mipmap/new_plan"
             android:gravity="center"
-<<<<<<< HEAD
             android:text="新增任务"
-            android:textColor="#0088ff"
-=======
-            android:text="新增计划"
             android:textColor="@color/text_blue"
->>>>>>> hkl
             android:textSize="16sp" />
     </LinearLayout>
 
