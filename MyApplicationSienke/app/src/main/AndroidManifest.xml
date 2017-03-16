@@ -18,6 +18,7 @@
             </intent-filter>
         </activity>
 
+        //移动查询
         <activity android:name=".activity.QueryActivity"/>
         <activity android:name=".activity.CostListviewActivity"/>
         <activity android:name=".activity.CostDetailActivity"/>
@@ -26,8 +27,9 @@
         <activity android:name=".activity.BusinessCheckActivity"/>
         <activity android:name=".activity.MoreSettingsActivity"/>
 
-
+        //安检
         <activity android:name=".activity.SecurityChooseActivity"/>
+
     </application>
 
 </manifest>

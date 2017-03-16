@@ -85,6 +85,7 @@ public class QueryAdapter extends BaseAdapter {
             viewHolder.pay_state.setBackgroundColor(context.getResources().getColor(R.color.green));
         }else{
             viewHolder.pay_state.setText("未缴纳");
+            viewHolder.pay_state.setBackgroundColor(context.getResources().getColor(R.color.red));
         }
         viewHolder.start_degree.setText(queryListviewItem.getStart_degree()+"");//起度
         viewHolder.end_degree.setText(queryListviewItem.getEnd_degree()+"");  //止度
