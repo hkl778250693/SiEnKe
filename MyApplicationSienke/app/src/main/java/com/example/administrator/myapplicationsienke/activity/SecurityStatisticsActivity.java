@@ -9,37 +9,31 @@ import android.widget.ImageView;
 import com.example.administrator.myapplicationsienke.R;
 
 /**
- * Created by Administrator on 2017/3/15.
+ * Created by Administrator on 2017/3/16.
  */
-public class CheckUserListActivity extends Activity {
-    private ImageView securityCheckBack;
-
+public class SecurityStatisticsActivity extends Activity {
+    private ImageView securityStatisticsBack;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_userlist);
+        setContentView(R.layout.activity_security_statistics);
         bindView();
     }
     //绑定控件
-    private void bindView() {
-        securityCheckBack= (ImageView) findViewById(R.id.security_check_back);
-        //点击事件
-        securityCheckBack.setOnClickListener(onClickListener);
+    private void bindView(){
+        securityStatisticsBack= (ImageView) findViewById(R.id.security_statistics_back);
     }
-    View.OnClickListener onClickListener=new View.OnClickListener(){
-
+    //点击事件
+    View.OnClickListener onClickListener=new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()){
-                case R.id.security_check_back:
-                    Intent intent=new Intent(CheckUserListActivity.this,SecurityActivity.class);
+                case R.id.security_statistics_back:
+                    Intent intent=new Intent(SecurityStatisticsActivity.this,SecurityActivity.class);
                     startActivity(intent);
                     finish();
                     break;
             }
-
         }
     };
-
-
 }

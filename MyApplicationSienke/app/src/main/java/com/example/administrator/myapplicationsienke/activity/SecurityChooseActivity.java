@@ -13,7 +13,6 @@ import com.example.administrator.myapplicationsienke.R;
  * Created by Administrator on 2017/3/14.
  */
 public class SecurityChooseActivity extends Activity {
-    private ImageView securityCheckBack;
     private ImageView security_check_back;
     private RadioButton optionRbt;
     private RadioButton dataTransferRbt;
@@ -31,13 +30,12 @@ public class SecurityChooseActivity extends Activity {
 
     //绑定控件
     private void bindView() {
-        securityCheckBack = (ImageView) findViewById(R.id.security_check_back);
         security_check_back = (ImageView) findViewById(R.id.security_check_back);
         optionRbt = (RadioButton) findViewById(R.id.option_rbt);
         dataTransferRbt = (RadioButton) findViewById(R.id.data_transfer_rbt);
 
         //点击事件
-        securityCheckBack.setOnClickListener(onClickListener);
+        security_check_back.setOnClickListener(onClickListener);
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {

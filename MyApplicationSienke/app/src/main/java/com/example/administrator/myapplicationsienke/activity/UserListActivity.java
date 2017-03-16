@@ -1,31 +1,27 @@
 package com.example.administrator.myapplicationsienke.activity;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
-
 import com.example.administrator.myapplicationsienke.R;
-import com.example.administrator.myapplicationsienke.adapter.NoCheckUserAdapter;
-import com.example.administrator.myapplicationsienke.model.NoCheckUserItem;
-
+import com.example.administrator.myapplicationsienke.adapter.UserListviewAdapter;
+import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Administrator on 2017/3/15.
+ * Created by Administrator on 2017/3/16.
  */
-public class NoCheckUserListActivity extends Activity {
-    private ImageView securityNoCheckBack;
+public class UserListActivity extends Activity {
+    private ImageView back;
     private ListView listView;
-    private List<NoCheckUserItem> noCheckUserItemList = new ArrayList<>();
-
+    private List<UserListviewItem> userListviewItemList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_security_choose_nocheck_listview);
+        setContentView(R.layout.activity_userlist);
         //绑定控件
         bindView();
         //暂时获取假数据
@@ -34,20 +30,20 @@ public class NoCheckUserListActivity extends Activity {
 
     //绑定控件ID
     private void bindView() {
-        securityNoCheckBack = (ImageView) findViewById(R.id.security_nocheck_back);
+        back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
         //点击事件
-        securityNoCheckBack.setOnClickListener(onClickListener);
-        NoCheckUserAdapter noCheckUserAdapter = new NoCheckUserAdapter(NoCheckUserListActivity.this, noCheckUserItemList);
-        listView.setAdapter(noCheckUserAdapter);
+        back.setOnClickListener(onClickListener);
+        UserListviewAdapter userListviewAdapter = new UserListviewAdapter(UserListActivity.this, userListviewItemList);
+        listView.setAdapter(userListviewAdapter);
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.security_nocheck_back:
-                    Intent intent = new Intent(NoCheckUserListActivity.this, SecurityActivity.class);
+                case R.id.back:
+                    Intent intent = new Intent(UserListActivity.this, SecurityActivity.class);
                     startActivity(intent);
                     finish();
                     break;
@@ -58,9 +54,10 @@ public class NoCheckUserListActivity extends Activity {
     //暂时获取假数据
     public void getData() {
         for (int i = 0; i < 20; i++) {
-            NoCheckUserItem noCheckUserItem = new NoCheckUserItem();
-            noCheckUserItemList.add(noCheckUserItem);
+            UserListviewItem userListviewItem = new UserListviewItem();
+            userListviewItemList.add(userListviewItem);
         }
     }
+
 
 }
