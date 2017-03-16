@@ -28,7 +28,8 @@
         <activity android:name=".activity.MoreSettingsActivity"/>
 
         //安检
-        <activity android:name=".activity.SecurityChooseActivity"/>
+        <activity android:name=".activity.UserDetailInfoActivity"/>
+        <activity android:name=".activity.TaskChooseActivity"/>
 
     </application>
 
