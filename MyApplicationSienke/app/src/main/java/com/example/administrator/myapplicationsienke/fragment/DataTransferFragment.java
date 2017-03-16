@@ -28,8 +28,8 @@ public class DataTransferFragment extends Fragment {
 
     //绑定控件
     public void bindView(){
-        upload = (TextView) view.findViewById(R.id.continue_security);
-        download = (TextView) view.findViewById(R.id.user_list);
+        upload = (TextView) view.findViewById(R.id.upload);
+        download = (TextView) view.findViewById(R.id.download);
 
         //点击事件
         upload.setOnClickListener(clickListener);

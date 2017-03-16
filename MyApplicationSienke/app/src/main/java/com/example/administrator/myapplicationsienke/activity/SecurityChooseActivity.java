@@ -27,12 +27,7 @@ public class SecurityChooseActivity extends FragmentActivity {
     private ImageView security_check_back;
     private RadioButton optionRbt;  //选项按钮
     private RadioButton dataTransferRbt;  //数据传输按钮
-    private SecurityChooseFragment securityChooseFragment;
-    private DataTransferFragment dataTransferFragment;
-    private FragmentManager fragmentManager;
     private List<Fragment> fragmentList;
-    private FragmentTransaction fragmentTransaction;
-    private LayoutInflater layoutInflater;
     private ViewPager viewPager;
     private SecurityCheckViewPagerAdapter adapter;
 
@@ -47,6 +42,8 @@ public class SecurityChooseActivity extends FragmentActivity {
         defaultSetting();
         //设置viewPager
         setViewPager();
+        //点击事件
+        setOnClickListener();
     }
 
     //绑定控件
@@ -55,48 +52,13 @@ public class SecurityChooseActivity extends FragmentActivity {
         optionRbt = (RadioButton) findViewById(R.id.option_rbt);
         dataTransferRbt = (RadioButton) findViewById(R.id.data_transfer_rbt);
         viewPager = (ViewPager) findViewById(R.id.security_viewpager);
+    }
 
-        //点击事件
+    //点击事件
+    public void setOnClickListener(){
         security_check_back.setOnClickListener(onClickListener);
-    }
-
-    View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.security_check_back:
-                    Intent intent = new Intent(SecurityChooseActivity.this, MobileSecurityActivity.class);
-                    startActivity(intent);
-                    finish();
-                    break;
-                case R.id.option_rbt:
-                    viewPager.setCurrentItem(0);
-                    break;
-                case R.id.data_transfer_rbt:
-                    viewPager.setCurrentItem(1);
-                    break;
-            }
-        }
-    };
-
-    //初始化设置
-    private void defaultSetting() {
-        fragmentManager = getSupportFragmentManager();
-        optionRbt.setChecked(true);
-        viewPager.setCurrentItem(0);
-    }
-
-    //设置viewPager
-    private void setViewPager(){
-        fragmentList = new ArrayList<>();
-        //添加fragment到list
-        fragmentList.add(securityChooseFragment);
-        fragmentList.add(dataTransferFragment);
-        //避免报空指针
-        if(fragmentList != null){
-            adapter = new SecurityCheckViewPagerAdapter(fragmentManager,fragmentList);
-        }
-        viewPager.setAdapter(adapter);
+        optionRbt.setOnClickListener(onClickListener);
+        dataTransferRbt.setOnClickListener(onClickListener);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -122,6 +84,43 @@ public class SecurityChooseActivity extends FragmentActivity {
 
             }
         });
+    }
+
+    View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.security_check_back:
+                    Intent intent = new Intent(SecurityChooseActivity.this, MobileSecurityActivity.class);
+                    startActivity(intent);
+                    finish();
+                    break;
+                case R.id.option_rbt:
+                    viewPager.setCurrentItem(0);
+                    break;
+                case R.id.data_transfer_rbt:
+                    viewPager.setCurrentItem(1);
+                    break;
+            }
+        }
+    };
+
+    //初始化设置
+    private void defaultSetting() {
+        optionRbt.setChecked(true);
+    }
+
+    //设置viewPager
+    private void setViewPager(){
+        fragmentList = new ArrayList<>();
+        //添加fragment到list
+        fragmentList.add(new SecurityChooseFragment());
+        fragmentList.add(new DataTransferFragment());
+        //避免报空指针
+        if(fragmentList != null){
+            adapter = new SecurityCheckViewPagerAdapter(getSupportFragmentManager(),fragmentList);
+        }
+        viewPager.setAdapter(adapter);
     }
 
 }
