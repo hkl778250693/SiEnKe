@@ -27,8 +27,8 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="请输入IP号"
-        android:textSize="18sp"
+        android:hint="请输入IP号"
+        android:textSize="14sp"
         android:textColor="@color/text_gray"
         android:background="@drawable/ip_setting"
         android:layout_marginTop="20dp"
@@ -38,8 +38,8 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="请输入IP号"
-        android:textSize="18sp"
+        android:hint="请输入IP号"
+        android:textSize="14sp"
         android:textColor="@color/text_gray"
         android:background="@drawable/ip_setting"
         android:layout_marginTop="20dp"

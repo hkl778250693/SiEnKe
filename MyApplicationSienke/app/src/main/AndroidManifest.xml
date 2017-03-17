@@ -38,6 +38,8 @@
         <activity android:name=".activity.UserListActivity"/>
         <activity android:name=".activity.UploadActivity"/>
         <activity android:name=".activity.DownloadActivity"/>
+        <activity android:name=".activity.FileManageActivity"/>
+        <activity android:name=".activity.IpSettingActivity"/>
 
     </application>
 

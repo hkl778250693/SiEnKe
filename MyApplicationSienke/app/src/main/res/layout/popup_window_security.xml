@@ -5,12 +5,12 @@
     android:orientation="vertical">
 
     <RadioGroup
-        android:layout_width="120dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
         <RadioButton
             android:id="@+id/file"
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:background="@drawable/security_popupwindow"
             android:button="@null"
@@ -22,13 +22,13 @@
             android:textSize="16sp" />
 
         <View
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="5dp"
             android:background="@color/gray_thin" />
 
         <RadioButton
             android:id="@+id/settings"
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:background="@drawable/security_popupwindow"
             android:button="@null"
@@ -40,13 +40,13 @@
             android:textSize="16sp" />
 
         <View
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="5dp"
             android:background="@color/gray_thin" />
 
         <RadioButton
             android:id="@+id/quite"
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:background="@drawable/security_popupwindow"
             android:button="@null"
