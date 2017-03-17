@@ -3,6 +3,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import com.example.administrator.myapplicationsienke.R;
@@ -22,20 +23,30 @@ public class UserListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userlist);
-        //绑定控件
-        bindView();
-        //暂时获取假数据
-        getData();
+
+        getData();//暂时获取假数据
+        bindView();//绑定控件
+        setOnClickListener();//点击事件
     }
 
     //绑定控件ID
     private void bindView() {
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
-        //点击事件
+    }
+
+    //点击事件
+    private void setOnClickListener(){
         back.setOnClickListener(onClickListener);
         UserListviewAdapter userListviewAdapter = new UserListviewAdapter(UserListActivity.this, userListviewItemList);
         listView.setAdapter(userListviewAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(UserListActivity.this,UserDetailInfoActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {

@@ -33,10 +33,9 @@ public class MoreSettingsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_more_settings);
 
-        //绑定控件
-        bindView();
-        //初始化设置
-        defaultSetting();
+        bindView();//绑定控件
+        defaultSetting();//初始化设置
+        setViewClickListener();//设置点击事件
     }
 
     //绑定控件ID
@@ -46,9 +45,10 @@ public class MoreSettingsActivity extends Activity {
         save = (Button) findViewById(R.id.save);
         ipEdit = (EditText) findViewById(R.id.ip_edit);
         servePhoneEdit = (EditText) findViewById(R.id.serve_phone_edit);
+    }
 
-
-        //设置点击事件
+    //设置点击事件
+    private void setViewClickListener(){
         back.setOnClickListener(clickListener);
         modify.setOnClickListener(clickListener);
         save.setOnClickListener(clickListener);

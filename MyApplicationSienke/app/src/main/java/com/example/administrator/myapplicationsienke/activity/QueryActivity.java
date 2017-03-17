@@ -67,10 +67,9 @@ public class QueryActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_query);
 
-        //绑定控件
-        bindView();
-        //初始化设置
-        defaultSetting();
+        bindView();//绑定控件
+        defaultSetting();//初始化设置
+        setViewClickListener();//设置点击事件
     }
 
     //绑定控件ID
@@ -82,8 +81,10 @@ public class QueryActivity extends Activity {
         editText1 = (EditText) findViewById(R.id.edit_text1);
         editText2 = (EditText) findViewById(R.id.edit_text2);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
+    }
 
-        //设置点击事件
+    //设置点击事件
+    private void setViewClickListener(){
         more.setOnClickListener(clickListener);
         queryBtn.setOnClickListener(clickListener);
         radioButton1.setOnClickListener(clickListener);
@@ -94,7 +95,6 @@ public class QueryActivity extends Activity {
         editText1.setFocusable(true);
         editText1.setFocusableInTouchMode(true);
         editText2.setEnabled(false);
-
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {

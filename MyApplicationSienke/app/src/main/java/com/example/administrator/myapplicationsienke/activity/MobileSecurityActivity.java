@@ -19,15 +19,17 @@ public class MobileSecurityActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mobile_security);
 
-
-        bindView();
+        bindView();//绑定控件
+        setViewClickListener();//点击事件
     }
 
     //绑定控件
     private void bindView() {
         logonBtn = (Button) findViewById(R.id.logon_btn);
+    }
 
-        //点击事件
+    //点击事件
+    private void setViewClickListener(){
         logonBtn.setOnClickListener(clickListener);
     }
 

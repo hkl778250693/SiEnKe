@@ -38,7 +38,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:scrollbars="none">
 
         <LinearLayout
@@ -434,28 +434,30 @@
 
                     <HorizontalScrollView
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
 
                             <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
                                 android:layout_marginRight="5dp"
                                 android:src="@mipmap/ic_launcher" />
 
                             <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
                                 android:layout_marginRight="5dp"
                                 android:src="@mipmap/ic_launcher" />
 
                             <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
                                 android:layout_marginRight="5dp"
                                 android:src="@mipmap/ic_launcher" />
 
@@ -464,6 +466,7 @@
                     </HorizontalScrollView>
 
                     <LinearLayout
+                        android:id="@+id/add_imgs"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@color/gray_thin"
@@ -471,7 +474,6 @@
                         android:padding="3dp">
 
                         <ImageView
-                            android:id="@+id/add_imgs"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@mipmap/camera" />
@@ -479,25 +481,21 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <Button
+                android:id="@+id/save_btn"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="11dp"
+                android:layout_marginRight="11dp"
+                android:background="@drawable/button_selector"
+                android:text="保 存"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
         </LinearLayout>
     </ScrollView>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <Button
-            android:id="@+id/save_btn"
-            android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="15dp"
-            android:layout_marginLeft="11dp"
-            android:layout_marginRight="11dp"
-            android:background="@drawable/button_selector"
-            android:text="保 存"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
-    </RelativeLayout>
 
 </LinearLayout>

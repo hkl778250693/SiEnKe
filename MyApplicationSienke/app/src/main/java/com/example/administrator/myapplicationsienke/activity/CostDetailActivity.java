@@ -59,13 +59,12 @@ public class CostDetailActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cost_detail);
 
-        //绑定控件ID
-        bindView();
-        //初始化设置
-        defaultSetting();
+        bindView();//绑定控件ID
+        defaultSetting();//初始化设置
+
         new Thread(){
             @Override
-            public void run() {
+            public void run() {  //开起一个支线程进行网络请求
                 intent = getIntent();
                 Log.i("intent===========>",intent+"");
                 if(intent != null){
@@ -79,6 +78,7 @@ public class CostDetailActivity extends Activity {
                 }
             }
         }.start();
+        setViewClickListener();//点击事件
     }
 
     //绑定控件ID
@@ -96,8 +96,10 @@ public class CostDetailActivity extends Activity {
         meterTime = (TextView) findViewById(R.id.meter_time);
         chargeTime = (TextView) findViewById(R.id.charge_time);
         servicePhoneNumber = (TextView) findViewById(R.id.service_phone_number);
+    }
 
-        //点击事件
+    //点击事件
+    private void setViewClickListener(){
         back.setOnClickListener(clickListener);
     }
 

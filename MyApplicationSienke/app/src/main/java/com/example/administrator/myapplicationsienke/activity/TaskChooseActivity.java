@@ -26,24 +26,25 @@ public class TaskChooseActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_choose);
 
-        //绑定控件
-        bindView();
-        //暂时获取假数据
-        getData();
+        getData();//暂时获取假数据
+        bindView();//绑定控件
+        setViewClickListener();//点击事件
     }
 
     //绑定控件ID
     private void bindView(){
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
+    }
 
-        //点击事件
-        back.setOnClickListener(clickListener);
+    //点击事件
+    private void setViewClickListener(){
+        back.setOnClickListener(onClickListener);
         TaskChooseAdapter adapter = new TaskChooseAdapter(TaskChooseActivity.this,taskChooseList);
         listView.setAdapter(adapter);
     }
 
-    View.OnClickListener clickListener = new View.OnClickListener() {
+    View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()){

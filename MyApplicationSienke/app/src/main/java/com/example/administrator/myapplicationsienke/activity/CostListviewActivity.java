@@ -64,11 +64,10 @@ public class CostListviewActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cost_listview);
 
-        //绑定控件
-        bindView();
-        //初始化设置
-        defaultSetting();
-        new Thread(){
+        bindView();//绑定控件
+        defaultSetting();//初始化设置
+
+        new Thread(){//开起一个支线程进行网络请求
             @Override
             public void run() {
                 intent = getIntent();
@@ -90,6 +89,8 @@ public class CostListviewActivity extends Activity {
                 }
             }
         }.start();
+
+        setViewClickListener();//点击事件
     }
 
 
@@ -104,8 +105,10 @@ public class CostListviewActivity extends Activity {
         meterType = (TextView) findViewById(R.id.meter_type);
         address = (TextView) findViewById(R.id.address);
         listView = (ListView) findViewById(R.id.listview);
+    }
 
-        //点击事件
+    //点击事件
+    private void setViewClickListener(){
         back.setOnClickListener(clickListener);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
