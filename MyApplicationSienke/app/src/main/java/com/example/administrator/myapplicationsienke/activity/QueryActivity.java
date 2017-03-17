@@ -181,7 +181,7 @@ public class QueryActivity extends Activity {
     //show弹出框
     public void showPopupwindow(){
         layoutInflater = LayoutInflater.from(QueryActivity.this);
-        view = layoutInflater.inflate(R.layout.popupwindow_quury_loading,null);
+        view = layoutInflater.inflate(R.layout.popupwindow_query_loading,null);
         popupWindow = new PopupWindow(view,250,250);
         frameAnimation = (ImageView) view.findViewById(R.id.frame_animation);
         //popupWindow.setFocusable(true);
