@@ -18,13 +18,18 @@ public class SecurityStatisticsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_security_statistics);
-        bindView();
+
+        bindView();//绑定控件
+        setViewClickListener();//点击事件
     }
 
     //绑定控件
     private void bindView() {
         securityStatisticsBack = (ImageView) findViewById(R.id.security_statistics_back);
-        //点击事件
+    }
+
+    //点击事件
+    private void setViewClickListener(){
         securityStatisticsBack.setOnClickListener(onClickListener);
     }
 

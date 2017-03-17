@@ -48,7 +48,7 @@ public class UserListviewAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            convertView = layoutInflater.inflate(R.layout.task_choose_listview_item, null);
+            convertView = layoutInflater.inflate(R.layout.userlist_listview_item, null);
             viewHolder.user_name = (TextView) convertView.findViewById(R.id.user_name);
             viewHolder.number = (TextView) convertView.findViewById(R.id.number);
             viewHolder.phone_number = (TextView) convertView.findViewById(R.id.phone_number);

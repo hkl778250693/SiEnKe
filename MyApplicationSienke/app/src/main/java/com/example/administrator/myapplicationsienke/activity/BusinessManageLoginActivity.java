@@ -19,15 +19,17 @@ public class BusinessManageLoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_business_manage_login);
 
-        bindView();
-
+        bindView();//绑定控件ID
+        setViewClickListener();//点击事件
     }
 
     //绑定控件ID
     private void bindView(){
         loginBtn = (Button) findViewById(R.id.login_btn);
+    }
 
-        //点击事件
+    //点击事件
+    private void setViewClickListener(){
         loginBtn.setOnClickListener(onClickListener);
     }
 

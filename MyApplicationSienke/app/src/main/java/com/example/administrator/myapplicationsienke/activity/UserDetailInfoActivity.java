@@ -32,8 +32,8 @@ import java.io.IOException;
  * Created by Administrator on 2017/3/16 0016.
  */
 public class UserDetailInfoActivity extends Activity {
-    private ImageView back,more,addImgs;  //返回，更多，添加图片
-    private LinearLayout rootLinearlayout;
+    private ImageView back,more;  //返回，更多，添加图片
+    private LinearLayout rootLinearlayout,addImgs;
     private TextView securityCheckCase,securityHiddenType,securityHiddenReason;  //安全情况,安全隐患类型，安全隐患原因
     private Button saveBtn,takePhoto,photoAlbum,cancel;  //保存、拍照、相册、取消
     private LayoutInflater inflater;  //转换器
@@ -53,10 +53,9 @@ public class UserDetailInfoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_detail_info);
 
-        //绑定控件
-        bindView();
-        //初始化设置
-        defaultSetting();
+        bindView();//绑定控件
+        defaultSetting();//初始化设置
+        setViewClickListener();//点击事件
     }
 
     //绑定控件
@@ -66,16 +65,13 @@ public class UserDetailInfoActivity extends Activity {
         securityCheckCase = (TextView) findViewById(R.id.security_check_case);
         securityHiddenType = (TextView) findViewById(R.id.security_hidden_type);
         securityHiddenReason = (TextView) findViewById(R.id.security_hidden_reason);
-        addImgs = (ImageView) findViewById(R.id.add_imgs);
+        addImgs = (LinearLayout) findViewById(R.id.add_imgs);
         saveBtn = (Button) findViewById(R.id.save_btn);
-        takePhoto = (Button) popupwindowView.findViewById(R.id.take_photo);
-        photoAlbum = (Button) popupwindowView.findViewById(R.id.photo_album);
-        cancel = (Button) popupwindowView.findViewById(R.id.cancel);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
     }
 
     //点击事件
-    public void setOnClickListener(){
+    private void setViewClickListener(){
         back.setOnClickListener(onClickListener);
         more.setOnClickListener(onClickListener);
         securityCheckCase.setOnClickListener(onClickListener);
@@ -83,9 +79,6 @@ public class UserDetailInfoActivity extends Activity {
         securityHiddenReason.setOnClickListener(onClickListener);
         addImgs.setOnClickListener(onClickListener);
         saveBtn.setOnClickListener(onClickListener);
-        takePhoto.setOnClickListener(onClickListener);
-        photoAlbum.setOnClickListener(onClickListener);
-        cancel.setOnClickListener(onClickListener);
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -105,17 +98,9 @@ public class UserDetailInfoActivity extends Activity {
                     break;
                 case R.id.add_imgs:
                     createPopupwindow();
+                    Log.i("createPopupwindow===>","true");
                     break;
                 case R.id.save_btn:  //保存
-                    break;
-                case R.id.take_photo:  //拍照
-                    openCamera();
-                    break;
-                case R.id.photo_album:  //打开相册
-                    openAlnum();
-                    break;
-                case R.id.cancel:
-                    popupWindow.dismiss();
                     break;
             }
         }
@@ -131,13 +116,37 @@ public class UserDetailInfoActivity extends Activity {
     public void createPopupwindow(){
         inflater = LayoutInflater.from(UserDetailInfoActivity.this);
         popupwindowView = inflater.inflate(R.layout.popupwindow_security_userinfo,null);
-        popupWindow = new PopupWindow(popupwindowView, LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(popupwindowView, LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+        //绑定控件ID
+        takePhoto = (Button) popupwindowView.findViewById(R.id.take_photo);
+        photoAlbum = (Button) popupwindowView.findViewById(R.id.photo_album);
+        cancel = (Button) popupwindowView.findViewById(R.id.cancel);
+        //设置点击事件
+        takePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openCamera();//拍照
+            }
+        });
+        photoAlbum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAlnum();//打开相册
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(android.R.color.white));
-        popupWindow.setAnimationStyle(R.style.dialog);
-        popupWindow.showAtLocation(rootLinearlayout,Gravity.BOTTOM,0,0);
+        popupWindow.update();
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
+        popupWindow.showAtLocation(rootLinearlayout,Gravity.BOTTOM,0,0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {

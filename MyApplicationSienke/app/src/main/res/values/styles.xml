@@ -32,4 +32,10 @@
          <item name="android:backgroundDimAmount">0.6</item>   //黑暗度
     </style>
 
+    <!--//选择照片弹出框样式 上下移动-->
+    <style name="Popupwindow">
+        <item name="android:windowEnterAnimation">@anim/enter_anim</item>
+        <item name="android:windowExitAnimation">@anim/out_anim</item>
+    </style>
+
 </resources>

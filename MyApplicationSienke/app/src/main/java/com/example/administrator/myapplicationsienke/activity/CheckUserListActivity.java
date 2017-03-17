@@ -18,14 +18,21 @@ public class CheckUserListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userlist);
-        bindView();
+
+        bindView();//绑定控件
+        setViewClickListener();//点击事件
     }
+
     //绑定控件
     private void bindView() {
         securityCheckBack= (ImageView) findViewById(R.id.security_check_back);
-        //点击事件
+    }
+
+    //点击事件
+    private void setViewClickListener(){
         securityCheckBack.setOnClickListener(onClickListener);
     }
+
     View.OnClickListener onClickListener=new View.OnClickListener(){
 
         @Override

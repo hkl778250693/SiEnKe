@@ -33,14 +33,10 @@ public class SecurityChooseActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_security);
 
-        //绑定控件
-        bindView();
-        //初始化设置
-        defaultSetting();
-        //设置viewPager
-        setViewPager();
-        //点击事件
-        setOnClickListener();
+        bindView();//绑定控件
+        defaultSetting();//初始化设置
+        setViewPager();//设置viewPager
+        setViewClickListener();//点击事件
     }
 
     //绑定控件
@@ -52,7 +48,7 @@ public class SecurityChooseActivity extends FragmentActivity {
     }
 
     //点击事件
-    public void setOnClickListener(){
+    public void setViewClickListener(){
         security_check_back.setOnClickListener(onClickListener);
         optionRbt.setOnClickListener(onClickListener);
         dataTransferRbt.setOnClickListener(onClickListener);

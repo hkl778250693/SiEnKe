@@ -26,8 +26,8 @@ public class GuideActivity extends Activity {
         setContentView(R.layout.activity_guide);
         sharedPreferences = getSharedPreferences("config", Context.MODE_PRIVATE);
 
-        //绑定控件
-        bindView();
+        bindView();//绑定控件
+        setCompanyNameAnimation();//设置动画
 
         new Handler(){
             @Override
@@ -48,8 +48,10 @@ public class GuideActivity extends Activity {
     //绑定控件ID
     private void bindView(){
         companyName = (TextView) findViewById(R.id.company_name);
+    }
 
-        //设置动画
+    //设置动画
+    private void setCompanyNameAnimation(){
         Typeface typeface = Typeface.createFromAsset(getAssets(),"fonts/classic_empty_fold_round.TTF");
         companyName.setTypeface(typeface);
         companyName.setAnimation(AnimationUtils.loadAnimation(GuideActivity.this,R.anim.text_scale_alpha));

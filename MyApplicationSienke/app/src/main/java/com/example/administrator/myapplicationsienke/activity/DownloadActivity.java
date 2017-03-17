@@ -27,18 +27,19 @@ public class DownloadActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
 
-        //绑定控件
-        bindView();
-        //暂时获取假数据
-        getData();
+        getData();//暂时获取假数据
+        bindView();//绑定控件
+        setViewClickListener();//点击事件
     }
 
     //绑定控件ID
     private void bindView() {
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
+    }
 
-        //点击事件
+    //点击事件
+    private void setViewClickListener(){
         back.setOnClickListener(clickListener);
         DownloadListViewAdapter adapter = new DownloadListViewAdapter(DownloadActivity.this, downloadListvieItemList);
         listView.setAdapter(adapter);

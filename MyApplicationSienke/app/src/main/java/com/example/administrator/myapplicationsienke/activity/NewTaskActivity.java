@@ -21,14 +21,18 @@ public class NewTaskActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_task);
 
-        bindView();
+        bindView();//绑定控件
+        setViewClickListener();//点击事件
     }
 
     //绑定控件
     private void bindView() {
         newTaskBack = (ImageView) findViewById(R.id.newtask_back);
         newPlanAddBtn = (Button) findViewById(R.id.newplan_add_btn);
-        //点击事件
+    }
+
+    //点击事件
+    private void setViewClickListener(){
         newTaskBack.setOnClickListener(onClickListener);
         newPlanAddBtn.setOnClickListener(onClickListener);
     }

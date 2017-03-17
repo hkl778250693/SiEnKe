@@ -30,17 +30,19 @@ public class BusinessManageActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_business_manage_homepage);
 
-        getData();
-        //绑定控件ID
-        bindView();
+        getData();//暂时获取假数据
+        bindView();//绑定控件ID
+        setViewClickListener();//点击事件
     }
 
     //绑定控件ID
     public void bindView(){
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.business_manage_listview);
+    }
 
-        //点击事件
+    //点击事件
+    private void setViewClickListener(){
         back.setOnClickListener(clickListener);
         BusinessManageAdapter adapter = new BusinessManageAdapter(BusinessManageActivity.this,businessManageListviewItemList);
         listView.setAdapter(adapter);

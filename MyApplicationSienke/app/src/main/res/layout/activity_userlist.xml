@@ -35,7 +35,6 @@
             android:src="@mipmap/more" />
     </RelativeLayout>
 
-
     <ListView
         android:id="@+id/listview"
         android:layout_width="match_parent"
