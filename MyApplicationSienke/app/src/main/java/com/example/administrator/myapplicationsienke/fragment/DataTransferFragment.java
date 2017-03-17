@@ -1,5 +1,6 @@
 package com.example.administrator.myapplicationsienke.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.administrator.myapplicationsienke.R;
+import com.example.administrator.myapplicationsienke.activity.DownloadActivity;
+import com.example.administrator.myapplicationsienke.activity.UploadActivity;
 
 /**
  * Created by Administrator on 2017/3/16 0016.
@@ -41,8 +44,12 @@ public class DataTransferFragment extends Fragment {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.upload:
+                    Intent intent=new Intent(getActivity(), UploadActivity.class);
+                    startActivity(intent);
                     break;
                 case R.id.download:
+                    Intent intent1=new Intent(getActivity(), DownloadActivity.class);
+                    startActivity(intent1);
                     break;
             }
         }
