@@ -1,6 +1,7 @@
 package com.example.administrator.myapplicationsienke.activity;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -39,6 +40,16 @@ public class SecurityChooseActivity extends FragmentActivity {
     private List<Fragment> fragmentList;
     private ViewPager viewPager;
     private SecurityCheckViewPagerAdapter adapter;
+
+
+    //强制竖屏
+    @Override
+    protected void onResume() {
+        if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        super.onResume();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,11 +164,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         quite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (v.getId()){
-                    case R.id.quite:
-                        popupWindow.dismiss();
-                        break;
-                }
+                System.exit(0);
             }
         });
 
