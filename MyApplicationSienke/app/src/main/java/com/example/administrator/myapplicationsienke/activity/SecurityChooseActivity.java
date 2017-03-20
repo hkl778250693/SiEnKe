@@ -133,7 +133,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                     case R.id.file:
                         Intent intent = new Intent(SecurityChooseActivity.this, FileManageActivity.class);
                         startActivity(intent);
-                        finish();
                         break;
                 }
             }
@@ -146,7 +145,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                     case R.id.settings:
                         Intent intent=new Intent(SecurityChooseActivity.this,IpSettingActivity.class);
                         startActivity(intent);
-                        finish();
                         break;
                 }
             }
@@ -157,7 +155,7 @@ public class SecurityChooseActivity extends FragmentActivity {
             public void onClick(View v) {
                 switch (v.getId()){
                     case R.id.quite:
-                        SecurityChooseActivity.this.finish();
+                        popupWindow.dismiss();
                         break;
                 }
             }
