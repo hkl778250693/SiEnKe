@@ -40,7 +40,9 @@
         <activity android:name=".activity.DownloadActivity"/>
         <activity android:name=".activity.FileManageActivity"/>
         <activity android:name=".activity.IpSettingActivity"/>
+        <activity android:name=".activity.FileManagerDetleActivity"/>
 
     </application>
+
 
 </manifest>
