@@ -1,11 +1,15 @@
 package com.example.administrator.myapplicationsienke.activity;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -33,8 +37,8 @@ import java.io.IOException;
  * Created by Administrator on 2017/3/16 0016.
  */
 public class UserDetailInfoActivity extends Activity {
-    private ImageView back,more;  //返回，更多，添加图片
-    private LinearLayout rootLinearlayout,addImgs;
+    private ImageView back,more,photoOne;  //返回，更多，照片(1)
+    private LinearLayout rootLinearlayout,addImgs;  //添加图片
     private TextView securityCheckCase,securityHiddenType,securityHiddenReason;  //安全情况,安全隐患类型，安全隐患原因
     private Button saveBtn,takePhoto,photoAlbum,cancel;  //保存、拍照、相册、取消
     private RadioButton notSecurityCheck,passSecurityCheck,notPassSecurityCheck,overSecurityCheckTime,nobodyHere,refuseSecurityCheck;
@@ -43,7 +47,10 @@ public class UserDetailInfoActivity extends Activity {
     private LayoutInflater inflater;  //转换器
     private View popupwindowView,securityCaseView,securityHiddenTypeView,securityHiddenreasonView;
     private PopupWindow popupWindow;
-    protected static Uri tempUri;
+    private Bitmap bitmap;
+    int sdkVersion = Build.VERSION.SDK_INT;  //当前SDK版本
+    private String SD_CARD_TEMP_DIR;
+    protected static Uri tempUri,albumUri;
     protected static final int TAKE_PHOTO = 100;//选择本地照片
     protected static final int PHOTO_ALBUM = 200;//拍照
     protected static final int CROP_SMALL_PICTURE = 300;  //裁剪成小图片
@@ -72,6 +79,7 @@ public class UserDetailInfoActivity extends Activity {
         addImgs = (LinearLayout) findViewById(R.id.add_imgs);
         saveBtn = (Button) findViewById(R.id.save_btn);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
+        photoOne = (ImageView) findViewById(R.id.photo_one);
     }
 
     //点击事件
@@ -139,6 +147,7 @@ public class UserDetailInfoActivity extends Activity {
             @Override
             public void onClick(View v) {
                 openAlnum();//打开相册
+                popupWindow.dismiss();
             }
         });
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -368,7 +377,8 @@ public class UserDetailInfoActivity extends Activity {
     public void openCamera(){
         Intent openCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // 指定照片保存路径（SD卡），image.jpg为一个临时文件，每次拍照后这个图片都会被替换
-        tempUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),"image.jpg"));
+        SD_CARD_TEMP_DIR = Environment.getExternalStorageDirectory() + File.separator + "image.jpg";
+        tempUri = Uri.fromFile(new File(SD_CARD_TEMP_DIR));
         openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,tempUri);
         startActivityForResult(openCameraIntent,TAKE_PHOTO);
     }
@@ -385,26 +395,83 @@ public class UserDetailInfoActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == RESULT_OK){   //如果返回码是可用的
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("onActivityResult===>",""+true);
+        Log.i("onActivityResult===>",""+requestCode);
+        if(resultCode == RESULT_OK){   //如果返回码是可用的
+            Log.i("RESULT_OK===>",""+true);
             switch (requestCode){
                 case TAKE_PHOTO:
+                    Log.i("TAKE_PHOTO===>",""+true);
                     startCropPhoto(tempUri);
                     break;
                 case PHOTO_ALBUM:
+                    Log.i("PHOTO_ALBUM===>",""+true);
                     if(Tools.hasSdcard()){
-                        startCropPhoto(data.getData());
+                        //startCropPhoto(albumUri);
+                        if (data != null) {
+                            albumUri = data.getData();
+                            if(sdkVersion >= 19){      //android 5.0以上直接返回的是图片的路径
+                                Log.i("sdkVersion===>",""+sdkVersion);
+                                path = albumUri.getPath();
+                                Log.i("sdkVersion=path=>",""+path);
+                                //path = getPath_above19(this,imgUri);    //或者直接使用path = imgUri.getPath();
+                            }else{
+                                path = getFilePath_below19(albumUri);
+                            }
+                            ContentResolver cr = this.getContentResolver();
+                            try {
+                                bitmap = MediaStore.Images.Media.getBitmap(cr, albumUri);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            Log.i("sdkVersion=bitmap=>",""+bitmap);
+                            photoOne.setImageBitmap(bitmap);
+                            //saveImage(data);//保存图片
+                        }
                     }else {
                         Toast.makeText(UserDetailInfoActivity.this, "未找到存储卡，无法存储照片！", Toast.LENGTH_LONG).show();
                     }
                     break;
                 case CROP_SMALL_PICTURE:
+                    Log.i("CROP_SMALL_PICTURE===>",""+true);
                     if (data != null) {
-                        saveImage(data);//保存图片
+                        //bitmap = BitmapFactory.decodeFile(SD_CARD_TEMP_DIR);
+                        //photoOne.setImageBitmap(bitmap);
+                        if(sdkVersion >= 19){      //android 5.0以上直接返回的是图片的路径
+                            path = albumUri.getPath();
+                            //path = getPath_above19(this,imgUri);    //或者直接使用path = imgUri.getPath();
+                        }else{
+                            path = getFilePath_below19(albumUri);
+                        }
+                        bitmap = decodeSampleBitmap(path);
+                        photoOne.setImageBitmap(bitmap);
+                        //saveImage(data);//保存图片
                     }
                     break;
             }
         }
-        super.onActivityResult(requestCode, resultCode, data);
+
+    }
+
+    /**
+     * API19以下获取图片路径的方法
+     * @param uri
+     */
+    private String getFilePath_below19(Uri uri) {
+        //这里开始的第二部分，获取图片的路径：低版本的是没问题的，但是sdk>19会获取不到
+        String[] proj = {MediaStore.Images.Media.DATA};
+        //好像是android多媒体数据库的封装接口，具体的看Android文档
+        Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
+        //获得用户选择的图片的索引值
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        Log.i("***************",""+column_index);
+        //将光标移至开头 ，这个很重要，不小心很容易引起越界
+        cursor.moveToFirst();
+        //最后根据索引值获取图片路径   结果类似：/mnt/sdcard/DCIM/Camera/IMG_20151124_013332.jpg
+        String path = cursor.getString(column_index);
+        Log.i("path:",path);
+        return path;
     }
 
     /**
@@ -422,11 +489,35 @@ public class UserDetailInfoActivity extends Activity {
             intent.putExtra("aspectX", 1);
             intent.putExtra("aspectY", 1);
             // outputX outputY 是裁剪图片宽高
-            intent.putExtra("outputX", 150);
-            intent.putExtra("outputY", 150);
+            intent.putExtra("outputX", 40);
+            intent.putExtra("outputY", 40);
             intent.putExtra("return-data", true);
             startActivityForResult(intent, CROP_SMALL_PICTURE);
         }
+    }
+
+    /**
+     * 压缩图片大小
+     * @param path 图片的路径
+     * @return
+     */
+    private Bitmap decodeSampleBitmap(String path) {
+        //photoOne是将要呈现图片的ImageView控件
+        int targetW = photoOne.getWidth();
+        int targetH = photoOne.getHeight();
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path,options);
+        int photoW = options.outWidth;
+        int photoH = options.outHeight;
+        //获取图片的最大压缩比
+        int scaleFactor = Math.max(photoW/targetW,photoH/targetH);
+        options.inJustDecodeBounds = false;
+        options.inSampleSize = scaleFactor;
+        options.inPurgeable = true;
+        Bitmap bitmap = BitmapFactory.decodeFile(path,options);
+        return  bitmap;
     }
 
     /**
