@@ -154,7 +154,7 @@ public class SecurityChooseActivity extends FragmentActivity {
             public void onClick(View v) {
                 switch (v.getId()){
                     case R.id.settings:
-                        Intent intent=new Intent(SecurityChooseActivity.this,IpSettingActivity.class);
+                        Intent intent=new Intent(SecurityChooseActivity.this,SystemSettingActivity.class);
                         startActivity(intent);
                         break;
                 }
