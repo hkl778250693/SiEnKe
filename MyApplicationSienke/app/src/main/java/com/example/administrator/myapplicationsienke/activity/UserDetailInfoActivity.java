@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -37,7 +38,8 @@ import java.io.IOException;
  * Created by Administrator on 2017/3/16 0016.
  */
 public class UserDetailInfoActivity extends Activity {
-    private ImageView back,more,photoOne;  //返回，更多，照片(1)
+    private ImageView back,more;  //返回，更多
+    private GridView gridView;
     private LinearLayout rootLinearlayout,addImgs;  //添加图片
     private TextView securityCheckCase,securityHiddenType,securityHiddenReason;  //安全情况,安全隐患类型，安全隐患原因
     private Button saveBtn,takePhoto,photoAlbum,cancel;  //保存、拍照、相册、取消
@@ -79,7 +81,7 @@ public class UserDetailInfoActivity extends Activity {
         addImgs = (LinearLayout) findViewById(R.id.add_imgs);
         saveBtn = (Button) findViewById(R.id.save_btn);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
-        photoOne = (ImageView) findViewById(R.id.photo_one);
+        gridView = (GridView) findViewById(R.id.gridview);
     }
 
     //点击事件
@@ -91,6 +93,7 @@ public class UserDetailInfoActivity extends Activity {
         securityHiddenReason.setOnClickListener(onClickListener);
         addImgs.setOnClickListener(onClickListener);
         saveBtn.setOnClickListener(onClickListener);
+
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -426,7 +429,7 @@ public class UserDetailInfoActivity extends Activity {
                                 e.printStackTrace();
                             }
                             Log.i("sdkVersion=bitmap=>",""+bitmap);
-                            photoOne.setImageBitmap(bitmap);
+                            //photoOne.setImageBitmap(bitmap);
                             //saveImage(data);//保存图片
                         }
                     }else {
@@ -445,7 +448,7 @@ public class UserDetailInfoActivity extends Activity {
                             path = getFilePath_below19(albumUri);
                         }
                         bitmap = decodeSampleBitmap(path);
-                        photoOne.setImageBitmap(bitmap);
+                       // photoOne.setImageBitmap(bitmap);
                         //saveImage(data);//保存图片
                     }
                     break;
@@ -503,8 +506,8 @@ public class UserDetailInfoActivity extends Activity {
      */
     private Bitmap decodeSampleBitmap(String path) {
         //photoOne是将要呈现图片的ImageView控件
-        int targetW = photoOne.getWidth();
-        int targetH = photoOne.getHeight();
+        //int targetW = photoOne.getWidth();
+        //int targetH = photoOne.getHeight();
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -512,9 +515,9 @@ public class UserDetailInfoActivity extends Activity {
         int photoW = options.outWidth;
         int photoH = options.outHeight;
         //获取图片的最大压缩比
-        int scaleFactor = Math.max(photoW/targetW,photoH/targetH);
+        //int scaleFactor = Math.max(photoW/targetW,photoH/targetH);
         options.inJustDecodeBounds = false;
-        options.inSampleSize = scaleFactor;
+        //options.inSampleSize = scaleFactor;
         options.inPurgeable = true;
         Bitmap bitmap = BitmapFactory.decodeFile(path,options);
         return  bitmap;
