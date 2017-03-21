@@ -51,6 +51,8 @@ public class GridviewImageAdapter extends BaseAdapter{
         if(convertView == null){
             convertView = layoutInflater.inflate(R.layout.gridview_image_item,null);
             ImageView imageView = (ImageView) convertView.findViewById(R.id.image);
+            GridviewImage image = gridviewImageList.get(position);
+            imageView.setImageBitmap(image.getImage());
         }
         return convertView;
     }

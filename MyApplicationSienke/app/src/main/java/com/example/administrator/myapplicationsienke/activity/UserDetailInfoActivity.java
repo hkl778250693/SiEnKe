@@ -28,11 +28,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
+import com.example.administrator.myapplicationsienke.adapter.GridviewImageAdapter;
 import com.example.administrator.myapplicationsienke.mode.Tools;
+import com.example.administrator.myapplicationsienke.model.GridviewImage;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/3/16 0016.
@@ -52,13 +55,14 @@ public class UserDetailInfoActivity extends Activity {
     private Bitmap bitmap;
     int sdkVersion = Build.VERSION.SDK_INT;  //当前SDK版本
     private String SD_CARD_TEMP_DIR;
-    protected static Uri tempUri,albumUri;
+    protected static Uri tempUri,albumUri,photoUri;
     protected static final int TAKE_PHOTO = 100;//选择本地照片
     protected static final int PHOTO_ALBUM = 200;//拍照
     protected static final int CROP_SMALL_PICTURE = 300;  //裁剪成小图片
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private String result, path, uid;
+    private List<GridviewImage> imageList;
 
 
     @Override
@@ -130,27 +134,19 @@ public class UserDetailInfoActivity extends Activity {
         editor = sharedPreferences.edit();
     }
 
-    //弹出照相或者选择照片popupwindow
+    //弹出拍照popupwindow
     public void createPhotoPopupwindow(){
         inflater = LayoutInflater.from(UserDetailInfoActivity.this);
         popupwindowView = inflater.inflate(R.layout.popupwindow_security_userinfo_take_photo,null);
         popupWindow = new PopupWindow(popupwindowView, LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
         takePhoto = (Button) popupwindowView.findViewById(R.id.take_photo);
-        photoAlbum = (Button) popupwindowView.findViewById(R.id.photo_album);
         cancel = (Button) popupwindowView.findViewById(R.id.cancel);
         //设置点击事件
         takePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openCamera();//拍照
-            }
-        });
-        photoAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openAlnum();//打开相册
-                popupWindow.dismiss();
             }
         });
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -386,12 +382,12 @@ public class UserDetailInfoActivity extends Activity {
         startActivityForResult(openCameraIntent,TAKE_PHOTO);
     }
 
-    //调用本地相册
+    /*//调用本地相册
     public void openAlnum(){
         Intent openAlbumIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        openAlbumIntent.setType("image/*");
+        openAlbumIntent.setType("image*//*");
         startActivityForResult(openAlbumIntent,PHOTO_ALBUM);
-    }
+    }*/
 
     //页面回调方法
 
@@ -439,17 +435,27 @@ public class UserDetailInfoActivity extends Activity {
                 case CROP_SMALL_PICTURE:
                     Log.i("CROP_SMALL_PICTURE===>",""+true);
                     if (data != null) {
-                        //bitmap = BitmapFactory.decodeFile(SD_CARD_TEMP_DIR);
-                        //photoOne.setImageBitmap(bitmap);
+                        photoUri = data.getData();
                         if(sdkVersion >= 19){      //android 5.0以上直接返回的是图片的路径
-                            path = albumUri.getPath();
+                            Log.i("sdkVersion===>",""+sdkVersion);
+                            path = photoUri.getPath();
+                            Log.i("sdkVersion=path=>",""+path);
                             //path = getPath_above19(this,imgUri);    //或者直接使用path = imgUri.getPath();
                         }else{
-                            path = getFilePath_below19(albumUri);
+                            path = getFilePath_below19(photoUri);
                         }
-                        bitmap = decodeSampleBitmap(path);
-                       // photoOne.setImageBitmap(bitmap);
-                        //saveImage(data);//保存图片
+                        ContentResolver cr = this.getContentResolver();
+                        try {
+                            bitmap = MediaStore.Images.Media.getBitmap(cr, photoUri);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("sdkVersion=bitmap=>",""+bitmap);
+                        GridviewImage image = new GridviewImage();
+                        image.setImage(bitmap);
+                        imageList.add(image);
+                        GridviewImageAdapter adapter = new GridviewImageAdapter(UserDetailInfoActivity.this,imageList);
+                        gridView.setAdapter(adapter);
                     }
                     break;
             }
