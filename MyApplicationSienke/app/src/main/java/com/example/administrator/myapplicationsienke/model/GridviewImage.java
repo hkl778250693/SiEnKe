@@ -1,18 +1,19 @@
 package com.example.administrator.myapplicationsienke.model;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 /**
  * Created by Administrator on 2017/3/21 0021.
  */
 public class GridviewImage {
-    private int image;
+    private Bitmap image;
 
-    public int getImage() {
+    public Bitmap getImage() {
         return image;
     }
 
-    public void setImage(int image) {
+    public void setImage(Bitmap image) {
         this.image = image;
     }
 }

@@ -27,14 +27,6 @@
             android:layout_height="1dp"
             android:background="@color/gray_thin"/>
 
-        <Button
-            android:id="@+id/photo_album"
-            android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:background="@drawable/button_white_bg_album_selector"
-            android:text="从相册选择照片"
-            android:textColor="@color/text_blue"
-            android:textSize="18sp" />
     </LinearLayout>
 
     <Button
