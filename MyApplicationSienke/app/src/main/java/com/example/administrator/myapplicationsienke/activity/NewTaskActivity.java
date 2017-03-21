@@ -1,5 +1,4 @@
 package com.example.administrator.myapplicationsienke.activity;
-
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -15,11 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.example.administrator.myapplicationsienke.MainActivity;
 import com.example.administrator.myapplicationsienke.R;
-
 import java.util.Calendar;
 
 /**
@@ -70,7 +65,7 @@ public class NewTaskActivity extends Activity {
         securityCheckCase = (TextView) findViewById(R.id.security_check_case);
         securityHiddenReason = (TextView) findViewById(R.id.security_hidden_reason);
         date = (TextView) findViewById(R.id.data);
-        date1= (TextView) findViewById(R.id.data1);
+        date1 = (TextView) findViewById(R.id.data1);
 
     }
 
