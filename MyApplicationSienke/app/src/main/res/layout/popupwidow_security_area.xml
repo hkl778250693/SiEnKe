@@ -73,36 +73,6 @@
                 android:text="阳台"
                 android:textColor="@drawable/radiogroup_text_selector"
                 android:textSize="14sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/gray_thin" />
-
-            <RadioButton
-                android:id="@+id/nobody_here"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:background="@drawable/button_white_bg_album_selector"
-                android:button="@null"
-                android:text="到访不遇"
-                android:textColor="@drawable/radiogroup_text_selector"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/gray_thin" />
-
-            <RadioButton
-                android:id="@+id/refuse_security_check"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:background="@drawable/button_white_bg_album_selector"
-                android:button="@null"
-                android:text="拒绝安检"
-                android:textColor="@drawable/radiogroup_text_selector"
-                android:textSize="14sp" />
         </RadioGroup>
     </ScrollView>
 
