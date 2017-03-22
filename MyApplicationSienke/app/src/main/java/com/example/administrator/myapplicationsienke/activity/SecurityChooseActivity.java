@@ -152,9 +152,9 @@ public class SecurityChooseActivity extends FragmentActivity {
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (v.getId()){
+                switch (v.getId()) {
                     case R.id.settings:
-                        Intent intent=new Intent(SecurityChooseActivity.this,SystemSettingActivity.class);
+                        Intent intent = new Intent(SecurityChooseActivity.this, SystemSettingActivity.class);
                         startActivity(intent);
                         break;
                 }
@@ -174,7 +174,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.setAnimationStyle(R.style.mypopwindow_anim_style);
         backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(security_check_go,0, 0);
+        popupWindow.showAsDropDown(security_check_go, 0, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
