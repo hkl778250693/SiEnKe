@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +20,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -35,6 +39,7 @@ import com.example.administrator.myapplicationsienke.model.GridviewImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,7 +48,7 @@ import java.util.List;
 public class UserDetailInfoActivity extends Activity {
     private ImageView back,more;  //返回，更多
     private GridView gridView;
-    private LinearLayout rootLinearlayout,addImgs;  //添加图片
+    private LinearLayout rootLinearlayout;  //添加图片
     private TextView securityCheckCase,securityHiddenType,securityHiddenReason;  //安全情况,安全隐患类型，安全隐患原因
     private Button saveBtn,takePhoto,photoAlbum,cancel;  //保存、拍照、相册、取消
     private RadioButton notSecurityCheck,passSecurityCheck,notPassSecurityCheck,overSecurityCheckTime,nobodyHere,refuseSecurityCheck;
@@ -62,7 +67,10 @@ public class UserDetailInfoActivity extends Activity {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private String result, path, uid;
-    private List<GridviewImage> imageList;
+    private List<GridviewImage> imageList = new ArrayList<>();
+    private Bitmap addImageBitmap;  //添加照片
+    private GridviewImage image;
+    private GridviewImageAdapter adapter;
 
 
     @Override
@@ -82,10 +90,20 @@ public class UserDetailInfoActivity extends Activity {
         securityCheckCase = (TextView) findViewById(R.id.security_check_case);
         securityHiddenType = (TextView) findViewById(R.id.security_hidden_type);
         securityHiddenReason = (TextView) findViewById(R.id.security_hidden_reason);
-        addImgs = (LinearLayout) findViewById(R.id.add_imgs);
         saveBtn = (Button) findViewById(R.id.save_btn);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
         gridView = (GridView) findViewById(R.id.gridview);
+
+        addImageBitmap = BitmapFactory.decodeResource(getResources(),R.mipmap.camera);
+        Log.i("bindView===>",""+addImageBitmap);
+        image = new GridviewImage();
+        image.setImage(addImageBitmap);
+        Log.i("bindView===>",""+image);
+        imageList.add(image);
+        Log.i("bindView===>",""+imageList.size());
+        adapter = new GridviewImageAdapter(UserDetailInfoActivity.this,imageList);
+        gridView.setSelector(new ColorDrawable(Color.TRANSPARENT));
+        gridView.setAdapter(adapter);
     }
 
     //点击事件
@@ -95,9 +113,19 @@ public class UserDetailInfoActivity extends Activity {
         securityCheckCase.setOnClickListener(onClickListener);
         securityHiddenType.setOnClickListener(onClickListener);
         securityHiddenReason.setOnClickListener(onClickListener);
-        addImgs.setOnClickListener(onClickListener);
         saveBtn.setOnClickListener(onClickListener);
 
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position == imageList.size()) {
+                    createPhotoPopupwindow();
+                    Log.i("createPopupwindow===>","true");
+                } else {
+
+                }
+            }
+        });
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -118,10 +146,6 @@ public class UserDetailInfoActivity extends Activity {
                 case R.id.security_hidden_reason:
                     createSecurityHiddenReasonPopupwindow();
                     break;
-                case R.id.add_imgs:
-                    createPhotoPopupwindow();
-                    Log.i("createPopupwindow===>","true");
-                    break;
                 case R.id.save_btn:  //保存
                     break;
             }
@@ -130,8 +154,10 @@ public class UserDetailInfoActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
+        Log.i("defaultSetting===>","defaultSetting");
         sharedPreferences = UserDetailInfoActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        Log.i("defaultSetting===>",""+editor);
     }
 
     //弹出拍照popupwindow
@@ -433,9 +459,13 @@ public class UserDetailInfoActivity extends Activity {
                     }
                     break;
                 case CROP_SMALL_PICTURE:
-                    Log.i("CROP_SMALL_PICTURE===>",""+true);
                     if (data != null) {
-                        photoUri = data.getData();
+                        Log.i("CROP_SMALL_photoUri",""+data);
+                        Bundle bundle = data.getExtras();
+                        Log.i("CROP_SMALL_photoUri",""+bundle);
+                        bitmap = (Bitmap) bundle.get("data");
+                        /*photoUri = data.getData();
+                        Log.i("CROP_SMALL_photoUri",""+photoUri);
                         if(sdkVersion >= 19){      //android 5.0以上直接返回的是图片的路径
                             Log.i("sdkVersion===>",""+sdkVersion);
                             path = photoUri.getPath();
@@ -443,18 +473,21 @@ public class UserDetailInfoActivity extends Activity {
                             //path = getPath_above19(this,imgUri);    //或者直接使用path = imgUri.getPath();
                         }else{
                             path = getFilePath_below19(photoUri);
+                            Log.i("getFilePath_below19==>",""+path);
                         }
                         ContentResolver cr = this.getContentResolver();
                         try {
                             bitmap = MediaStore.Images.Media.getBitmap(cr, photoUri);
                         } catch (IOException e) {
                             e.printStackTrace();
-                        }
-                        Log.i("sdkVersion=bitmap=>",""+bitmap);
-                        GridviewImage image = new GridviewImage();
+                        }*/
+                        Log.i("CROP_SMALL_photoUri=>",""+bitmap);
+                        image = new GridviewImage();
                         image.setImage(bitmap);
+                        Log.i("CROP_SMALL_photoUri=>",""+image);
                         imageList.add(image);
-                        GridviewImageAdapter adapter = new GridviewImageAdapter(UserDetailInfoActivity.this,imageList);
+                        Log.i("CROP_SMALL_photoUri=>",""+imageList.size());
+                        adapter = new GridviewImageAdapter(UserDetailInfoActivity.this,imageList);
                         gridView.setAdapter(adapter);
                     }
                     break;
