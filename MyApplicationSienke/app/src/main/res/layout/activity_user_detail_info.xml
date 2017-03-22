@@ -39,7 +39,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -481,22 +482,23 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="wrap_content"
+                    android:layout_height="140dp"
                     android:layout_marginLeft="5dp"
                     android:background="@drawable/check_hidden_danger_down_shape"
-                    android:gravity="center_vertical"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:padding="10dp">
                     
                     <GridView
                         android:id="@+id/gridview"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:stretchMode="columnWidth"
                         android:gravity="center"
                         android:numColumns="3"
-                        android:columnWidth="40dp"
-                        android:horizontalSpacing="5dp"
+                        android:columnWidth="60dp"
+                        android:horizontalSpacing="3dp"
+                        android:verticalSpacing="5dp"
                         android:scrollbars="none"/>
 
                 </LinearLayout>

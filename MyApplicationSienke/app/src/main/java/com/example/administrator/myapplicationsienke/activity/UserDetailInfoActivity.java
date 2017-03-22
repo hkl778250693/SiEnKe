@@ -71,6 +71,7 @@ public class UserDetailInfoActivity extends Activity {
     private Bitmap addImageBitmap;  //添加照片
     private GridviewImage image;
     private GridviewImageAdapter adapter;
+    private boolean isShowDelete = false;
 
 
     @Override
@@ -94,16 +95,6 @@ public class UserDetailInfoActivity extends Activity {
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
         gridView = (GridView) findViewById(R.id.gridview);
 
-        addImageBitmap = BitmapFactory.decodeResource(getResources(),R.mipmap.camera);
-        Log.i("bindView===>",""+addImageBitmap);
-        image = new GridviewImage();
-        image.setImage(addImageBitmap);
-        Log.i("bindView===>",""+image);
-        imageList.add(image);
-        Log.i("bindView===>",""+imageList.size());
-        adapter = new GridviewImageAdapter(UserDetailInfoActivity.this,imageList);
-        gridView.setSelector(new ColorDrawable(Color.TRANSPARENT));
-        gridView.setAdapter(adapter);
     }
 
     //点击事件
@@ -115,15 +106,33 @@ public class UserDetailInfoActivity extends Activity {
         securityHiddenReason.setOnClickListener(onClickListener);
         saveBtn.setOnClickListener(onClickListener);
 
+        adapter = new GridviewImageAdapter(UserDetailInfoActivity.this,imageList);
+        gridView.setSelector(new ColorDrawable(Color.TRANSPARENT));
+        gridView.setAdapter(adapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("createPopupwindow===>",""+parent.getChildCount());
                 if (position == imageList.size()) {
                     createPhotoPopupwindow();
                     Log.i("createPopupwindow===>","true");
                 } else {
 
                 }
+            }
+        });
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if (isShowDelete) {
+                    isShowDelete = false;
+                } else {
+                    isShowDelete = true;
+                }
+                Log.d("TAG","onItemLongClicked");
+                adapter.setIsShowDelete(isShowDelete);
+                adapter.setClickItemIndex(position);
+                return true;
             }
         });
     }
@@ -172,6 +181,7 @@ public class UserDetailInfoActivity extends Activity {
         takePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                popupWindow.dismiss();
                 openCamera();//拍照
             }
         });

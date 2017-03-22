@@ -1,6 +1,7 @@
 package com.example.administrator.myapplicationsienke.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,6 +62,7 @@ public class NoCheckUserAdapter extends BaseAdapter {
         }
 
         NoCheckUserItem noCheckUserItem = noCheckUserItemList.get(position);
+        Log.i("NoCheckUserAdapter=>",""+position+"----"+noCheckUserItemList.size());
         return convertView;
     }
 

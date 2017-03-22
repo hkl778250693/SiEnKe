@@ -24,6 +24,8 @@ public class GridviewImageAdapter extends BaseAdapter{
     private Context context;
     private List<GridviewImage> gridviewImageList;
     private LayoutInflater layoutInflater;
+    private boolean isShowDelete;//根据这个变量来判断是否显示删除图标，true是显示，false是不显示
+    private int clickItemIndex=-1;//根据这个变量来辨识选中的current值
 
     public GridviewImageAdapter(Context context,List<GridviewImage> gridviewImageList){
         this.context = context;
@@ -35,8 +37,8 @@ public class GridviewImageAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        if(gridviewImageList.size() == 6){
-            return 6;
+        if(gridviewImageList.size() == 0){
+            return 1;
         }
         return (gridviewImageList.size() + 1);//返回listiview数目加1
     }
@@ -51,34 +53,56 @@ public class GridviewImageAdapter extends BaseAdapter{
         return 0;
     }
 
+    public void setIsShowDelete(boolean isShowDelete){
+        this.isShowDelete=isShowDelete;
+        notifyDataSetChanged();
+    }
+
+    public void setClickItemIndex(int postion){
+        this.clickItemIndex=postion;
+    }
+
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
         if(convertView == null){
             viewHolder = new ViewHolder();
             convertView = layoutInflater.inflate(R.layout.gridview_image_item,null);
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.image);
+            viewHolder.delete = (ImageView) convertView.findViewById(R.id.delete);
             convertView.setTag(viewHolder);
         }else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if(position == gridviewImageList.size()){
-            /*view = layoutInflater.inflate(R.layout.gridview_default_add_image_item,null);
-            viewHolder.imageView.setImageBitmap(view.getDrawingCache());*/
+        if(position < gridviewImageList.size()){
+            GridviewImage image = gridviewImageList.get(position);
+            viewHolder.imageView.setImageBitmap(image.getImage());
+            Log.i("GridviewImageAdapter=>","image.getImage()");
+        }else {
             viewHolder.imageView.setBackgroundResource(R.mipmap.camera);
             Log.i("GridviewImageAdapter=>","imageView");
             if (position == 6) {
                 viewHolder.imageView.setVisibility(View.GONE);
             }
-        }else {
-            GridviewImage image = gridviewImageList.get(position);
-            viewHolder.imageView.setImageBitmap(image.getImage());
+        }
+        viewHolder.delete.setVisibility(isShowDelete?View.VISIBLE:View.GONE);//设置删除按钮是否显示
+        if(viewHolder.delete.getVisibility() == View.VISIBLE){
+            if(position == clickItemIndex){
+                viewHolder.delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        gridviewImageList.remove(position);
+                        notifyDataSetChanged();
+                    }
+                });
+            }
         }
         return convertView;
     }
 
     public class ViewHolder {
-        public ImageView imageView;
+        ImageView imageView;
+        ImageView delete;
     }
 }
