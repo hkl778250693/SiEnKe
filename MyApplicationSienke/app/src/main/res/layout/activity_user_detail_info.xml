@@ -480,9 +480,9 @@
 
                 <LinearLayout
                     android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:layout_weight="1"
                     android:background="@drawable/check_hidden_danger_down_shape"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
@@ -490,27 +490,15 @@
                     
                     <GridView
                         android:id="@+id/gridview"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="70dp"
-                        android:numColumns="auto_fit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:stretchMode="columnWidth"
+                        android:gravity="center"
+                        android:numColumns="3"
                         android:columnWidth="40dp"
                         android:horizontalSpacing="5dp"
                         android:scrollbars="none"/>
 
-                    <LinearLayout
-                        android:id="@+id/add_imgs"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/gray_thin"
-                        android:orientation="horizontal"
-                        android:padding="3dp">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@mipmap/camera" />
-                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
