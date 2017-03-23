@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.DownloadListViewAdapter;
@@ -19,6 +20,7 @@ import java.util.List;
 public class DownloadActivity extends Activity {
     private ImageView back;
     private ListView listView;
+    private TextView download;
     private List<DownloadListvieItem> downloadListvieItemList = new ArrayList<>();
 
 
@@ -36,11 +38,13 @@ public class DownloadActivity extends Activity {
     private void bindView() {
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
+        download= (TextView) findViewById(R.id.download);
     }
 
     //点击事件
     private void setViewClickListener(){
         back.setOnClickListener(clickListener);
+        download.setOnClickListener(clickListener);
         DownloadListViewAdapter adapter = new DownloadListViewAdapter(DownloadActivity.this, downloadListvieItemList);
         listView.setAdapter(adapter);
     }
@@ -50,6 +54,9 @@ public class DownloadActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.back:
+                    finish();
+                    break;
+                case R.id.download:
                     finish();
                     break;
             }
