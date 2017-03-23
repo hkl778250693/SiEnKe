@@ -115,7 +115,7 @@ public class UserDetailInfoActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("createPopupwindow===>",""+parent.getChildCount());
-                if (position == imageList.size()) {
+                if (id == imageList.size()) {
                     createPhotoPopupwindow();
                     Log.i("createPopupwindow===>","true");
                 } else {
@@ -136,9 +136,10 @@ public class UserDetailInfoActivity extends Activity {
                 if(position == imageList.size()){
                     Log.i("UserDetailInfoActivity","imageList="+imageList.size());
                     view.findViewById(R.id.delete).setVisibility(View.GONE);
+                    view.findViewById(R.id.image).setBackgroundResource(R.mipmap.camera);
                 }
                 adapter.setIsShowDelete(isShowDelete);
-                adapter.setIndex(position);
+                adapter.setIndex(id);
                 parent.postInvalidate();
                 adapter.notifyDataSetChanged();
                 return true;
