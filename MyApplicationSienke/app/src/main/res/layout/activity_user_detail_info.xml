@@ -363,13 +363,13 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:background="@null"
+                    android:background="@drawable/linearlayout_shape"
                     android:hint="请输入表编号"
                     android:textColor="@color/text_gray"
                     android:textSize="14sp"
                     android:paddingTop="7dp"
                     android:paddingBottom="7dp"
-                    android:paddingLeft="5dp"
+                    android:paddingLeft="8dp"
                     android:paddingRight="5dp"/>
             </LinearLayout>
 
@@ -378,7 +378,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp">
+                android:paddingRight="16dp"
+                android:layout_marginTop="5dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -391,13 +392,13 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:background="@null"
+                    android:background="@drawable/linearlayout_shape"
                     android:hint="备注信息"
                     android:textColor="@color/text_gray"
                     android:textSize="14sp"
                     android:paddingTop="7dp"
                     android:paddingBottom="7dp"
-                    android:paddingLeft="5dp"
+                    android:paddingLeft="8dp"
                     android:paddingRight="5dp"/>
             </LinearLayout>
 
