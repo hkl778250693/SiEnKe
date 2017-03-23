@@ -25,7 +25,7 @@ public class GridviewImageAdapter extends BaseAdapter{
     private List<GridviewImage> gridviewImageList;
     private LayoutInflater layoutInflater;
     private boolean isShowDelete = false;//根据这个变量来判断是否显示删除图标，true是显示，false是不显示
-    private int index;
+    private long index;
 
     public GridviewImageAdapter(Context context,List<GridviewImage> gridviewImageList){
         this.context = context;
@@ -55,7 +55,7 @@ public class GridviewImageAdapter extends BaseAdapter{
         notifyDataSetChanged();
     }
 
-    public void setIndex(int index){
+    public void setIndex(long index){
         this.index = index;
     }
 
@@ -92,7 +92,7 @@ public class GridviewImageAdapter extends BaseAdapter{
                     viewHolder.delete.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            gridviewImageList.remove(index);
+                            gridviewImageList.remove((int)index);
                             Log.i("GridviewImageAdapter=>","index"+index);
                             notifyDataSetChanged();
                         }

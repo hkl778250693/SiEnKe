@@ -25,6 +25,7 @@
             android:textSize="21sp" />
     </RelativeLayout>
     <EditText
+        android:id="@+id/ip_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="请输入IP号"
@@ -36,6 +37,7 @@
         android:layout_marginRight="10dp"
         android:padding="10dp"/>
     <EditText
+        android:id="@+id/port_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="请输入Port号"
@@ -47,7 +49,7 @@
         android:layout_marginRight="10dp"
         android:padding="10dp"/>
     <Button
-        android:id="@+id/query_btn"
+        android:id="@+id/confirm_btn"
         android:layout_width="match_parent"
         android:layout_height="38dp"
         android:layout_marginLeft="11dp"
