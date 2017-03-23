@@ -43,12 +43,11 @@ public class SystemSettingActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.back:
-                    SystemSettingActivity.this.finish();
+                    finish();
                     break;
                 case R.id.ip:
                     Intent intent = new Intent(SystemSettingActivity.this,IpSettingActivity.class);
                     startActivity(intent);
-                    finish();
                     break;
             }
         }
