@@ -14,6 +14,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
@@ -129,9 +131,16 @@ public class UserDetailInfoActivity extends Activity {
                 } else {
                     isShowDelete = true;
                 }
-                Log.d("TAG","onItemLongClicked");
+                Log.i("UserDetailInfoActivity","id="+id);
+                Log.i("UserDetailInfoActivity","position="+position);
+                if(position == imageList.size()){
+                    Log.i("UserDetailInfoActivity","imageList="+imageList.size());
+                    view.findViewById(R.id.delete).setVisibility(View.GONE);
+                }
                 adapter.setIsShowDelete(isShowDelete);
-                adapter.setClickItemIndex(position);
+                adapter.setIndex(position);
+                parent.postInvalidate();
+                adapter.notifyDataSetChanged();
                 return true;
             }
         });
@@ -497,14 +506,25 @@ public class UserDetailInfoActivity extends Activity {
                         Log.i("CROP_SMALL_photoUri=>",""+image);
                         imageList.add(image);
                         Log.i("CROP_SMALL_photoUri=>",""+imageList.size());
-                        adapter = new GridviewImageAdapter(UserDetailInfoActivity.this,imageList);
-                        gridView.setAdapter(adapter);
+                        handler.sendEmptyMessage(1);
                     }
                     break;
             }
         }
 
     }
+
+    Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what == 1){
+                adapter = new GridviewImageAdapter(UserDetailInfoActivity.this,imageList);
+                gridView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+            }
+            super.handleMessage(msg);
+        }
+    };
 
     /**
      * API19以下获取图片路径的方法

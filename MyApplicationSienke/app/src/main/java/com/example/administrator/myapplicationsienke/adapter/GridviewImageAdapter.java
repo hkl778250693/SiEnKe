@@ -24,8 +24,8 @@ public class GridviewImageAdapter extends BaseAdapter{
     private Context context;
     private List<GridviewImage> gridviewImageList;
     private LayoutInflater layoutInflater;
-    private boolean isShowDelete;//根据这个变量来判断是否显示删除图标，true是显示，false是不显示
-    private int clickItemIndex=-1;//根据这个变量来辨识选中的current值
+    private boolean isShowDelete = false;//根据这个变量来判断是否显示删除图标，true是显示，false是不显示
+    private int index;
 
     public GridviewImageAdapter(Context context,List<GridviewImage> gridviewImageList){
         this.context = context;
@@ -37,33 +37,31 @@ public class GridviewImageAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        if(gridviewImageList.size() == 0){
-            return 1;
-        }
-        return (gridviewImageList.size() + 1);//返回listiview数目加1
+        return gridviewImageList.size() + 1;//返回listiview数目加1
     }
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return gridviewImageList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     public void setIsShowDelete(boolean isShowDelete){
-        this.isShowDelete=isShowDelete;
+        this.isShowDelete = isShowDelete;
         notifyDataSetChanged();
     }
 
-    public void setClickItemIndex(int postion){
-        this.clickItemIndex=postion;
+    public void setIndex(int index){
+        this.index = index;
     }
 
+
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView( int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
         if(convertView == null){
             viewHolder = new ViewHolder();
@@ -75,30 +73,39 @@ public class GridviewImageAdapter extends BaseAdapter{
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if(position < gridviewImageList.size()){
-            GridviewImage image = gridviewImageList.get(position);
-            viewHolder.imageView.setImageBitmap(image.getImage());
-            Log.i("GridviewImageAdapter=>","image.getImage()");
-        }else {
+        if(position == gridviewImageList.size()){
             viewHolder.imageView.setBackgroundResource(R.mipmap.camera);
-            Log.i("GridviewImageAdapter=>","imageView");
+            viewHolder.imageView.setVisibility(View.VISIBLE);
+            viewHolder.delete.setVisibility(View.GONE);
+            Log.i("GridviewImageAdapter=>","position"+position);
             if (position == 6) {
                 viewHolder.imageView.setVisibility(View.GONE);
             }
-        }
-        viewHolder.delete.setVisibility(isShowDelete?View.VISIBLE:View.GONE);//设置删除按钮是否显示
-        if(viewHolder.delete.getVisibility() == View.VISIBLE){
-            if(position == clickItemIndex){
-                viewHolder.delete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        gridviewImageList.remove(position);
-                        notifyDataSetChanged();
-                    }
-                });
+        }else {
+            Log.i("GridviewImageAdapter","imageList="+gridviewImageList.size());
+            GridviewImage image = gridviewImageList.get(position);
+            Log.i("GridviewImageAdapter=>","gridviewImageList"+position);
+            viewHolder.imageView.setImageBitmap(image.getImage());
+            viewHolder.delete.setVisibility(isShowDelete?View.VISIBLE:View.GONE);//设置删除按钮是否显示
+            if(viewHolder.delete.getVisibility() == View.VISIBLE){
+                if(index == position){
+                    viewHolder.delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            gridviewImageList.remove(index);
+                            Log.i("GridviewImageAdapter=>","index"+index);
+                            notifyDataSetChanged();
+                        }
+                    });
+                }
             }
         }
         return convertView;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return super.isEnabled(position);
     }
 
     public class ViewHolder {
