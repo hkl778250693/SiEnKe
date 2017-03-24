@@ -81,6 +81,7 @@ public class GridviewImageAdapter extends BaseAdapter{
             if (position == 6) {
                 viewHolder.imageView.setVisibility(View.GONE);
             }
+            return convertView;
         }else {
             Log.i("GridviewImageAdapter","imageList="+gridviewImageList.size());
             GridviewImage image = gridviewImageList.get(position);
@@ -99,8 +100,9 @@ public class GridviewImageAdapter extends BaseAdapter{
                     });
                 }
             }
+            return convertView;
         }
-        return convertView;
+
     }
 
     @Override

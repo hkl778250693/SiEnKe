@@ -205,7 +205,7 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setOutsideTouchable(true);
         popupWindow.update();
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
-        popupWindow.setAnimationStyle(R.style.Popupwindow);
+        popupWindow.setAnimationStyle(R.style.camera);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAtLocation(rootLinearlayout,Gravity.BOTTOM,0,0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {

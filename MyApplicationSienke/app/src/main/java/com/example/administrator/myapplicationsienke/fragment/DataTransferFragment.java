@@ -160,10 +160,10 @@ public class DataTransferFragment extends Fragment {
                         ip = "88.88.88.31:";
                     }
                     if(!sharedPreferences.getString("security_port","").equals("")){
-                        ip = sharedPreferences.getString("security_port","");
+                        port = sharedPreferences.getString("security_port","");
                         //Log.i("sharedPreferences=ip=>",ip);
                     }else {
-                        ip = "8080";
+                        port = "8080";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
@@ -201,6 +201,13 @@ public class DataTransferFragment extends Fragment {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
+                        }
+                    }else {
+                        try {
+                            Thread.sleep(3000);
+                            handler.sendEmptyMessage(2);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
                 } catch (UnsupportedEncodingException e) {
