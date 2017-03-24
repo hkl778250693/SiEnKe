@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.example.administrator.myapplicationsienke.R;
 import java.util.Calendar;
 
@@ -37,6 +39,7 @@ public class NewTaskActivity extends Activity {
     private PopupWindow popupWindow;
     private ImageView newTaskBack;
     private Button newPlanAddBtn;
+    private Button save_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,7 @@ public class NewTaskActivity extends Activity {
         securityHiddenReason = (TextView) findViewById(R.id.security_hidden_reason);
         date = (TextView) findViewById(R.id.data);
         date1 = (TextView) findViewById(R.id.data1);
+        save_btn = (Button) findViewById(R.id.save_btn);
 
     }
 
@@ -77,6 +81,7 @@ public class NewTaskActivity extends Activity {
         securityHiddenReason.setOnClickListener(onClickListener);
         date.setOnClickListener(onClickListener);
         date1.setOnClickListener(onClickListener);
+        save_btn.setOnClickListener(onClickListener);
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {

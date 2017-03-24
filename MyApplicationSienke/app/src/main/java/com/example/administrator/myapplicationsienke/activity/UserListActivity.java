@@ -25,9 +25,10 @@ import java.util.List;
  * Created by Administrator on 2017/3/16.
  */
 public class UserListActivity extends Activity {
-    private ImageView back;
+    private ImageView back,tiaoZhuan;
     private ListView listView;
     private TextView securityCheckCase;
+    private Button backBtn,nextBtn;
     private LayoutInflater inflater;  //转换器
     private View securityCaseView;
     private RadioButton notSecurityCheck,passSecurityCheck,notPassSecurityCheck;
@@ -57,11 +58,18 @@ public class UserListActivity extends Activity {
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
         securityCheckCase= (TextView) findViewById(R.id.security_check_case);
+        tiaoZhuan = (ImageView) findViewById(R.id.tiaozhuan);
+        backBtn = (Button) findViewById(R.id.back_btn);
+        nextBtn = (Button) findViewById(R.id.next_btn);
+
     }
 
     //点击事件
     private void setOnClickListener(){
         back.setOnClickListener(onClickListener);
+        tiaoZhuan.setOnClickListener(onClickListener);
+        backBtn.setOnClickListener(onClickListener);
+        nextBtn.setOnClickListener(onClickListener);
         securityCheckCase.setOnClickListener(onClickListener);
         UserListviewAdapter userListviewAdapter = new UserListviewAdapter(UserListActivity.this, userListviewItemList);
         listView.setAdapter(userListviewAdapter);
@@ -83,6 +91,8 @@ public class UserListActivity extends Activity {
                     break;
                 case R.id.security_check_case:
                     createSecurityCasePopupwindow();
+                    break;
+                case R.id.tiaozhuan:
                     break;
             }
         }

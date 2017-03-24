@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -40,10 +40,11 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal">
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="搜索"/>
+            android:text="搜索" />
 
         <EditText
             android:id="@+id/edit_text"
@@ -54,6 +55,7 @@
             android:gravity="center_vertical"
             android:hint="请输入查询信息"
             android:maxLength="13"
+            android:maxLines="1"
             android:padding="10dp"
             android:textSize="14sp" />
 
@@ -75,12 +77,75 @@
         android:layout_height="5dp"
         android:background="@color/gray_thin" />
 
-    <ListView
-        android:id="@+id/listview"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ListView
+            android:id="@+id/listview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:dividerHeight="5dp"
+            android:scrollbars="none" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@color/gray_thin" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:dividerHeight="5dp"
-        android:scrollbars="none" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/back_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="上一页" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/check_hidden_danger_down_shape"
+            android:gravity="center_vertical">
+
+            <EditText
+                android:id="@+id/tiaozhuan_edit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/mobile_security_edittview"
+                android:hint="请输入页数"
+                android:maxLines="1"
+                android:padding="5dp"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/tiaozhuan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:src="@mipmap/tiaozhuan" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/next_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="下一页" />
+
+
+    </LinearLayout>
 
 </LinearLayout>
