@@ -23,13 +23,13 @@
             android:text="数据下载"
             android:textColor="@android:color/white"
             android:textSize="21sp" />
-        <TextView
+        <Button
             android:id="@+id/download"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:padding="15dp"
             android:text="下载"
+            android:background="@color/theme_colors"
             android:textColor="@android:color/white"
             android:textSize="16dp" />
     </RelativeLayout>
