@@ -134,34 +134,36 @@ public class MobileSecurityActivity extends Activity {
                             ip = sharedPreferences.getString("security_ip", "");
                             //Log.i("sharedPreferences=ip=>",ip);
                         } else {
-                            ip = "88.88.88.31:";
+                            ip = "88.88.88.66:";
                         }
                         if (!sharedPreferences.getString("security_port", "").equals("")) {
                             port = sharedPreferences.getString("security_port", "");
                             //Log.i("sharedPreferences=ip=>",ip);
                         } else {
-                            port = "8080";
+                            port = "8088";
                         }
                         String httpUrl = "http://" + ip + port + "/SMDemo/login.do?";
                         // 根据地址创建URL对象
                         URL url = new URL(httpUrl);
                         // 根据URL对象打开链接
                         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                        // 发送POST请求必须设置允许输出
+                        urlConnection.setDoOutput(true);
+                        urlConnection.setDoInput(true);
+                        urlConnection.setUseCaches(false);//不使用缓存
                         // 设置请求的方式
                         urlConnection.setRequestMethod("POST");
                         // 设置请求的超时时间
                         urlConnection.setReadTimeout(5000);
                         urlConnection.setConnectTimeout(5000);
                         // 传递的数据
-                        String data = "userName=" + URLEncoder.encode(userName, "UTF-8") + "userPass=" + URLEncoder.encode(userPass, "UTF-8");
+                        String data = "userName=" + URLEncoder.encode(userName, "UTF-8") + "&userPass=" + URLEncoder.encode(userPass, "UTF-8");
+                        Log.i("data==========>","data="+data);
                         // 设置请求的头
                         urlConnection.setRequestProperty("Connection", "keep-alive");
                         urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                         urlConnection.setRequestProperty("Content-Length", String.valueOf(data.getBytes().length));
                         urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0");
-                        // 发送POST请求必须设置允许输出
-                        urlConnection.setDoOutput(true);
-                        urlConnection.setDoInput(true);
                         //获取输出流
                         OutputStream os = urlConnection.getOutputStream();
                         os.write(data.getBytes());

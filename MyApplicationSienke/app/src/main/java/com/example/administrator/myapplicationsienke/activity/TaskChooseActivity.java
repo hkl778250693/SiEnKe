@@ -120,30 +120,18 @@ public class TaskChooseActivity extends Activity {
     //读取下载到本地的任务数据
     public void getTaskData() {
         Cursor cursor = db.query("Task",null,null,null,null,null,null);//查询并获得游标
-        /**
-         * 方法一
-         */
         if(!cursor.isFirst()){  //是否在第一行
             cursor.moveToFirst();  //将游标移动到第一行
             int columnNumb = cursor.getColumnCount();
             while (cursor.moveToNext()){
+                TaskChoose taskChoose = new TaskChoose();
                 for (int i=0;i < columnNumb;i++){  //循环读取每列的数据
 
+
                 }
+                taskChooseList.add(taskChoose);
             }
         }
-        /**
-         * 方法二
-         */
-        /*while(cursor.moveToNext()) {//循环移动游标到下一行，
-            int numb = cursor.getColumnCount();//获取列总数
-            for (int i = 0; i < numb; i++) {//循环读取每列的数据
-                String columnName = cursor.getColumnName(i);//获得每列的列名
-                String value = cursor. getString(i);//获取每列对应的值
-                Log.i("columnName", columnName);
-                Log.i("value", value);
-            }
-        }*/
         //cursor游标操作完成以后,一定要关闭
         cursor.close();
         for (int i = 0; i < 20; i++) {

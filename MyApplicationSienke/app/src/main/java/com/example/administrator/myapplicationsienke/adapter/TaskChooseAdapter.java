@@ -53,7 +53,7 @@ public class TaskChooseAdapter extends BaseAdapter {
             viewHolder.taskNumber = (TextView) convertView.findViewById(R.id.task_number);
             viewHolder.checkType = (TextView) convertView.findViewById(R.id.check_type);
             viewHolder.totalUserNumber = (TextView) convertView.findViewById(R.id.total_user_number);
-            viewHolder.checkedUserNumber = (TextView) convertView.findViewById(R.id.checked_user_number);
+            viewHolder.endTime = (TextView) convertView.findViewById(R.id.end_time);
             convertView.setTag(viewHolder);
         }else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -68,6 +68,6 @@ public class TaskChooseAdapter extends BaseAdapter {
         TextView taskNumber;  //任务编号
         TextView checkType;  //安检类型
         TextView totalUserNumber;   //总用户数
-        TextView checkedUserNumber;  //已检用户数
+        TextView endTime;  //结束时间
     }
 }
