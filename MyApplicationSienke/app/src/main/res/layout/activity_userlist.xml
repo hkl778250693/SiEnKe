@@ -54,7 +54,6 @@
             android:background="@drawable/check_hidden_danger_down_shape"
             android:gravity="center_vertical"
             android:hint="请输入查询信息"
-            android:maxLength="13"
             android:maxLines="1"
             android:padding="10dp"
             android:textSize="14sp" />

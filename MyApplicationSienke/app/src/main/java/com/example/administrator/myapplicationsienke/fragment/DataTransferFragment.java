@@ -42,12 +42,12 @@ import java.net.URL;
  */
 public class DataTransferFragment extends Fragment {
     private View view;
-    private TextView upload,download;
+    private TextView upload, download;
     private LinearLayout rootLinearlayout;
     private String result; //网络请求结果
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private String ip,port;  //接口ip地址   端口
+    private String ip, port;  //接口ip地址   端口
     public int responseCode = 0;
     private LayoutInflater layoutInflater;
     private PopupWindow popupWindow;
@@ -57,7 +57,7 @@ public class DataTransferFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_data_transfer,null);
+        view = inflater.inflate(R.layout.fragment_data_transfer, null);
 
         bindView(); //绑定控件ID
         defaultSetting();//初始化设置
@@ -66,14 +66,14 @@ public class DataTransferFragment extends Fragment {
     }
 
     //绑定控件
-    public void bindView(){
+    public void bindView() {
         upload = (TextView) view.findViewById(R.id.upload);
         download = (TextView) view.findViewById(R.id.download);
         rootLinearlayout = (LinearLayout) view.findViewById(R.id.root_linearlayout);
     }
 
     //点击事件
-    private void setViewClickListener(){
+    private void setViewClickListener() {
         upload.setOnClickListener(clickListener);
         download.setOnClickListener(clickListener);
     }
@@ -81,9 +81,9 @@ public class DataTransferFragment extends Fragment {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.upload:
-                    Intent intent=new Intent(getActivity(), UploadActivity.class);
+                    Intent intent = new Intent(getActivity(), UploadActivity.class);
                     startActivity(intent);
                     break;
                 case R.id.download:
@@ -93,7 +93,7 @@ public class DataTransferFragment extends Fragment {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    requireMyWorks("UserSafeCheck.do","safetyPlan="+11+"&safetyState="+1+"&page="+1+"&rows"+50);
+                    requireMyWorks("UserSafeCheck.do", "safetyPlan=" + 11 + "&safetyState=" + 1 + "&page=" + 1 + "&rows" + 50);
                     break;
             }
         }
@@ -106,10 +106,10 @@ public class DataTransferFragment extends Fragment {
     }
 
     //show弹出框
-    public void showPopupwindow(){
+    public void showPopupwindow() {
         layoutInflater = LayoutInflater.from(getActivity());
-        view = layoutInflater.inflate(R.layout.popupwindow_query_loading,null);
-        popupWindow = new PopupWindow(view,250,250);
+        view = layoutInflater.inflate(R.layout.popupwindow_query_loading, null);
+        popupWindow = new PopupWindow(view, 250, 250);
         frameAnimation = (ImageView) view.findViewById(R.id.frame_animation);
         //popupWindow.setFocusable(true);
         //popupWindow.setOutsideTouchable(true);
@@ -117,7 +117,7 @@ public class DataTransferFragment extends Fragment {
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.loading_shape));
         popupWindow.setAnimationStyle(R.style.dialog);
         //popupWindow.update();
-        popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER,0,0);
+        popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
@@ -130,15 +130,14 @@ public class DataTransferFragment extends Fragment {
     }
 
     //设置背景透明度
-    public void backgroundAlpha(float bgAlpha)
-    {
+    public void backgroundAlpha(float bgAlpha) {
         WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
         lp.alpha = bgAlpha; //0.0-1.0
         getActivity().getWindow().setAttributes(lp);
     }
 
     //开始帧动画
-    public void startFrameAnimation(){
+    public void startFrameAnimation() {
         frameAnimation.setBackgroundResource(R.drawable.frame_animation_list);
         animationDrawable = (AnimationDrawable) frameAnimation.getDrawable();
         animationDrawable.start();
@@ -152,34 +151,34 @@ public class DataTransferFragment extends Fragment {
                 try {
                     URL url;
                     HttpURLConnection httpURLConnection;
-                    Log.i("sharedPreferences====>",sharedPreferences.getString("IP",""));
-                    if(!sharedPreferences.getString("security_ip","").equals("")){
-                        ip = sharedPreferences.getString("security_ip","");
+                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
+                    if (!sharedPreferences.getString("security_ip", "").equals("")) {
+                        ip = sharedPreferences.getString("security_ip", "");
                         //Log.i("sharedPreferences=ip=>",ip);
-                    }else {
+                    } else {
                         ip = "88.88.88.31:";
                     }
-                    if(!sharedPreferences.getString("security_port","").equals("")){
-                        port = sharedPreferences.getString("security_port","");
+                    if (!sharedPreferences.getString("security_port", "").equals("")) {
+                        port = sharedPreferences.getString("security_port", "");
                         //Log.i("sharedPreferences=ip=>",ip);
-                    }else {
+                    } else {
                         port = "8080";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
-                    if (!keyAndValue.equals("") ) {
+                    if (!keyAndValue.equals("")) {
                         url = new URL(httpUrl + "?" + keyAndValue);
                         //没有参数传递
                     } else {
                         url = new URL(httpUrl);
                     }
-                    Log.i("url=============>",url+"");
+                    Log.i("url=============>", url + "");
                     httpURLConnection = (HttpURLConnection) url.openConnection();
                     httpURLConnection.setConnectTimeout(6000);
                     httpURLConnection.setReadTimeout(6000);
                     httpURLConnection.connect();
                     //传回的数据解析成String
-                    Log.i("responseCode====>",httpURLConnection.getResponseCode()+"");
+                    Log.i("responseCode====>", httpURLConnection.getResponseCode() + "");
                     if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
                         InputStream inputStream = httpURLConnection.getInputStream();
                         InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
@@ -190,11 +189,11 @@ public class DataTransferFragment extends Fragment {
                             stringBuilder.append(str);
                         }
                         result = stringBuilder.toString();
-                        Log.i("result_query==========>",result);
+                        Log.i("result_query==========>", result);
                         JSONObject jsonObject = new JSONObject(result);
-                        if(!jsonObject.optString("total","").equals("0")){
+                        if (!jsonObject.optString("total", "").equals("0")) {
                             handler.sendEmptyMessage(1);
-                        }else{
+                        } else {
                             try {
                                 Thread.sleep(3000);
                                 handler.sendEmptyMessage(2);
@@ -202,7 +201,7 @@ public class DataTransferFragment extends Fragment {
                                 e.printStackTrace();
                             }
                         }
-                    }else {
+                    } else {
                         try {
                             Thread.sleep(3000);
                             handler.sendEmptyMessage(2);
@@ -215,7 +214,7 @@ public class DataTransferFragment extends Fragment {
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
-                    Log.i("IOException==========>","网络请求异常!");
+                    Log.i("IOException==========>", "网络请求异常!");
                     handler.sendEmptyMessage(3);
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -225,23 +224,23 @@ public class DataTransferFragment extends Fragment {
         }.start();
     }
 
-    Handler handler = new Handler(){
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case 1:
-                    Intent intent = new Intent(getActivity(),DownloadActivity.class);
-                    intent.putExtra("","");
+                    Intent intent = new Intent(getActivity(), DownloadActivity.class);
+                    intent.putExtra("", "");
                     startActivity(intent);
                     popupWindow.dismiss();
                     break;
                 case 2:
                     popupWindow.dismiss();
-                    Toast.makeText(getActivity(),"网络请求超时！",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
                     popupWindow.dismiss();
-                    Toast.makeText(getActivity(),"网络请求超时！",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
             }
             super.handleMessage(msg);
