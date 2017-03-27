@@ -101,14 +101,14 @@ public class MobileSecurityActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.logon_btn:
-                    if (editMobileUser.getText().toString().equals("")&&editmobilePsw.getText().toString().equals("")) {
+                    if (editMobileUser.getText().toString().equals("") && editmobilePsw.getText().toString().equals("")) {
                         Toast.makeText(MobileSecurityActivity.this, "用户名或密码不能为空", Toast.LENGTH_LONG).show();
-                    }else if (editMobileUser.getText().toString().equals("")) {
+                    } else if (editMobileUser.getText().toString().equals("")) {
                         Toast.makeText(MobileSecurityActivity.this, "请输入用户名", Toast.LENGTH_LONG).show();
-                    }else if (editmobilePsw.getText().toString().equals("")) {
+                    } else if (editmobilePsw.getText().toString().equals("")) {
                         Toast.makeText(MobileSecurityActivity.this, "请输入密码", Toast.LENGTH_LONG).show();
                     }
-                    if (!editMobileUser.getText().toString().equals("") && !editmobilePsw.getText().toString().equals("")){
+                    if (!editMobileUser.getText().toString().equals("") && !editmobilePsw.getText().toString().equals("")) {
                         //开启子线程
                         new Thread() {
                             public void run() {
