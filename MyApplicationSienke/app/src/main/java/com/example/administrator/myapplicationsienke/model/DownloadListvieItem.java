@@ -5,10 +5,10 @@ package com.example.administrator.myapplicationsienke.model;
  */
 public class DownloadListvieItem {
     private String taskName;   //任务名称
-    private String taskNumber;  //任务编号
+    private int taskNumber;  //任务编号
     private String checkType;   //安检类型
-    private String totalUserNumber;  //总用户数
-    private String checkedUserNumber;   //已检用户数
+    private int totalUserNumber;  //总用户数
+    private String endTime;   //结束时间
 
     public String getTaskName() {
         return taskName;
@@ -18,11 +18,11 @@ public class DownloadListvieItem {
         this.taskName = taskName;
     }
 
-    public String getTaskNumber() {
+    public int getTaskNumber() {
         return taskNumber;
     }
 
-    public void setTaskNumber(String taskNumber) {
+    public void setTaskNumber(int taskNumber) {
         this.taskNumber = taskNumber;
     }
 
@@ -34,19 +34,19 @@ public class DownloadListvieItem {
         this.checkType = checkType;
     }
 
-    public String getTotalUserNumber() {
+    public int getTotalUserNumber() {
         return totalUserNumber;
     }
 
-    public void setTotalUserNumber(String totalUserNumber) {
+    public void setTotalUserNumber(int totalUserNumber) {
         this.totalUserNumber = totalUserNumber;
     }
 
-    public String getCheckedUserNumber() {
-        return checkedUserNumber;
+    public String getEndTime() {
+        return endTime;
     }
 
-    public void setCheckedUserNumber(String checkedUserNumber) {
-        this.checkedUserNumber = checkedUserNumber;
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 }

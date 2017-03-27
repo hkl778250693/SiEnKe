@@ -14,7 +14,7 @@ public class MySqliteHelper extends SQLiteOpenHelper {
     final String CREATE_TABLE_SQL_USER = "CREATE TABLE IF NOT EXISTS User " +                       //用户表
             "(id INTEGER  primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
     final String CREATE_TABLE_SQL_TASK = "CREATE TABLE IF NOT EXISTS Task " +                       //任务表
-            "(id INTEGER  primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
+            "(id INTEGER  primary key AUTOINCREMENT,taskName varchar(200),taskId varchar(200),securityType varchar(200),totalCount varchar(200),endTime varchar(200))";
     final String CREATE_TABLE_SQL_SECURITY_CASE = "CREATE TABLE IF NOT EXISTS security_case " +     //安全情况表
             "(id INTEGER  primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
     final String CREATE_TABLE_SQL_SECURITY_HIDDEEN_DANGER = "CREATE TABLE IF NOT EXISTS security_hidden_danger " +  //安全隐患表
