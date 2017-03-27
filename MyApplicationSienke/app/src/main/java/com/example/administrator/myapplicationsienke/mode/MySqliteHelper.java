@@ -6,13 +6,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
+ * 对于抽象类SQLiteOpenHelper的继承，需要重写：1）constructor，2）onCreate()和onUpgrade()
  * Created by Administrator on 2017/3/20 0020.
  */
 public class MySqliteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME="SiEnKe.db";//数据库名称
 
     final String CREATE_TABLE_SQL_USER = "CREATE TABLE IF NOT EXISTS User " +                       //用户表
-            "(id INTEGER  primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
+            "(id INTEGER  primary key AUTOINCREMENT,userName varchar(200),meterNumber varchar(200),userPhone varchar(200),securityType varchar(200),oldUserId varchar(200),newUserId varchar(200),userAddress  varchar(200),taskNumber varchar(200))";
     final String CREATE_TABLE_SQL_TASK = "CREATE TABLE IF NOT EXISTS Task " +                       //任务表
             "(id INTEGER  primary key AUTOINCREMENT,taskName varchar(200),taskId varchar(200),securityType varchar(200),totalCount varchar(200),endTime varchar(200))";
     final String CREATE_TABLE_SQL_SECURITY_CASE = "CREATE TABLE IF NOT EXISTS security_case " +     //安全情况表
