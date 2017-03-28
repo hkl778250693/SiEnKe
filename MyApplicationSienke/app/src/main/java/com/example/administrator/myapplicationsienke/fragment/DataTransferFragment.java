@@ -156,13 +156,13 @@ public class DataTransferFragment extends Fragment {
                         ip = sharedPreferences.getString("security_ip", "");
                         //Log.i("sharedPreferences=ip=>",ip);
                     } else {
-                        ip = "88.88.88.31:";
+                        ip = "88.88.88.66:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                         //Log.i("sharedPreferences=ip=>",ip);
                     } else {
-                        port = "8080";
+                        port = "8088";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
