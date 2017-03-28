@@ -119,17 +119,17 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="已检户数："
-                android:textSize="13sp"
-                android:textColor="@color/text_gray"/>
+                android:text="结束时间："
+                android:textColor="@color/text_gray"
+                android:textSize="13sp" />
 
             <TextView
-                android:id="@+id/checked_user_number"
+                android:id="@+id/end_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1752户"
-                android:textSize="13sp"
-                android:textColor="@color/text_gray"/>
+                android:text=""
+                android:textColor="@color/text_gray"
+                android:textSize="13sp" />
         </LinearLayout>
     </LinearLayout>
 

@@ -164,6 +164,8 @@ public class MobileSecurityActivity extends Activity {
                         //urlConnection.setRequestProperty("Content-Length", String.valueOf(data.getBytes().length));
                         urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                         //urlConnection.setRequestProperty("Origin", "http://"+ ip + port);
+                        urlConnection.setRequestProperty("Content-Length", String.valueOf(data.getBytes().length));
+                        urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0");
                         //获取输出流
                         OutputStream os = urlConnection.getOutputStream();
                         os.write(data.getBytes("UTF-8"));
