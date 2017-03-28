@@ -104,10 +104,10 @@ public class DataTransferFragment extends Fragment {
                         e.printStackTrace();
                     }
                     requireMyWorks("UserSafeCheck.do", "safetyPlan=" + 11 + "&safetyState=" + 1 + "&page=" + 1 + "&rows" + 50);
-                    new Thread(){
+                    new Thread() {
                         @Override
                         public void run() {
-                            requireMyWorks("SafeCheckPlan.do","safePlanMember="+"杜述洪");
+                            requireMyWorks("SafeCheckPlan.do", "safePlanMember=" + "杜述洪");
                             super.run();
                         }
                     }.start();
@@ -172,13 +172,13 @@ public class DataTransferFragment extends Fragment {
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                         //Log.i("sharedPreferences=ip=>",ip);
-                    }else {
+                    } else {
                         ip = "88.88.88.66:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                         //Log.i("sharedPreferences=ip=>",ip);
-                    }else {
+                    } else {
                         port = "8088";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
@@ -207,7 +207,7 @@ public class DataTransferFragment extends Fragment {
                         }
                         result = stringBuilder.toString();
                         Log.i("result_query==========>", result);
-                        Log.i("DataTransferFragment==>",result);
+                        Log.i("DataTransferFragment==>", result);
                         JSONObject jsonObject = new JSONObject(result);
                         if (!jsonObject.optString("total", "").equals("0")) {
                             handler.sendEmptyMessage(1);
@@ -254,14 +254,14 @@ public class DataTransferFragment extends Fragment {
                     try {
                         JSONObject jsonObject = new JSONObject(result);
                         JSONArray jsonArray = jsonObject.getJSONArray("rows");
-                        for(int i=0;i<jsonArray.length();i++){
+                        for (int i = 0; i < jsonArray.length(); i++) {
                             object = jsonArray.getJSONObject(i);
                             insertData();
                         }
                         popupWindow.dismiss();
-                        Toast.makeText(getActivity(),"任务下载完成，用户信息正在下载，请稍等...",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "任务下载完成，用户信息正在下载，请稍等...", Toast.LENGTH_SHORT).show();
                         showPopupwindow();
-                        
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -280,19 +280,19 @@ public class DataTransferFragment extends Fragment {
     };
 
     //将服务器下载的数据存到本地数据库
-    private void insertData(){
-        MySqliteHelper helper = new MySqliteHelper(getActivity(),1);
+    private void insertData() {
+        MySqliteHelper helper = new MySqliteHelper(getActivity(), 1);
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("taskName",object.optString("safetyPlanName",""));
-        values.put("taskId",object.optInt("safetyplanId",0)+"");
-        values.put("securityType",object.optString("securityName",""));
-        values.put("totalCount",object.optInt("countRs",0)+"");
-        values.put("endTime",object.optString("safetyEnd",""));
+        values.put("taskName", object.optString("safetyPlanName", ""));
+        values.put("taskId", object.optInt("safetyplanId", 0) + "");
+        values.put("securityType", object.optString("securityName", ""));
+        values.put("totalCount", object.optInt("countRs", 0) + "");
+        values.put("endTime", object.optString("safetyEnd", ""));
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
-        db.insert("Task",null,values);
-        Log.i("db==========>","db!"+db);
+        db.insert("Task", null, values);
+        Log.i("db==========>", "db!" + db);
     }
 }
