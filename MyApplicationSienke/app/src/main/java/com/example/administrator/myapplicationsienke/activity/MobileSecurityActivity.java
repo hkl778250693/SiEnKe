@@ -143,7 +143,7 @@ public class MobileSecurityActivity extends Activity {
                             port = "8088";
                         }
                         String httpUrl = "http://" + ip + port + "/SMDemo/login.do";
-                        Log.i("httpUrl==========>",""+httpUrl);
+                        Log.i("httpUrl==========>", "" + httpUrl);
                         // 根据地址创建URL对象
                         URL url = new URL(httpUrl);
                         // 根据URL对象打开链接
@@ -164,12 +164,20 @@ public class MobileSecurityActivity extends Activity {
                         //urlConnection.setRequestProperty("Content-Length", String.valueOf(data.getBytes().length));
                         urlConnection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
                         //urlConnection.setRequestProperty("Origin", "http://"+ ip + port);
+                        Log.i("data==========>", "data=" + data);
+                        // 设置请求的头
+                        //urlConnection.setRequestProperty("Content-Length", String.valueOf(data.getBytes().length));
+                        urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                        //urlConnection.setRequestProperty("Origin", "http://"+ ip + port);
+                        urlConnection.setRequestProperty("Content-Length", String.valueOf(data.getBytes().length));
+                        urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0");
                         //获取输出流
                         OutputStream os = urlConnection.getOutputStream();
                         os.write(data.getBytes("UTF-8"));
                         os.flush();
                         os.close();
                         Log.i("getResponseCode====>",""+urlConnection.getResponseCode());
+                        Log.i("getResponseCode====>", "" + urlConnection.getResponseCode());
                         if (urlConnection.getResponseCode() == 200) {
                             InputStream inputStream = urlConnection.getInputStream();
                             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
@@ -193,6 +201,7 @@ public class MobileSecurityActivity extends Activity {
                             }
                         } else {
                             Log.i("login_state===>","登录失败");
+                            Log.i("login_state===>", "登录失败");
                         }
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();

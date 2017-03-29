@@ -53,7 +53,7 @@ public class DataTransferFragment extends Fragment {
     private View view;
     private TextView upload, download;
     private LinearLayout rootLinearlayout;
-    private String taskResult,userResult; //网络请求结果
+    private String taskResult, userResult; //网络请求结果
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private String ip, port;  //接口ip地址   端口
@@ -63,11 +63,10 @@ public class DataTransferFragment extends Fragment {
     private ImageView frameAnimation;
     private AnimationDrawable animationDrawable;
     private List<DownloadListvieItem> downloadListvieItemList = new ArrayList<>();
-    private JSONObject taskObject,userObject;
+    private JSONObject taskObject, userObject;
     private SQLiteDatabase db;  //数据库
     private String taskNumb = null;  //任务编号
     List<String> taskNumbList = new ArrayList<>();
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -109,7 +108,7 @@ public class DataTransferFragment extends Fragment {
                     }
 
                     //开启支线程进行请求任务信息
-                    new Thread(){
+                    new Thread() {
                         @Override
                         public void run() {
                             Log.i("SafeCheckPlan.do=====>", "isEnter="+true);
@@ -119,7 +118,7 @@ public class DataTransferFragment extends Fragment {
                     }.start();
 
                     //开启支线程进行请求用户信息
-                    new Thread(){
+                    new Thread() {
                         @Override
                         public void run() {
                             Log.i("UserSafeCheck.do=====>", "isEnter="+true);
@@ -139,7 +138,7 @@ public class DataTransferFragment extends Fragment {
     private void defaultSetting() {
         sharedPreferences = getActivity().getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        MySqliteHelper helper = new MySqliteHelper(getActivity(),1);
+        MySqliteHelper helper = new MySqliteHelper(getActivity(), 1);
         db = helper.getWritableDatabase();
     }
 
@@ -190,14 +189,14 @@ public class DataTransferFragment extends Fragment {
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                         //Log.i("sharedPreferences=ip=>",ip);
-                    }else {
-                        ip = "88.88.88.66:";
+                    } else {
+                        ip = "88.88.88.31:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                         //Log.i("sharedPreferences=ip=>",ip);
-                    }else {
-                        port = "8088";
+                    } else {
+                        port = "8080";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
@@ -276,7 +275,7 @@ public class DataTransferFragment extends Fragment {
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                         Log.i("sharedPreferences=ip=>",port);
-                    }else {
+                    } else {
                         port = "8088";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
@@ -316,7 +315,7 @@ public class DataTransferFragment extends Fragment {
                                 e.printStackTrace();
                             }
                         }
-                    }else {
+                    } else {
                         try {
                             Thread.sleep(3000);
                             handler.sendEmptyMessage(3);
@@ -347,14 +346,16 @@ public class DataTransferFragment extends Fragment {
                     try {
                         JSONObject jsonObject = new JSONObject(taskResult);
                         JSONArray jsonArray = jsonObject.getJSONArray("rows");
-                        for(int i=0;i<jsonArray.length();i++){
+                        for (int i = 0; i < jsonArray.length(); i++) {
                             taskObject = jsonArray.getJSONObject(i);
                             insertTaskData();
                             //taskNumbList.add(userObject.optInt("safetyplanId",0)+"");
                         }
                         //Log.i("taskNumb=======>",taskNumb);
+                        taskNumb = userObject.optInt("safetyplanId", 0) + "";
+                        Log.i("taskNumb=======>", taskNumb);
                         popupWindow.dismiss();
-                        Toast.makeText(getActivity(),"任务下载完成，用户信息正在下载，请稍等...",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "任务下载完成，用户信息正在下载，请稍等...", Toast.LENGTH_SHORT).show();
                         showPopupwindow();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -372,12 +373,12 @@ public class DataTransferFragment extends Fragment {
                     try {
                         JSONObject jsonObject = new JSONObject(userResult);
                         JSONArray jsonArray = jsonObject.getJSONArray("rows");
-                        for(int i=0;i<jsonArray.length();i++){
+                        for (int i = 0; i < jsonArray.length(); i++) {
                             userObject = jsonArray.getJSONObject(i);
                             insertUserInfo();
                         }
                         popupWindow.dismiss();
-                        Toast.makeText(getActivity(),"用户信息下载完成！",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "用户信息下载完成！", Toast.LENGTH_SHORT).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -388,13 +389,13 @@ public class DataTransferFragment extends Fragment {
     };
 
     //将服务器下载的任务数据存到本地数据库任务表
-    private void insertTaskData(){
+    private void insertTaskData() {
         ContentValues values = new ContentValues();
-        values.put("taskName",taskObject.optString("safetyPlanName",""));
-        values.put("taskId",taskObject.optInt("safetyplanId",0)+"");
-        values.put("securityType",taskObject.optString("securityName",""));
-        values.put("totalCount",taskObject.optInt("countRs",0)+"");
-        values.put("endTime",taskObject.optString("safetyEnd",""));
+        values.put("taskName", taskObject.optString("safetyPlanName", ""));
+        values.put("taskId", taskObject.optInt("safetyplanId", 0) + "");
+        values.put("securityType", taskObject.optString("securityName", ""));
+        values.put("totalCount", taskObject.optInt("countRs", 0) + "");
+        values.put("endTime", taskObject.optString("safetyEnd", ""));
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
@@ -403,20 +404,20 @@ public class DataTransferFragment extends Fragment {
     }
 
     //将服务器下载的用户信息数据存到本地数据库用户表
-    private void insertUserInfo(){
+    private void insertUserInfo() {
         ContentValues values = new ContentValues();
-        values.put("userName",userObject.optString("userName",""));
-        values.put("meterNumber",userObject.optString("meterNumber",""));
-        values.put("userPhone",userObject.optString("userPhone",""));
-        values.put("securityType",userObject.optString("securityName",""));
-        values.put("oldUserId",userObject.optString("oldUserId",""));
-        values.put("taskId",userObject.optInt("safetyPlan",0)+"");
-        values.put("newUserId",userObject.optString("userId",""));
+        values.put("userName", userObject.optString("userName", ""));
+        values.put("meterNumber", userObject.optString("meterNumber", ""));
+        values.put("userPhone", userObject.optString("userPhone", ""));
+        values.put("securityType", userObject.optString("securityName", ""));
+        values.put("oldUserId", userObject.optString("oldUserId", ""));
+        values.put("taskId", userObject.optInt("safetyPlan", 0) + "");
+        values.put("newUserId", userObject.optString("userId", ""));
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
-        db.insert("User",null,values);
-        Log.i("db==========>","user_db!"+db);
+        db.insert("User", null, values);
+        Log.i("db==========>", "user_db!" + db);
     }
 
     @Override
