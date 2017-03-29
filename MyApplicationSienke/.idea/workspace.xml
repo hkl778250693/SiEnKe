@@ -48,22 +48,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="workspace.xml" pinned="false" current-in-tab="false">
+      <file leaf-file-name="workspace.xml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-18.803572">
-              <caret line="2842" column="10" selection-start-line="2842" selection-start-column="10" selection-end-line="2842" selection-end-column="10" />
-              <folding>
-                <marker date="1490756928136" expanded="true" signature="1264:1321" placeholder="..." />
-                <marker date="1490756928136" expanded="true" signature="1438:1503" placeholder="..." />
-                <marker date="1490756928136" expanded="true" signature="1542:2352" placeholder="..." />
-                <marker date="1490756928136" expanded="true" signature="1584:2352" placeholder="..." />
-                <marker date="1490756928136" expanded="true" signature="1676:2276" placeholder="..." />
-                <marker date="1490756928136" expanded="true" signature="1817:2262" placeholder="..." />
-                <marker date="1490756928136" expanded="true" signature="1883:2245" placeholder="..." />
-                <marker date="1490756928136" expanded="true" signature="1936:2223" placeholder="..." />
-                <marker date="1490756928136" expanded="true" signature="2107:2202" placeholder="..." />
-              </folding>
+            <state vertical-scroll-proportion="0.9342561">
+              <caret line="2345" column="10" selection-start-line="2345" selection-start-column="10" selection-end-line="2345" selection-end-column="10" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -101,10 +91,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DataTransferFragment.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="DataTransferFragment.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/DataTransferFragment.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.34858045">
+            <state vertical-scroll-proportion="0.0">
               <caret line="390" column="27" selection-start-line="390" selection-start-column="27" selection-end-line="390" selection-end-column="27" />
               <folding>
                 <element signature="e#3380#4960#0" expanded="true" />
@@ -1776,12 +1766,12 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/mode/MySqliteHelper.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/task_choose_listview_item.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/model/TaskChoose.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/DataTransferFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/adapter/TaskChooseAdapter.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/adapter/UploadListViewAdapter.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/MobileSecurityActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/TaskChooseActivity.java" />
         <option value="$PROJECT_DIR$/.idea/workspace.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/MobileSecurityActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/DataTransferFragment.java" />
       </list>
     </option>
   </component>
@@ -2180,11 +2170,6 @@
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="device.picker.selection" value="Nexus_5_API_24" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="F:\app\SiEnKe\MyApplicationSienke\app\src\main\res\mipmap-xxhdpi" />
-    </key>
   </component>
   <component name="RunManager" selected="Android Application.app">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
@@ -2862,24 +2847,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-18.803572">
-          <caret line="2842" column="10" selection-start-line="2842" selection-start-column="10" selection-end-line="2842" selection-end-column="10" />
-          <folding>
-            <marker date="1490756928136" expanded="true" signature="1264:1321" placeholder="..." />
-            <marker date="1490756928136" expanded="true" signature="1438:1503" placeholder="..." />
-            <marker date="1490756928136" expanded="true" signature="1542:2352" placeholder="..." />
-            <marker date="1490756928136" expanded="true" signature="1584:2352" placeholder="..." />
-            <marker date="1490756928136" expanded="true" signature="1676:2276" placeholder="..." />
-            <marker date="1490756928136" expanded="true" signature="1817:2262" placeholder="..." />
-            <marker date="1490756928136" expanded="true" signature="1883:2245" placeholder="..." />
-            <marker date="1490756928136" expanded="true" signature="1936:2223" placeholder="..." />
-            <marker date="1490756928136" expanded="true" signature="2107:2202" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/mode/MySqliteHelper.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -2898,7 +2865,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/DataTransferFragment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.34858045">
+        <state vertical-scroll-proportion="0.0">
           <caret line="390" column="27" selection-start-line="390" selection-start-column="27" selection-end-line="390" selection-end-column="27" />
           <folding>
             <element signature="e#3380#4960#0" expanded="true" />
@@ -2916,6 +2883,14 @@
             <element signature="e#14606#16901#0" expanded="true" />
             <element signature="e#16900#16901#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.9342561">
+          <caret line="2345" column="10" selection-start-line="2345" selection-start-column="10" selection-end-line="2345" selection-end-column="10" />
+          <folding />
         </state>
       </provider>
     </entry>
