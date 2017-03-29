@@ -138,11 +138,12 @@ public class MobileSecurityActivity extends Activity {
                         }
                         if (!sharedPreferences.getString("security_port", "").equals("")) {
                             port = sharedPreferences.getString("security_port", "");
-                            //Log.i("sharedPreferences=ip=>",ip);
+                            //Log.i("sharedPreferences=ip=>",port);
                         } else {
                             port = "8088";
                         }
-                        String httpUrl = "http://" + ip + port + "/SMDemo/login.do?";
+                        String httpUrl = "http://" + ip + port + "/SMDemo/login.do";
+                        Log.i("httpUrl==========>",""+httpUrl);
                         // 根据地址创建URL对象
                         URL url = new URL(httpUrl);
                         // 根据URL对象打开链接
@@ -157,21 +158,21 @@ public class MobileSecurityActivity extends Activity {
                         urlConnection.setReadTimeout(5000);
                         urlConnection.setConnectTimeout(5000);
                         // 传递的数据
-                        String data = "userName=" + URLEncoder.encode(userName, "UTF-8") + "&userPass=" + URLEncoder.encode(userPass, "UTF-8");
+                        String data = "username=" + URLEncoder.encode(userName, "UTF-8") + "&password=" + URLEncoder.encode(userPass, "UTF-8");
                         Log.i("data==========>","data="+data);
                         // 设置请求的头
-                        urlConnection.setRequestProperty("Connection", "keep-alive");
-                        urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                        urlConnection.setRequestProperty("Content-Length", String.valueOf(data.getBytes().length));
-                        urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0");
+                        //urlConnection.setRequestProperty("Content-Length", String.valueOf(data.getBytes().length));
+                        urlConnection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                        //urlConnection.setRequestProperty("Origin", "http://"+ ip + port);
                         //获取输出流
                         OutputStream os = urlConnection.getOutputStream();
-                        os.write(data.getBytes());
+                        os.write(data.getBytes("UTF-8"));
                         os.flush();
                         os.close();
+                        Log.i("getResponseCode====>",""+urlConnection.getResponseCode());
                         if (urlConnection.getResponseCode() == 200) {
                             InputStream inputStream = urlConnection.getInputStream();
-                            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+                            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
                             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                             StringBuilder stringBuilder = new StringBuilder();
                             String str;
@@ -182,7 +183,7 @@ public class MobileSecurityActivity extends Activity {
                             inputStream.close();
                             // 返回字符串
                             String result = stringBuilder.toString();
-                            Log.i("result_query==========>", result);
+                            Log.i("login_result=========>", result);
                             JSONObject jsonObject = new JSONObject(result);
                             if (jsonObject.optInt("messg", 0) == 1) {
                                 handler.sendEmptyMessage(1);
@@ -191,7 +192,7 @@ public class MobileSecurityActivity extends Activity {
                                 handler.sendEmptyMessage(2);
                             }
                         } else {
-                            System.out.println("登录失败！");
+                            Log.i("login_state===>","登录失败");
                         }
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
@@ -215,6 +216,7 @@ public class MobileSecurityActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
+                    Toast.makeText(MobileSecurityActivity.this, "登录成功！!", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(MobileSecurityActivity.this, SecurityChooseActivity.class);
                     startActivity(intent);
                     finish();

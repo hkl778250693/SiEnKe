@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,6 +20,7 @@ import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -25,17 +28,21 @@ import java.util.List;
  */
 public class TaskChooseActivity extends Activity {
     private ImageView back;
-    private TextView save;
+    private TextView save,noData;
     private ListView listView;
     private List<TaskChoose> taskChooseList = new ArrayList<>();
+    private HashMap<String,Object> map = new HashMap<String,Object>();
+    private TaskChooseAdapter adapter;   //适配器
     private SQLiteDatabase db;  //数据库
     private MySqliteHelper helper; //数据库帮助类
+    List<Integer> integerList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_choose);
 
+        defaultSetting();//初始化设置
         new Thread(){
             @Override
             public void run() {
@@ -44,7 +51,6 @@ public class TaskChooseActivity extends Activity {
             }
         }.start();
         bindView();//绑定控件
-        defaultSetting();//初始化设置
         setViewClickListener();//点击事件
     }
 
@@ -52,6 +58,7 @@ public class TaskChooseActivity extends Activity {
     private void bindView() {
         back = (ImageView) findViewById(R.id.back);
         save = (TextView) findViewById(R.id.save);
+        noData = (TextView) findViewById(R.id.no_data);
         listView = (ListView) findViewById(R.id.listview);
     }
 
@@ -65,7 +72,7 @@ public class TaskChooseActivity extends Activity {
     private void setViewClickListener() {
         back.setOnClickListener(onClickListener);
         save.setOnClickListener(onClickListener);
-        TaskChooseAdapter adapter = new TaskChooseAdapter(TaskChooseActivity.this, taskChooseList);
+        adapter = new TaskChooseAdapter(TaskChooseActivity.this, taskChooseList);
         listView.setAdapter(adapter);
     }
 
@@ -77,13 +84,29 @@ public class TaskChooseActivity extends Activity {
                     finish();
                     break;
                 case R.id.save:
+                    saveTaskInfo();
                     Intent intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
+                    for(int j=0;j<integerList.size();j++){
+                        intent.putExtra("taskId"+integerList.get(j),map.get("taskId="+integerList.get(j))+"");
+                    }
                     startActivity(intent);
                     finish();
                     break;
             }
         }
     };
+
+    //保存选中的任务编号信息
+    public void saveTaskInfo(){
+        HashMap<Integer,Boolean> state = adapter.state;
+        for(int i=0;i<adapter.getCount();i++){
+            if(state.get(i) != null){
+                TaskChoose taskChoose = taskChooseList.get((int)adapter.getItemId(i));
+                map.put("taskId="+i,taskChoose.getTaskNumber());
+                integerList.add(i);
+            }
+        }
+    }
 
     /**
      * 查询方法参数详解
@@ -120,24 +143,34 @@ public class TaskChooseActivity extends Activity {
     //读取下载到本地的任务数据
     public void getTaskData() {
         Cursor cursor = db.query("Task",null,null,null,null,null,null);//查询并获得游标
-        if(!cursor.isFirst()){  //是否在第一行
+        if (cursor.getCount() == 0){
+            if(noData.getVisibility() == View.GONE){
+                noData.setVisibility(View.VISIBLE);
+            }
+            return;
+        }else if(!cursor.isFirst()){  //是否在第一行
             cursor.moveToFirst();  //将游标移动到第一行
-            int columnNumb = cursor.getColumnCount();
+            if(noData.getVisibility() == View.VISIBLE){
+                noData.setVisibility(View.GONE);
+            }
             while (cursor.moveToNext()){
                 TaskChoose taskChoose = new TaskChoose();
-                for (int i=0;i < columnNumb;i++){  //循环读取每列的数据
-
-
-                }
+                taskChoose.setTaskName(cursor.getString(1));
+                taskChoose.setTaskNumber(cursor.getString(2));
+                taskChoose.setCheckType(cursor.getString(3));
+                taskChoose.setTotalUserNumber(cursor.getString(4));
+                taskChoose.setEndTime(cursor.getString(5));
                 taskChooseList.add(taskChoose);
             }
         }
+
+        /*int columnNumb = cursor.getColumnCount();
+          for (int i=0;i < columnNumb;i++){  //循环读取每列的数据
+                    String columnName = cursor.getColumnName(i);  //获得每列的列名
+                    String taskName = cursor.getString(i);  //获取每列对应的值
+                }*/
         //cursor游标操作完成以后,一定要关闭
         cursor.close();
-        for (int i = 0; i < 20; i++) {
-            TaskChoose taskChoose = new TaskChoose();
-            taskChooseList.add(taskChoose);
-        }
     }
 
     @Override

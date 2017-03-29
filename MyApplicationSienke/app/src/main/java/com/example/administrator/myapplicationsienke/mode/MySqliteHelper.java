@@ -12,20 +12,27 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MySqliteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME="SiEnKe.db";//数据库名称
 
-    final String CREATE_TABLE_SQL_USER = "CREATE TABLE IF NOT EXISTS User " +                       //用户表
-            "(id INTEGER  primary key AUTOINCREMENT,userName varchar(200),meterNumber varchar(200),userPhone varchar(200),securityType varchar(200),oldUserId varchar(200),newUserId varchar(200),userAddress  varchar(200),taskNumber varchar(200))";
-    final String CREATE_TABLE_SQL_TASK = "CREATE TABLE IF NOT EXISTS Task " +                       //任务表
-            "(id INTEGER  primary key AUTOINCREMENT,taskName varchar(200),taskId varchar(200),securityType varchar(200),totalCount varchar(200),endTime varchar(200))";
-    final String CREATE_TABLE_SQL_SECURITY_CASE = "CREATE TABLE IF NOT EXISTS security_case " +     //安全情况表
-            "(id INTEGER  primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
-    final String CREATE_TABLE_SQL_SECURITY_HIDDEEN_DANGER = "CREATE TABLE IF NOT EXISTS security_hidden_danger " +  //安全隐患表
-            "(id INTEGER  primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
-    final String CREATE_TABLE_SQL_SECURITY_HIDDEEN_DENGER_REASON = "CREATE TABLE IF NOT EXISTS security_hidden_danger_reason " +   //安全隐患原因表
-            "(id INTEGER  primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
-    final String CREATE_TABLE_SQL_SECURITY_INFO_PHOTO = "CREATE TABLE IF NOT EXISTS security_info_photo " +         //安全信息与照片关联表
-            "(id INTEGER  primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
-    final String CREATE_TABLE_SQL_SECURITY_INFO = "CREATE TABLE IF NOT EXISTS security_info " +     //安全信息表
-            "(id INTEGER  primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
+    //用户表
+    final String CREATE_TABLE_SQL_USER = "CREATE TABLE User" +
+            "(id integer primary key AUTOINCREMENT,userName varchar(200),meterNumber varchar(200),userPhone varchar(200),securityType varchar(200),oldUserId varchar(200),newUserId varchar(200),userAddress  varchar(200),taskId varchar(200))";
+    //任务表
+    final String CREATE_TABLE_SQL_TASK = "CREATE TABLE Task " +
+            "(id integer primary key AUTOINCREMENT,taskName varchar(200),taskId varchar(200),securityType varchar(200),totalCount varchar(200),endTime varchar(200))";
+    //安全情况表
+    final String CREATE_TABLE_SQL_SECURITY_CASE = "CREATE TABLE security_case " +
+            "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
+    //安全隐患表
+    final String CREATE_TABLE_SQL_SECURITY_HIDDEEN_DANGER = "CREATE TABLE security_hidden_danger " +
+            "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
+    //安全隐患原因表
+    final String CREATE_TABLE_SQL_SECURITY_HIDDEEN_DENGER_REASON = "CREATE TABLE security_hidden_danger_reason " +
+            "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
+    //安全信息与照片关联表
+    final String CREATE_TABLE_SQL_SECURITY_INFO_PHOTO = "CREATE TABLE security_info_photo " +
+            "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
+    //安全信息表
+    final String CREATE_TABLE_SQL_SECURITY_INFO = "CREATE TABLE security_info " +
+            "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";    
 
     //构造器
     public MySqliteHelper(Context context,int version){

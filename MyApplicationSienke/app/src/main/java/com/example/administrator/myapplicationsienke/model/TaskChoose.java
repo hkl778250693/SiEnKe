@@ -9,6 +9,7 @@ public class TaskChoose {
     private String checkType;   //安检类型
     private String totalUserNumber;  //总用户数
     private String endTime;   //结束时间
+    private boolean isChecked;  //是否是选中状态
 
     public String getTaskName() {
         return taskName;
@@ -48,5 +49,13 @@ public class TaskChoose {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
     }
 }
