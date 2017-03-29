@@ -190,13 +190,13 @@ public class DataTransferFragment extends Fragment {
                         ip = sharedPreferences.getString("security_ip", "");
                         //Log.i("sharedPreferences=ip=>",ip);
                     } else {
-                        ip = "88.88.88.31:";
+                        ip = "88.88.88.66:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                         //Log.i("sharedPreferences=ip=>",ip);
                     } else {
-                        port = "8080";
+                        port = "8088";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
@@ -346,14 +346,12 @@ public class DataTransferFragment extends Fragment {
                     try {
                         JSONObject jsonObject = new JSONObject(taskResult);
                         JSONArray jsonArray = jsonObject.getJSONArray("rows");
+                        Log.i("jsonArray==========>", "jsonArray=="+jsonArray.length());
                         for (int i = 0; i < jsonArray.length(); i++) {
                             taskObject = jsonArray.getJSONObject(i);
                             insertTaskData();
                             //taskNumbList.add(userObject.optInt("safetyplanId",0)+"");
                         }
-                        //Log.i("taskNumb=======>",taskNumb);
-                        taskNumb = userObject.optInt("safetyplanId", 0) + "";
-                        Log.i("taskNumb=======>", taskNumb);
                         popupWindow.dismiss();
                         Toast.makeText(getActivity(), "任务下载完成，用户信息正在下载，请稍等...", Toast.LENGTH_SHORT).show();
                         showPopupwindow();
@@ -395,6 +393,7 @@ public class DataTransferFragment extends Fragment {
         values.put("taskId", taskObject.optInt("safetyplanId", 0) + "");
         values.put("securityType", taskObject.optString("securityName", ""));
         values.put("totalCount", taskObject.optInt("countRs", 0) + "");
+        Log.i("totalCount==========>", "totalCount="+taskObject.optInt("countRs", 0));
         values.put("endTime", taskObject.optString("safetyEnd", ""));
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
