@@ -34,6 +34,8 @@ public class UserListActivity extends Activity {
     private RadioButton notSecurityCheck,passSecurityCheck,notPassSecurityCheck;
     private PopupWindow popupWindow;
     private List<UserListviewItem> userListviewItemList = new ArrayList<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

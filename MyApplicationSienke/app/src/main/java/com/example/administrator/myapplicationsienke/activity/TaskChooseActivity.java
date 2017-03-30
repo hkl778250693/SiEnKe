@@ -1,12 +1,9 @@
 package com.example.administrator.myapplicationsienke.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +14,6 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.TaskChooseAdapter;
-import com.example.administrator.myapplicationsienke.fragment.SecurityChooseFragment;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
 
@@ -39,9 +35,7 @@ public class TaskChooseActivity extends AppCompatActivity {
     private MySqliteHelper helper; //数据库帮助类
     private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
     private ArrayList<String> stringList = new ArrayList<>();//保存任务编号参数
-    private FragmentManager fragmentManager;
-    private FragmentTransaction transaction;
-    private SecurityChooseFragment chooseFragment;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +66,6 @@ public class TaskChooseActivity extends AppCompatActivity {
     private void defaultSetting() {
         helper = new MySqliteHelper(TaskChooseActivity.this, 1);
         db = helper.getReadableDatabase();
-        fragmentManager = getSupportFragmentManager();
-        transaction = fragmentManager.beginTransaction();
     }
 
     //点击事件
@@ -92,47 +84,57 @@ public class TaskChooseActivity extends AppCompatActivity {
                     finish();
                     break;
                 case R.id.save:
-                    saveTaskInfo(); //保存选中的任务编号信息
+                    saveTaskInfoAndDelete(); //保存选中的任务编号信息
                     Toast.makeText(TaskChooseActivity.this, "保存成功！您可以到用户列表查看哦~", Toast.LENGTH_LONG).show();
-                    transferParams(); //传递任务编号参数到fragment
-                    Intent intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
-                    startActivity(intent);
-                    finish();
+                    intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
+                    transferParams(); //传递任务编号参数到主页面
+                    //startActivity(intent);
+                    //finish();
                     break;
             }
         }
     };
 
     //保存选中的任务编号信息
-    public void saveTaskInfo() {
-        HashMap<Integer, Boolean> state = adapter.state;
-        for (int i = 0; i < adapter.getCount(); i++) {
-            if (state.get(i) != null) {
+    public void saveTaskInfoAndDelete() {
+        HashMap<Integer, Boolean> isCheck_delete = adapter.getHashMap();
+        int count = adapter.getCount();
+        for (int i = 0; i < count; i++) {
+            int position = i - (count - adapter.getCount());
+            if (isCheck_delete.get(i) != null && isCheck_delete.get(i)) {
                 TaskChoose taskChoose = taskChooseList.get((int) adapter.getItemId(i));
                 map.put("taskId" + i, taskChoose.getTaskNumber());
-                Log.i("taskId=========>","这次被勾选第"+i+"个，任务编号为："+taskChoose.getTaskNumber());
+                Log.i("taskId=========>", "这次被勾选第" + i + "个，任务编号为：" + taskChoose.getTaskNumber());
                 integers.add(i);
-                Log.i("integers====>","长度为："+integers.size());
+                Log.i("integers====>", "长度为：" + integers.size());
+                isCheck_delete.remove(i);
+                adapter.removeData(position);
+                Log.i("removeData====>", "删除的位置是：" + position);
             }
         }
+        /*//点击保存时删除选中的item
+        for (int j=0;j<count;j++){
+            int position = j - (count - adapter.getCount());
+            // 判断状态，true则删除
+            if(isCheck_delete.get(j) != null){
+                isCheck_delete.remove(j);
+                adapter.removeData(position);
+            }
+        }*/
+        adapter.notifyDataSetChanged();
     }
 
-    //传递任务编号参数到fragment
-    public void transferParams(){
-        chooseFragment = new SecurityChooseFragment();
+    //传递任务编号参数到主页面
+    public void transferParams() {
         Bundle bundle = new Bundle();
         for (int j = 0; j < integers.size(); j++) {
-            stringList.add( map.get("taskId" + integers.get(j)).toString());
-            Log.i("bundle.putString====>","传递的参数为："+map.get("taskId=" + integers.get(j)));
+            stringList.add(map.get("taskId" + integers.get(j)).toString());
+            Log.i("bundle.putString====>", "传递的参数为：" + map.get("taskId=" + integers.get(j)));
         }
-        bundle.putStringArrayList("taskId",stringList);
-        bundle.putInt("task_total_numb",integers.size());
-        bundle.putIntegerArrayList("integerList",integers);
-        chooseFragment.setArguments(bundle);
-        //将Fragment添加到事务中，并指定一个TAG
-        transaction.add(chooseFragment,"100");
-        //提交Fragment事务
-        transaction.commit();
+        bundle.putStringArrayList("taskId", stringList);
+        bundle.putInt("task_total_numb", integers.size());
+        bundle.putIntegerArrayList("integerList", integers);
+        intent.putExtras(bundle);
     }
 
     /**
