@@ -23,8 +23,11 @@
                 android:layout_margin="10dp"
                 android:background="@mipmap/userlist"
                 android:gravity="right"
-                android:padding="3dp"
-                android:text="37"
+                android:paddingLeft="25dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:paddingRight="5dp"
+                android:text="37221226"
                 android:textColor="@android:color/white"
                 android:textSize="13sp" />
 
