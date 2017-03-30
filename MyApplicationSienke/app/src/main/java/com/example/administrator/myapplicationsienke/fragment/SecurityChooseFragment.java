@@ -1,9 +1,11 @@
 package com.example.administrator.myapplicationsienke.fragment;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +17,9 @@ import com.example.administrator.myapplicationsienke.activity.NoCheckUserListAct
 import com.example.administrator.myapplicationsienke.activity.SecurityStatisticsActivity;
 import com.example.administrator.myapplicationsienke.activity.TaskChooseActivity;
 import com.example.administrator.myapplicationsienke.activity.UserListActivity;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/3/16 0016.
@@ -23,7 +27,7 @@ import java.util.ArrayList;
 public class SecurityChooseFragment extends Fragment {
     private View view;
     //继续安检  //用户列表 //未检用户 //新建任务   //安检统计     //任务选择
-    private LinearLayout continueSecurity, userList, noCheckUser, newTask, securityStatistics, taskChoose;
+    private LinearLayout continueSecurity,userList,noCheckUser,newTask,securityStatistics,taskChoose;
     private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
     private int task_total_numb;
     private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
@@ -32,7 +36,7 @@ public class SecurityChooseFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_security, null);
+        view = inflater.inflate(R.layout.fragment_security,null);
 
         getTaskParams();//获取任务编号参数
         bindView();//绑定控件ID
@@ -41,23 +45,23 @@ public class SecurityChooseFragment extends Fragment {
     }
 
     //获取任务编号参数
-    public void getTaskParams() {
+    public void getTaskParams(){
         fragmentManager = getActivity().getSupportFragmentManager();
         Bundle bundle = fragmentManager.findFragmentByTag("100").getArguments();
-        if (bundle != null) {
-            task_total_numb = bundle.getInt("task_total_numb", 0);
-            Log.i("SecurityChooseFragment=", "task_total_numb=" + task_total_numb);
+        if(bundle != null){
+            task_total_numb = bundle.getInt("task_total_numb",0);
+            Log.i("SecurityChooseFragment=","task_total_numb="+task_total_numb);
             integers = bundle.getIntegerArrayList("integerList");
-            Log.i("SecurityChooseFragment=", "integers：" + integers.size());
+            Log.i("SecurityChooseFragment=","integers："+integers.size());
             stringList = bundle.getStringArrayList("taskId");
-            for (int i = 0; i < stringList.size(); i++) {
-                Log.i("intent.getStringExtra=", "得到的参数为：" + stringList);
+            for(int i=0;i<stringList.size();i++){
+                Log.i("intent.getStringExtra=","得到的参数为："+stringList);
             }
         }
     }
 
     //绑定控件
-    public void bindView() {
+    public void bindView(){
         continueSecurity = (LinearLayout) view.findViewById(R.id.continue_security);
         userList = (LinearLayout) view.findViewById(R.id.user_list);
         noCheckUser = (LinearLayout) view.findViewById(R.id.no_check_user);
@@ -67,7 +71,7 @@ public class SecurityChooseFragment extends Fragment {
     }
 
     //点击事件
-    private void setViewClickListener() {
+    private void setViewClickListener(){
         continueSecurity.setOnClickListener(clickListener);
         userList.setOnClickListener(clickListener);
         noCheckUser.setOnClickListener(clickListener);
@@ -79,11 +83,11 @@ public class SecurityChooseFragment extends Fragment {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (v.getId()) {
+            switch (v.getId()){
                 case R.id.continue_security:
                     break;
                 case R.id.user_list:
-                    Intent intent = new Intent(getActivity(), UserListActivity.class);
+                    Intent intent = new Intent(getActivity(),UserListActivity.class);
                     startActivity(intent);
                     break;
                 case R.id.no_check_user:

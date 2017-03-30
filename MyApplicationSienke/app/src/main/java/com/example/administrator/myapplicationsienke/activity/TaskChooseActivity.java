@@ -1,5 +1,6 @@
 package com.example.administrator.myapplicationsienke.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -109,27 +110,27 @@ public class TaskChooseActivity extends AppCompatActivity {
             if (state.get(i) != null) {
                 TaskChoose taskChoose = taskChooseList.get((int) adapter.getItemId(i));
                 map.put("taskId" + i, taskChoose.getTaskNumber());
-                Log.i("taskId=========>", "这次被勾选第" + i + "个，任务编号为：" + taskChoose.getTaskNumber());
+                Log.i("taskId=========>","这次被勾选第"+i+"个，任务编号为："+taskChoose.getTaskNumber());
                 integers.add(i);
-                Log.i("integers====>", "长度为：" + integers.size());
+                Log.i("integers====>","长度为："+integers.size());
             }
         }
     }
 
     //传递任务编号参数到fragment
-    public void transferParams() {
+    public void transferParams(){
         chooseFragment = new SecurityChooseFragment();
         Bundle bundle = new Bundle();
         for (int j = 0; j < integers.size(); j++) {
-            stringList.add(map.get("taskId" + integers.get(j)).toString());
-            Log.i("bundle.putString====>", "传递的参数为：" + map.get("taskId=" + integers.get(j)));
+            stringList.add( map.get("taskId" + integers.get(j)).toString());
+            Log.i("bundle.putString====>","传递的参数为："+map.get("taskId=" + integers.get(j)));
         }
-        bundle.putStringArrayList("taskId", stringList);
-        bundle.putInt("task_total_numb", integers.size());
-        bundle.putIntegerArrayList("integerList", integers);
+        bundle.putStringArrayList("taskId",stringList);
+        bundle.putInt("task_total_numb",integers.size());
+        bundle.putIntegerArrayList("integerList",integers);
         chooseFragment.setArguments(bundle);
         //将Fragment添加到事务中，并指定一个TAG
-        transaction.add(chooseFragment, "100");
+        transaction.add(chooseFragment,"100");
         //提交Fragment事务
         transaction.commit();
     }
