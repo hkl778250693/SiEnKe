@@ -24,9 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
-import com.example.administrator.myapplicationsienke.activity.DownloadActivity;
 import com.example.administrator.myapplicationsienke.activity.UploadActivity;
-import com.example.administrator.myapplicationsienke.adapter.DownloadListViewAdapter;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.DownloadListvieItem;
 
