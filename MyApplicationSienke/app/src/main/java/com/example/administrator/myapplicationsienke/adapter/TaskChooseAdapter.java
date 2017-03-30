@@ -22,7 +22,7 @@ public class TaskChooseAdapter extends BaseAdapter {
     private Context context;
     private List<TaskChoose> taskChooseList;
     private LayoutInflater layoutInflater;
-    public HashMap<Integer,Boolean> state = new HashMap<Integer,Boolean>();
+    public HashMap<Integer,Boolean> isCheck = new HashMap<Integer,Boolean>();
 
     public TaskChooseAdapter(Context context,List<TaskChoose> taskChooseList){
         this.context = context;
@@ -30,6 +30,24 @@ public class TaskChooseAdapter extends BaseAdapter {
         if(context != null){
             layoutInflater = LayoutInflater.from(context);
         }
+        // 默认为不选中
+        initCheck(false);
+    }
+    // 初始化map集合
+    public void initCheck(boolean flag) {
+        for (int i = 0; i < taskChooseList.size(); i++) {  // map集合的数量和list的数量是一致的
+            isCheck.put(i, flag);  // 设置默认的显示
+        }
+    }
+
+    // 删除一个数据
+    public void removeData(int position) {
+        taskChooseList.remove(position);
+    }
+
+    public HashMap<Integer,Boolean> getHashMap() {
+        // 返回状态
+        return isCheck;
     }
 
     @Override
@@ -72,14 +90,20 @@ public class TaskChooseAdapter extends BaseAdapter {
         viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    state.put(position,isChecked);
+                /*if(isChecked){
+                    isCheck.put(position,isChecked);
                 }else {
-                    state.remove(position);
-                }
+                    isCheck.remove(position);
+                }*/
+                // 用map集合保存
+                isCheck.put(position, isChecked);
             }
         });
-        viewHolder.checkBox.setChecked((state.get(position) == null ? false : true));
+        // 设置状态
+        if (isCheck.get(position) == null) {
+            isCheck.put(position, false);
+        }
+        viewHolder.checkBox.setChecked(isCheck.get(position));
         return convertView;
     }
 

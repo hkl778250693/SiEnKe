@@ -84,7 +84,7 @@ public class TaskChooseActivity extends AppCompatActivity {
                     finish();
                     break;
                 case R.id.save:
-                    saveTaskInfo(); //保存选中的任务编号信息
+                    saveTaskInfoAndDelete(); //保存选中的任务编号信息
                     Toast.makeText(TaskChooseActivity.this, "保存成功！您可以到用户列表查看哦~", Toast.LENGTH_LONG).show();
                     intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
                     transferParams(); //传递任务编号参数到主页面
@@ -96,17 +96,32 @@ public class TaskChooseActivity extends AppCompatActivity {
     };
 
     //保存选中的任务编号信息
-    public void saveTaskInfo() {
-        HashMap<Integer, Boolean> state = adapter.state;
-        for (int i = 0; i < adapter.getCount(); i++) {
-            if (state.get(i) != null) {
+    public void saveTaskInfoAndDelete() {
+        HashMap<Integer, Boolean> isCheck_delete = adapter.getHashMap();
+        int count = adapter.getCount();
+        for (int i = 0; i < count; i++) {
+            int position = i - (count - adapter.getCount());
+            if (isCheck_delete.get(i) != null && isCheck_delete.get(i)) {
                 TaskChoose taskChoose = taskChooseList.get((int) adapter.getItemId(i));
                 map.put("taskId" + i, taskChoose.getTaskNumber());
                 Log.i("taskId=========>", "这次被勾选第" + i + "个，任务编号为：" + taskChoose.getTaskNumber());
                 integers.add(i);
                 Log.i("integers====>", "长度为：" + integers.size());
+                isCheck_delete.remove(i);
+                adapter.removeData(position);
+                Log.i("removeData====>", "删除的位置是：" + position);
             }
         }
+        /*//点击保存时删除选中的item
+        for (int j=0;j<count;j++){
+            int position = j - (count - adapter.getCount());
+            // 判断状态，true则删除
+            if(isCheck_delete.get(j) != null){
+                isCheck_delete.remove(j);
+                adapter.removeData(position);
+            }
+        }*/
+        adapter.notifyDataSetChanged();
     }
 
     //传递任务编号参数到主页面
@@ -115,6 +130,7 @@ public class TaskChooseActivity extends AppCompatActivity {
         for (int j = 0; j < integers.size(); j++) {
             stringList.add(map.get("taskId" + integers.get(j)).toString());
             Log.i("bundle.putString====>", "传递的参数为：" + map.get("taskId" + integers.get(j)).toString());
+            Log.i("bundle.putString====>", "传递的参数为：" + map.get("taskId=" + integers.get(j)));
         }
         bundle.putStringArrayList("taskId", stringList);
         bundle.putInt("task_total_numb", integers.size());
