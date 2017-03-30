@@ -405,6 +405,7 @@ public class DataTransferFragment extends Fragment {
     //将服务器下载的用户信息数据存到本地数据库用户表
     private void insertUserInfo() {
         ContentValues values = new ContentValues();
+        values.put("securityNumber", userObject.optString("safetyInspectionId", ""));
         values.put("userName", userObject.optString("userName", ""));
         values.put("meterNumber", userObject.optString("meterNumber", ""));
         values.put("userPhone", userObject.optString("userPhone", ""));

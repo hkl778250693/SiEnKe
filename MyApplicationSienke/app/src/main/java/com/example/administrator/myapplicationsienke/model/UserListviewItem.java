@@ -5,11 +5,12 @@ package com.example.administrator.myapplicationsienke.model;
  */
 public class UserListviewItem {
     private String userName;             //姓名
-    private int number;                   //表编号
-    private int phoneNumber;             //电话号码
+    private String number;                   //表编号
+    private String phoneNumber;             //电话号码
     private String securityType;         //安检类型
     private String userId;                     //时间
     private String adress;                //地址
+    private String securityNumber;                //安检编号
 
     public String getUserName() {
         return userName;
@@ -19,19 +20,19 @@ public class UserListviewItem {
         this.userName = userName;
     }
 
-    public int getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(int phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
@@ -57,5 +58,13 @@ public class UserListviewItem {
 
     public void setAdress(String adress) {
         this.adress = adress;
+    }
+
+    public String getSecurityNumber() {
+        return securityNumber;
+    }
+
+    public void setSecurityNumber(String securityNumber) {
+        this.securityNumber = securityNumber;
     }
 }
