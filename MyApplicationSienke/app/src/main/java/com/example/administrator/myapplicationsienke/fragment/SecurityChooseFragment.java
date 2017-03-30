@@ -4,12 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.activity.NewTaskActivity;
 import com.example.administrator.myapplicationsienke.activity.NoCheckUserListActivity;
@@ -17,22 +18,46 @@ import com.example.administrator.myapplicationsienke.activity.SecurityStatistics
 import com.example.administrator.myapplicationsienke.activity.TaskChooseActivity;
 import com.example.administrator.myapplicationsienke.activity.UserListActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Administrator on 2017/3/16 0016.
  */
 public class SecurityChooseFragment extends Fragment {
     private View view;
-                        //继续安检  //用户列表 //未检用户 //新建任务   //安检统计     //任务选择
+    //继续安检  //用户列表 //未检用户 //新建任务   //安检统计     //任务选择
     private LinearLayout continueSecurity,userList,noCheckUser,newTask,securityStatistics,taskChoose;
+    private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
+    private int task_total_numb;
+    private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
+    private FragmentManager fragmentManager;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_security,null);
 
+        getTaskParams();//获取任务编号参数
         bindView();//绑定控件ID
         setViewClickListener();//点击事件
         return view;
+    }
+
+    //获取任务编号参数
+    public void getTaskParams(){
+        fragmentManager = getActivity().getSupportFragmentManager();
+        Bundle bundle = fragmentManager.findFragmentByTag("100").getArguments();
+        if(bundle != null){
+            task_total_numb = bundle.getInt("task_total_numb",0);
+            Log.i("SecurityChooseFragment=","task_total_numb="+task_total_numb);
+            integers = bundle.getIntegerArrayList("integerList");
+            Log.i("SecurityChooseFragment=","integers："+integers.size());
+            stringList = bundle.getStringArrayList("taskId");
+            for(int i=0;i<stringList.size();i++){
+                Log.i("intent.getStringExtra=","得到的参数为："+stringList);
+            }
+        }
     }
 
     //绑定控件
@@ -84,4 +109,5 @@ public class SecurityChooseFragment extends Fragment {
             }
         }
     };
+
 }

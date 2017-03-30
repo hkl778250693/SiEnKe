@@ -1,15 +1,15 @@
 package com.example.administrator.myapplicationsienke.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.TaskChooseAdapter;
+import com.example.administrator.myapplicationsienke.fragment.SecurityChooseFragment;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
 
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/3/15 0015.
  */
-public class TaskChooseActivity extends Activity {
+public class TaskChooseActivity extends AppCompatActivity {
     private ImageView back;
     private TextView save, noData;
     private ListView listView;
@@ -36,7 +37,11 @@ public class TaskChooseActivity extends Activity {
     private TaskChooseAdapter adapter;   //适配器
     private SQLiteDatabase db;  //数据库
     private MySqliteHelper helper; //数据库帮助类
-    List<Integer> integerList = new ArrayList<>();
+    private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
+    private ArrayList<String> stringList = new ArrayList<>();//保存任务编号参数
+    private FragmentManager fragmentManager;
+    private FragmentTransaction transaction;
+    private SecurityChooseFragment chooseFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +72,8 @@ public class TaskChooseActivity extends Activity {
     private void defaultSetting() {
         helper = new MySqliteHelper(TaskChooseActivity.this, 1);
         db = helper.getReadableDatabase();
+        fragmentManager = getSupportFragmentManager();
+        transaction = fragmentManager.beginTransaction();
     }
 
     //点击事件
@@ -85,14 +92,10 @@ public class TaskChooseActivity extends Activity {
                     finish();
                     break;
                 case R.id.save:
-                    saveTaskInfo();
+                    saveTaskInfo(); //保存选中的任务编号信息
                     Toast.makeText(TaskChooseActivity.this, "保存成功！您可以到用户列表查看哦~", Toast.LENGTH_LONG).show();
+                    transferParams(); //传递任务编号参数到fragment
                     Intent intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
-                    for (int j = 0; j < integerList.size(); j++) {
-                        intent.putExtra("taskId" + integerList.get(j), map.get("taskId=" + integerList.get(j)) + "");
-                        Log.i("intent.putExtra====>","传递的参数为："+map.get("taskId=" + integerList.get(j)));
-                    }
-                    intent.putExtra("task_total_numb",integerList.size());
                     startActivity(intent);
                     finish();
                     break;
@@ -106,12 +109,30 @@ public class TaskChooseActivity extends Activity {
         for (int i = 0; i < adapter.getCount(); i++) {
             if (state.get(i) != null) {
                 TaskChoose taskChoose = taskChooseList.get((int) adapter.getItemId(i));
-                map.put("taskId=" + i, taskChoose.getTaskNumber());
+                map.put("taskId" + i, taskChoose.getTaskNumber());
                 Log.i("taskId=========>","这次被勾选第"+i+"个，任务编号为："+taskChoose.getTaskNumber());
-                integerList.add(i);
-                Log.i("integerList====>","长度为："+integerList.size());
+                integers.add(i);
+                Log.i("integers====>","长度为："+integers.size());
             }
         }
+    }
+
+    //传递任务编号参数到fragment
+    public void transferParams(){
+        chooseFragment = new SecurityChooseFragment();
+        Bundle bundle = new Bundle();
+        for (int j = 0; j < integers.size(); j++) {
+            stringList.add( map.get("taskId" + integers.get(j)).toString());
+            Log.i("bundle.putString====>","传递的参数为："+map.get("taskId=" + integers.get(j)));
+        }
+        bundle.putStringArrayList("taskId",stringList);
+        bundle.putInt("task_total_numb",integers.size());
+        bundle.putIntegerArrayList("integerList",integers);
+        chooseFragment.setArguments(bundle);
+        //将Fragment添加到事务中，并指定一个TAG
+        transaction.add(chooseFragment,"100");
+        //提交Fragment事务
+        transaction.commit();
     }
 
     /**
