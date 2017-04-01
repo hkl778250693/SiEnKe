@@ -18,7 +18,6 @@
     </layouts>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_LOG_LEVEL" value="INFO" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
@@ -110,11 +109,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AndroidManifest.xml" pinned="false" current-in-tab="true">
+      <file leaf-file-name="AndroidManifest.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.38124055">
-              <caret line="33" column="66" selection-start-line="33" selection-start-column="66" selection-end-line="33" selection-end-column="66" />
+            <state vertical-scroll-proportion="-16.464285">
+              <caret line="44" column="62" selection-start-line="44" selection-start-column="62" selection-end-line="44" selection-end-column="62" />
               <folding />
             </state>
           </provider>
@@ -138,18 +137,18 @@
             <state vertical-scroll-proportion="0.0">
               <caret line="229" column="42" selection-start-line="229" selection-start-column="42" selection-end-line="229" selection-end-column="42" />
               <folding>
-                <element signature="e#10002#10820#0" expanded="true" />
-                <element signature="e#10819#10820#0" expanded="true" />
+                <element signature="e#9980#10798#0" expanded="true" />
+                <element signature="e#10797#10798#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SecurityChooseFragment.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="SecurityChooseFragment.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/SecurityChooseFragment.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="58" column="19" selection-start-line="58" selection-start-column="19" selection-end-line="58" selection-end-column="19" />
+            <state vertical-scroll-proportion="1.2054795">
+              <caret line="91" column="71" selection-start-line="91" selection-start-column="71" selection-end-line="91" selection-end-column="71" />
               <folding />
             </state>
           </provider>
@@ -1817,11 +1816,11 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/UserListActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/mode/Tools.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/DataTransferFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/SecurityChooseFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/MobileSecurityActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/TaskChooseActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/SecurityChooseActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/SecurityChooseFragment.java" />
       </list>
     </option>
   </component>
@@ -2155,7 +2154,7 @@
     <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
-    <property name="device.picker.selection" value="KFN76HGQWKS8DMT4" />
+    <property name="device.picker.selection" value="Nexus_5_API_24" />
   </component>
   <component name="RunManager" selected="Android Application.app">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
@@ -2434,8 +2433,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1456" height="876" extended-state="7" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -2443,7 +2442,7 @@
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.7562674" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Monitor" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.7562674" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5041783" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -2892,14 +2891,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/SecurityChooseFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="58" column="19" selection-start-line="58" selection-start-column="19" selection-end-line="58" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/TaskChooseActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -2926,8 +2917,8 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="229" column="42" selection-start-line="229" selection-start-column="42" selection-end-line="229" selection-end-column="42" />
           <folding>
-            <element signature="e#10002#10820#0" expanded="true" />
-            <element signature="e#10819#10820#0" expanded="true" />
+            <element signature="e#9980#10798#0" expanded="true" />
+            <element signature="e#10797#10798#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2946,8 +2937,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.38124055">
-          <caret line="33" column="66" selection-start-line="33" selection-start-column="66" selection-end-line="33" selection-end-column="66" />
+        <state vertical-scroll-proportion="-16.464285">
+          <caret line="44" column="62" selection-start-line="44" selection-start-column="62" selection-end-line="44" selection-end-column="62" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/SecurityChooseFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.2054795">
+          <caret line="91" column="71" selection-start-line="91" selection-start-column="71" selection-end-line="91" selection-end-column="71" />
           <folding />
         </state>
       </provider>
