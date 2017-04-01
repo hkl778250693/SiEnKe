@@ -403,12 +403,14 @@
             </LinearLayout>
 
             <RelativeLayout
+                android:id="@+id/hidden_type_root"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="7dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:paddingTop="7dp">
+                android:paddingTop="7dp"
+                android:visibility="visible">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -435,11 +437,13 @@
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/hidden_reason_root"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:paddingTop="7dp">
+                android:paddingTop="7dp"
+                android:visibility="visible">
 
                 <TextView
                     android:layout_width="wrap_content"
