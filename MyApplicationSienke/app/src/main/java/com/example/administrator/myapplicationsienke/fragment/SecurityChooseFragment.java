@@ -45,16 +45,18 @@ public class SecurityChooseFragment extends Fragment {
     public void getTaskParams() {
         Intent intent = getActivity().getIntent();
         if (intent != null) {
+            Log.i("SecurityChooseFragment=", "intent不为空");
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
+                Log.i("SecurityChooseFragment=", "bundle不为空");
                 task_total_numb = bundle.getInt("task_total_numb", 0);
                 Log.i("SecurityChooseFragment=", "task_total_numb=" + task_total_numb);
                 integers = bundle.getIntegerArrayList("integerList");
-                Log.i("SecurityChooseFragment=", "integers：" + integers.size());
+                //Log.i("SecurityChooseFragment=", "integers：" + integers.size());
                 stringList = bundle.getStringArrayList("taskId");
-                for (int i = 0; i < stringList.size(); i++) {
+                /*for (int i = 0; i < stringList.size(); i++) {
                     Log.i("intent.getStringExtra=", "得到的参数为：" + stringList);
-                }
+                }*/
             }
         }
     }

@@ -225,7 +225,7 @@ public class MobileSecurityActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    Toast.makeText(MobileSecurityActivity.this, "登录成功！", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MobileSecurityActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MobileSecurityActivity.this, SecurityChooseActivity.class);
                     startActivity(intent);
                     finish();
