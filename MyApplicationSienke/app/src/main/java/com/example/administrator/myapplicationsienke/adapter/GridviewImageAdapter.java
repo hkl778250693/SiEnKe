@@ -110,7 +110,7 @@ public class GridviewImageAdapter extends BaseAdapter{
         return super.isEnabled(position);
     }
 
-    public class ViewHolder {
+    class ViewHolder {
         ImageView imageView;
         ImageView delete;
     }

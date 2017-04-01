@@ -273,7 +273,7 @@ public class UserListActivity extends Activity {
         Log.i("UserListActivityget=", "任务编号是：" + taskId);
         Log.i("UserListActivityget=", "有" + cursor.getCount() + "条数据！");
         //如果游标为空，则显示没有数据图片
-        if (cursor.getCount() == 0) {
+        if (cursor.getCount() == 0 && noData != null) {
             if (noData.getVisibility() == View.GONE) {
                 noData.setVisibility(View.VISIBLE);
             }
