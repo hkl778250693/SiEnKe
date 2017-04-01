@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.SecurityCheckViewPagerAdapter;
@@ -40,6 +42,7 @@ public class SecurityChooseActivity extends FragmentActivity {
     private List<Fragment> fragmentList;
     private ViewPager viewPager;
     private SecurityCheckViewPagerAdapter adapter;
+    private long exitTime = 0;//退出程序
 
 
     //强制竖屏
@@ -60,6 +63,16 @@ public class SecurityChooseActivity extends FragmentActivity {
         defaultSetting();//初始化设置
         setViewPager();//设置viewPager
         setViewClickListener();//点击事件
+
+        //获取任务选择页面传过来的参数，如果参数为 1 ，则让viewpager显示数据传输fragment
+        Intent intent = getIntent();
+        if(intent != null){
+            int number = intent.getIntExtra("down",0);
+            if(number == 1){
+                dataTransferRbt.setChecked(true);
+                viewPager.setCurrentItem(1);
+            }
+        }
     }
 
     //绑定控件
@@ -209,6 +222,41 @@ public class SecurityChooseActivity extends FragmentActivity {
             adapter = new SecurityCheckViewPagerAdapter(getSupportFragmentManager(), fragmentList);
         }
         viewPager.setAdapter(adapter);
+    }
+
+    /**
+     * 捕捉返回事件按钮
+     * 因为此 Activity继承 TabActivity,用 onKeyDown无响应，
+     * 所以改用 dispatchKeyEvent
+     * <p/>
+     * 一般的 Activity 用 onKeyDown就可以了
+     */
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+                this.exitApp();
+            }
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+
+    /**
+     * 退出程序
+     */
+    private void exitApp() {
+        // 判断2次点击事件时间
+        if ((System.currentTimeMillis() - exitTime) > 2000) {
+            Log.i("exitTime==========>", System.currentTimeMillis() - exitTime + "");
+            //-------------Activity.this的context 返回当前activity的上下文，属于activity，activity 摧毁他就摧毁
+            //-------------getApplicationContext() 返回应用的上下文，生命周期是整个应用，应用摧毁它才摧毁
+            Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
+            exitTime = System.currentTimeMillis();
+        } else {
+            finish();
+        }
     }
 
 }
