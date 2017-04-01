@@ -104,13 +104,15 @@ public class TaskChooseActivity extends Activity {
             switch (v.getId()) {
                 case R.id.save:
                     if(cursor.getCount() == 0){
-                        Intent intent = new Intent(TaskChooseActivity.this, DataTransferFragment.class);
+                        Intent intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
+                        intent.putExtra("down",1);  //传递一个 1 的参数到主页面，让他替换fragment
                         startActivity(intent);
+                        finish();
                     }else {
                         saveTaskInfo(); //保存选中的任务编号信息
                         //deleteChecked();//删除选中的任务编号信息
                         saveCheckStateInfo();//保存选中状态，将信息写入preference保存以备下一次读取使用
-                        Toast.makeText(TaskChooseActivity.this, "保存成功！您可以到用户列表查看哦~", Toast.LENGTH_LONG).show();
+                        Toast.makeText(TaskChooseActivity.this, "保存成功！您可以到用户列表查看哦~", Toast.LENGTH_SHORT).show();
                         intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
                         transferParams(); //传递任务编号参数到主页面
                         startActivity(intent);
@@ -254,6 +256,7 @@ public class TaskChooseActivity extends Activity {
                 taskChooseList.add(taskChoose);
             }
         }*/
+        save.setText("保存");
         if (noData.getVisibility() == View.VISIBLE) {
             noData.setVisibility(View.GONE);
         }
@@ -279,7 +282,7 @@ public class TaskChooseActivity extends Activity {
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == 0){
-                Toast.makeText(TaskChooseActivity.this, "您还没有任务哦，快去下载吧！~", Toast.LENGTH_LONG).show();
+                Toast.makeText(TaskChooseActivity.this, "您还没有任务哦，快去下载吧！~", Toast.LENGTH_SHORT).show();
             }
             super.handleMessage(msg);
         }
