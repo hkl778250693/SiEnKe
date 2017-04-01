@@ -89,11 +89,13 @@ public class SecurityChooseFragment extends Fragment {
                     break;
                 case R.id.user_list:
                     Intent intent = new Intent(getActivity(), UserListActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putStringArrayList("taskId", stringList);
-                    bundle.putInt("task_total_numb", integers.size());
-                    bundle.putIntegerArrayList("integerList", integers);
-                    intent.putExtras(bundle);
+                    if(stringList.size() != 0 && integers.size() != 0){
+                        Bundle bundle = new Bundle();
+                        bundle.putStringArrayList("taskId", stringList);
+                        bundle.putInt("task_total_numb", integers.size());
+                        bundle.putIntegerArrayList("integerList", integers);
+                        intent.putExtras(bundle);
+                    }
                     startActivity(intent);
                     break;
                 case R.id.no_check_user:
