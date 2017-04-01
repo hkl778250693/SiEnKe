@@ -1,19 +1,23 @@
 package com.example.administrator.myapplicationsienke.activity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.TaskChooseAdapter;
+import com.example.administrator.myapplicationsienke.fragment.DataTransferFragment;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
 
@@ -24,8 +28,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/3/15 0015.
  */
-public class TaskChooseActivity extends AppCompatActivity {
-    private ImageView back;
+public class TaskChooseActivity extends Activity {
     private TextView save, noData;
     private ListView listView;
     private List<TaskChoose> taskChooseList = new ArrayList<>();
@@ -36,6 +39,10 @@ public class TaskChooseActivity extends AppCompatActivity {
     private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
     private ArrayList<String> stringList = new ArrayList<>();//保存任务编号参数
     private Intent intent;
+    private String defaul = "";//默认的全部不勾选
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +57,17 @@ public class TaskChooseActivity extends AppCompatActivity {
                 super.run();
             }
         }.start();
+        getCheckStateInfo();//获得保存在这个activity中的选择框选中状态信息
+        //初始化勾选框信息，默认都是以未勾选为单位
+        for (int i = 0; i < taskChooseList.size(); i++) {
+            defaul = defaul + "0";
+        }
         bindView();//绑定控件
         setViewClickListener();//点击事件
     }
 
     //绑定控件ID
     private void bindView() {
-        back = (ImageView) findViewById(R.id.back);
         save = (TextView) findViewById(R.id.save);
         noData = (TextView) findViewById(R.id.no_data);
         listView = (ListView) findViewById(R.id.listview);
@@ -66,11 +77,22 @@ public class TaskChooseActivity extends AppCompatActivity {
     private void defaultSetting() {
         helper = new MySqliteHelper(TaskChooseActivity.this, 1);
         db = helper.getReadableDatabase();
+        sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+    }
+
+    //获得保存在这个activity中的选择框选中状态信息
+    public void getCheckStateInfo() {
+        String checkState = sharedPreferences.getString("checkState", defaul); //如果没有获取到的话默认是0
+        for (int i = 0; i < taskChooseList.size(); i++) {
+            if (checkState.charAt(i) == '1') {
+                TaskChooseAdapter.getIsCheck().put(i, true);
+            }
+        }
     }
 
     //点击事件
     private void setViewClickListener() {
-        back.setOnClickListener(onClickListener);
         save.setOnClickListener(onClickListener);
         adapter = new TaskChooseAdapter(TaskChooseActivity.this, taskChooseList);
         listView.setAdapter(adapter);
@@ -80,47 +102,70 @@ public class TaskChooseActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.back:
-                    finish();
-                    break;
                 case R.id.save:
-                    saveTaskInfoAndDelete(); //保存选中的任务编号信息
-                    Toast.makeText(TaskChooseActivity.this, "保存成功！您可以到用户列表查看哦~", Toast.LENGTH_LONG).show();
-                    intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
-                    transferParams(); //传递任务编号参数到主页面
-                    startActivity(intent);
-                    finish();
+                    if(cursor.getCount() == 0){
+                        Intent intent = new Intent(TaskChooseActivity.this, DataTransferFragment.class);
+                        startActivity(intent);
+                    }else {
+                        saveTaskInfo(); //保存选中的任务编号信息
+                        //deleteChecked();//删除选中的任务编号信息
+                        saveCheckStateInfo();//保存选中状态，将信息写入preference保存以备下一次读取使用
+                        Toast.makeText(TaskChooseActivity.this, "保存成功！您可以到用户列表查看哦~", Toast.LENGTH_LONG).show();
+                        intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
+                        transferParams(); //传递任务编号参数到主页面
+                        startActivity(intent);
+                        finish();
+                    }
                     break;
             }
         }
     };
 
     //保存选中的任务编号信息
-    public void saveTaskInfoAndDelete() {
-        HashMap<Integer, Boolean> isCheck_delete = adapter.getHashMap();
+    public void saveTaskInfo() {
+        HashMap<Integer, Boolean> state = adapter.getHashMap();
         int count = adapter.getCount();
+        Log.i("count====>", "长度为：" + count);
         for (int i = 0; i < count; i++) {
-            int position = i - (count - adapter.getCount());
-            if (isCheck_delete.get(i) != null && isCheck_delete.get(i)) {
+            if (state.get(i) != null) {
                 TaskChoose taskChoose = taskChooseList.get((int) adapter.getItemId(i));
                 map.put("taskId" + i, taskChoose.getTaskNumber());
                 Log.i("taskId=========>", "这次被勾选第" + i + "个，任务编号为：" + taskChoose.getTaskNumber());
                 integers.add(i);
                 Log.i("integers====>", "长度为：" + integers.size());
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    //保存选中状态，将信息写入preference保存以备下一次读取使用
+    public void saveCheckStateInfo() {
+        String flag = "";
+        int count = adapter.getCount();
+        Log.i("count====>", "长度为：" + count);
+        for (int i = 0; i < count; i++) {
+            if (TaskChooseAdapter.getIsCheck().get(i) != null) {  //判断如果此时是选中状态就保存到SharedPreferences，“1”表示选中，0表示没选中
+                flag = flag + '1';
+            } else {
+                flag = flag + '0';
+            }
+        }
+        editor.putString("checkState", flag);//将数据已字符串形式保存起来，下次读取再用
+        editor.commit();
+    }
+
+    //删除选中的任务编号信息
+    public void deleteChecked() {
+        HashMap<Integer, Boolean> isCheck_delete = adapter.getHashMap();
+        int count = adapter.getCount();
+        for (int i = 0; i < count; i++) {
+            int position = i - (count - adapter.getCount());
+            if (isCheck_delete.get(i) != null && isCheck_delete.get(i)) {
                 isCheck_delete.remove(i);
                 adapter.removeData(position);
                 Log.i("removeData====>", "删除的位置是：" + position);
             }
         }
-        /*//点击保存时删除选中的item
-        for (int j=0;j<count;j++){
-            int position = j - (count - adapter.getCount());
-            // 判断状态，true则删除
-            if(isCheck_delete.get(j) != null){
-                isCheck_delete.remove(j);
-                adapter.removeData(position);
-            }
-        }*/
         adapter.notifyDataSetChanged();
     }
 
@@ -172,12 +217,25 @@ public class TaskChooseActivity extends AppCompatActivity {
 
     //读取下载到本地的任务数据
     public void getTaskData() {
-        Cursor cursor = db.query("Task", null, null, null, null, null, null);//查询并获得游标
+        cursor = db.query("Task", null, null, null, null, null, null);//查询并获得游标
         //如果游标为空，则显示没有数据图片
         if (cursor.getCount() == 0) {
+            save.setText("去下载");
             if (noData.getVisibility() == View.GONE) {
                 noData.setVisibility(View.VISIBLE);
             }
+            new Thread(){
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(500);
+                        handler.sendEmptyMessage(0);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    super.run();
+                }
+            }.start();
             return;
         }
         /*if (!cursor.isFirst()) {  //是否在第一行
@@ -208,7 +266,6 @@ public class TaskChooseActivity extends AppCompatActivity {
             taskChoose.setEndTime(cursor.getString(5));
             taskChooseList.add(taskChoose);
         }
-
         /*int columnNumb = cursor.getColumnCount();
           for (int i=0;i < columnNumb;i++){  //循环读取每列的数据
                     String columnName = cursor.getColumnName(i);  //获得每列的列名
@@ -217,6 +274,16 @@ public class TaskChooseActivity extends AppCompatActivity {
         //cursor游标操作完成以后,一定要关闭
         cursor.close();
     }
+
+    Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what == 0){
+                Toast.makeText(TaskChooseActivity.this, "您还没有任务哦，快去下载吧！~", Toast.LENGTH_LONG).show();
+            }
+            super.handleMessage(msg);
+        }
+    };
 
     @Override
     public void onDestroy() {

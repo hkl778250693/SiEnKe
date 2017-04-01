@@ -236,7 +236,7 @@ public class UserListActivity extends Activity {
     public void getUserData() {
         Cursor cursor = db.query("User", null, null, null, null, null, null,null);//查询并获得游标
         //如果游标为空，则显示没有数据图片
-        if (cursor.getCount() == 0) {
+        if (cursor.getCount() == 0 && noData != null) {
             if (noData.getVisibility() == View.GONE) {
                 noData.setVisibility(View.VISIBLE);
             }
