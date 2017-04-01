@@ -25,7 +25,7 @@ public class CheckUserListActivity extends Activity {
 
     //绑定控件
     private void bindView() {
-        securityCheckBack= (ImageView) findViewById(R.id.security_check_back);
+        securityCheckBack= (ImageView) findViewById(R.id.back);
     }
 
     //点击事件
@@ -38,7 +38,7 @@ public class CheckUserListActivity extends Activity {
         @Override
         public void onClick(View v) {
             switch (v.getId()){
-                case R.id.security_check_back:
+                case R.id.back:
                     Intent intent=new Intent(CheckUserListActivity.this,SecurityChooseActivity.class);
                     startActivity(intent);
                     finish();

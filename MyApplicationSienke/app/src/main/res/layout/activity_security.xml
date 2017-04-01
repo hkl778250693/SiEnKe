@@ -9,14 +9,6 @@
         android:layout_height="wrap_content"
         android:background="@color/theme_colors">
 
-        <ImageView
-            android:id="@+id/security_check_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:padding="16dp"
-            android:src="@mipmap/securit_back" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

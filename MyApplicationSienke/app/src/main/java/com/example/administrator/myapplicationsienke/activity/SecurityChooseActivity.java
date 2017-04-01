@@ -34,7 +34,6 @@ public class SecurityChooseActivity extends FragmentActivity {
     private View popupwindowView;
     private PopupWindow popupWindow;
     private ImageView security_check_go;
-    private ImageView security_check_back;
     private RadioButton optionRbt;  //选项按钮
     private RadioButton dataTransferRbt;  //数据传输按钮
     private List<Fragment> fragmentList;
@@ -64,7 +63,6 @@ public class SecurityChooseActivity extends FragmentActivity {
 
     //绑定控件
     private void bindView() {
-        security_check_back = (ImageView) findViewById(R.id.security_check_back);
         security_check_go = (ImageView) findViewById(R.id.security_check_go);
         optionRbt = (RadioButton) findViewById(R.id.option_rbt);
         dataTransferRbt = (RadioButton) findViewById(R.id.data_transfer_rbt);
@@ -73,7 +71,6 @@ public class SecurityChooseActivity extends FragmentActivity {
 
     //点击事件
     public void setViewClickListener() {
-        security_check_back.setOnClickListener(onClickListener);
         security_check_go.setOnClickListener(onClickListener);
         optionRbt.setOnClickListener(onClickListener);
         dataTransferRbt.setOnClickListener(onClickListener);
@@ -108,11 +105,6 @@ public class SecurityChooseActivity extends FragmentActivity {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.security_check_back:
-                    Intent intent = new Intent(SecurityChooseActivity.this, MobileSecurityActivity.class);
-                    startActivity(intent);
-                    finish();
-                    break;
                 case R.id.security_check_go:
                     createPopupwindow();
                     Log.i("createPopupwindow===>", "true");
