@@ -118,7 +118,7 @@ public class MobileSecurityActivity extends Activity {
                     }
                     break;
                 case R.id.cancel_btn:
-                    MobileSecurityActivity.this.finish();
+                    System.exit(0);
                     break;
             }
         }

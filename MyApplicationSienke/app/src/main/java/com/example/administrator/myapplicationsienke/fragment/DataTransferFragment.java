@@ -120,7 +120,7 @@ public class DataTransferFragment extends Fragment {
                         @Override
                         public void run() {
                             Log.i("UserSafeCheck.do=====>", "isEnter="+true);
-                            requireUserInfo("UserSafeCheck.do", "safetyPlan=" + 11  + "&page=" + 1 + "&rows=" + 100);
+                            requireUserInfo("SafeCheckPlan.do", "safetyPlan=" + 11  + "&page=" + 1 + "&rows=" + 100);
                             for(int i=0;i<taskNumbList.size();i++){
 
                             }
@@ -409,8 +409,9 @@ public class DataTransferFragment extends Fragment {
         values.put("userPhone", userObject.optString("userPhone", ""));
         values.put("securityType", userObject.optString("securityName", ""));
         values.put("oldUserId", userObject.optString("oldUserId", ""));
-        values.put("taskId", userObject.optInt("safetyPlan", 0) + "");
         values.put("newUserId", userObject.optString("userId", ""));
+        values.put("userAddress", userObject.optString("userAdress", ""));
+        values.put("taskId", userObject.optInt("safetyPlan", 0) + "");
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
