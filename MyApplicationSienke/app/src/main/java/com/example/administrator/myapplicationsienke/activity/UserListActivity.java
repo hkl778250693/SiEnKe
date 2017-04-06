@@ -58,7 +58,6 @@ public class UserListActivity extends Activity {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private int checkedNumber = 0;   //已检户数
-    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +69,19 @@ public class UserListActivity extends Activity {
         new Thread() {
             @Override
             public void run() {
-                for (int i = 0; i < integers.size(); i++) {
-                    getUserData(stringList.get(i));//读取下载到本地的任务数据
-                    Log.i("UserListActivity=", "查询的任务编号是：" + stringList.get(i));
+                if(integers.size() != 0){
+                    if (noData.getVisibility() == View.VISIBLE) {
+                        noData.setVisibility(View.GONE);
+                    }
+                    for (int i = 0; i < integers.size(); i++) {
+                        getUserData(stringList.get(i));//读取所有安检用户数据
+                        Log.i("UserListActivity", "查询的任务编号是：" + stringList.get(i));
+                    }
+                }else {
+                    if (noData.getVisibility() == View.GONE) {
+                        Log.i("UserListActivity", "显示没有用户数据照片！");
+                        noData.setVisibility(View.VISIBLE);
+                    }
                 }
                 super.run();
             }

@@ -1,6 +1,7 @@
 package com.example.administrator.myapplicationsienke.activity;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,6 +39,10 @@ public class NoCheckUserListActivity extends Activity {
     private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
     private int task_total_numb;
     private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
+    private UserListviewItem item;
+    private int currentPosition;  //点击listview  当前item的位置
+    private NoCheckUserAdapter noCheckUserAdapter;
+    private int checkedNumber = 0;   //已检户数
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,18 +51,29 @@ public class NoCheckUserListActivity extends Activity {
 
         defaultSetting();//初始化设置
         getTaskParams(); //获取任务编号参数
+        bindView();//绑定控件
+        setViewClickListener();//点击事件
         new Thread() {
             @Override
             public void run() {
-                for (int i = 0; i < integers.size(); i++) {
-                    getUserInfo(stringList.get(i));//读取下载到本地的未检任务数据
-                    Log.i("UserListActivity=", "查询的任务编号是：" + stringList.get(i));
+                Log.i("NoCheckUserListActivity", "查询本地数据循环进来了！"+integers.size());
+                if(integers.size() != 0){
+                    if (noData.getVisibility() == View.VISIBLE) {
+                        noData.setVisibility(View.GONE);
+                    }
+                    for (int i = 0; i < integers.size(); i++) {
+                        getUserInfo(stringList.get(i));//读取未检任务数据
+                        Log.i("NoCheckUserListActivity", "查询的任务编号是：" + stringList.get(i));
+                    }
+                }else {
+                    if (noData.getVisibility() == View.GONE) {
+                        Log.i("NoCheckUserListActivity", "显示没有用户数据照片！");
+                        noData.setVisibility(View.VISIBLE);
+                    }
                 }
                 super.run();
             }
         }.start();
-        bindView();//绑定控件
-        setViewClickListener();//点击事件
     }
 
     //绑定控件ID
@@ -78,13 +94,16 @@ public class NoCheckUserListActivity extends Activity {
     //点击事件
     private void setViewClickListener(){
         securityNoCheckBack.setOnClickListener(onClickListener);
-        NoCheckUserAdapter noCheckUserAdapter = new NoCheckUserAdapter(NoCheckUserListActivity.this, noCheckUserItemList);
+        noCheckUserAdapter = new NoCheckUserAdapter(NoCheckUserListActivity.this, noCheckUserItemList);
         listView.setAdapter(noCheckUserAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(NoCheckUserListActivity.this,UserDetailInfoActivity.class);
-                startActivity(intent);
+                item = noCheckUserItemList.get((int) parent.getAdapter().getItemId(position));
+                currentPosition = position;
+                Intent intent = new Intent(NoCheckUserListActivity.this, UserDetailInfoActivity.class);
+                intent.putExtra("position",position);
+                startActivityForResult(intent,position);
             }
         });
     }
@@ -123,15 +142,7 @@ public class NoCheckUserListActivity extends Activity {
     public void getUserInfo(String taskId) {
         Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});
         //如果游标为空，则显示没有数据图片
-        if (cursor.getCount() == 0) {
-            if (noData.getVisibility() == View.GONE) {
-                noData.setVisibility(View.VISIBLE);
-            }
-            return;
-        }
-        if (noData.getVisibility() == View.VISIBLE) {
-            noData.setVisibility(View.GONE);
-        }
+        Log.i("NoCheckUserListActivity", "一共有"+cursor.getCount()+"个用户");
         while (cursor.moveToNext()) {
             if(cursor.getString(10).equals("false")){
                 UserListviewItem item = new UserListviewItem();
@@ -149,6 +160,31 @@ public class NoCheckUserListActivity extends Activity {
         }
         //cursor游标操作完成以后,一定要关闭
         cursor.close();
+    }
+
+    //更新用户表是否安检状态
+    public void updateUserCheckedState(){
+        ContentValues values = new ContentValues();
+        values.put("ifChecked","true");
+        Log.i("UserList=update", "更新安检状态为true");
+        db.update("User",values,"securityNumber=?",new String[]{item.getSecurityNumber()});
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            if(requestCode == currentPosition){
+                updateUserCheckedState(); //更新本地数据库用户表安检状态
+                item.setIfEdit(R.mipmap.userlist_gray);
+                noCheckUserItemList.remove(currentPosition);
+                noCheckUserAdapter.notifyDataSetChanged();
+                checkedNumber++;
+                editor.putInt("checkedNumber",checkedNumber);
+                editor.commit();
+                Log.i("UserList=ActivityResult", "页面回调进来了");
+            }
+        }
     }
 
     @Override
