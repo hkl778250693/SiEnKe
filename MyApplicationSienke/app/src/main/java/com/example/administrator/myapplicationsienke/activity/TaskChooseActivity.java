@@ -104,9 +104,9 @@ public class TaskChooseActivity extends Activity {
             switch (v.getId()) {
                 case R.id.save:
                     if(cursor.getCount() == 0){
-                        Intent intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
+                        Intent intent = new Intent();
                         intent.putExtra("down",1);  //传递一个 1 的参数到主页面，让他替换fragment
-                        startActivity(intent);
+                        setResult(Activity.RESULT_OK,intent);
                         finish();
                     }else {
                         saveTaskInfo(); //保存选中的任务编号信息

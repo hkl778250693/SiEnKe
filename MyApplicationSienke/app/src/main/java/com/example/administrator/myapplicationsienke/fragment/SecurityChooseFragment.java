@@ -53,11 +53,7 @@ public class SecurityChooseFragment extends Fragment {
                 task_total_numb = params.getInt("task_total_numb", 0);
                 Log.i("SecurityChooseFragment=", "task_total_numb=" + task_total_numb);
                 integers = params.getIntegerArrayList("integerList");
-                //Log.i("SecurityChooseFragment=", "integers：" + integers.size());
                 stringList = params.getStringArrayList("taskId");
-                /*for (int i = 0; i < stringList.size(); i++) {
-                    Log.i("intent.getStringExtra=", "得到的参数为：" + stringList);
-                }*/
             }
         }
     }
@@ -86,9 +82,7 @@ public class SecurityChooseFragment extends Fragment {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.continue_security:
-                    break;
-                case R.id.user_list:
+                case R.id.continue_security:    //继续安检
                     Intent intent = new Intent(getActivity(), UserListActivity.class);
                     if(params != null && stringList.size() != 0 && integers.size() != 0){
                         Bundle bundle = new Bundle();
@@ -99,24 +93,47 @@ public class SecurityChooseFragment extends Fragment {
                     }
                     startActivity(intent);
                     break;
-                case R.id.no_check_user:
-                    Intent intent1 = new Intent(getActivity(), NoCheckUserListActivity.class);
+                case R.id.user_list:
+                    Intent intent1 = new Intent(getActivity(), UserListActivity.class);
+                    if(params != null && stringList.size() != 0 && integers.size() != 0){
+                        Bundle bundle = new Bundle();
+                        bundle.putStringArrayList("taskId", stringList);
+                        bundle.putInt("task_total_numb", integers.size());
+                        bundle.putIntegerArrayList("integerList", integers);
+                        intent1.putExtras(bundle);
+                    }
                     startActivity(intent1);
                     break;
-                case R.id.new_task:
-                    Intent intent2 = new Intent(getActivity(), NewTaskActivity.class);
+                case R.id.no_check_user:
+                    Intent intent2 = new Intent(getActivity(), NoCheckUserListActivity.class);
+                    if(params != null && stringList.size() != 0 && integers.size() != 0){
+                        Bundle bundle = new Bundle();
+                        bundle.putStringArrayList("taskId", stringList);
+                        bundle.putInt("task_total_numb", integers.size());
+                        bundle.putIntegerArrayList("integerList", integers);
+                        intent2.putExtras(bundle);
+                    }
                     startActivity(intent2);
                     break;
-                case R.id.security_statistics:
-                    Intent intent3 = new Intent(getActivity(), SecurityStatisticsActivity.class);
+                case R.id.new_task:
+                    Intent intent3 = new Intent(getActivity(), NewTaskActivity.class);
                     startActivity(intent3);
                     break;
-                case R.id.task_choose:
-                    Intent intent4 = new Intent(getActivity(), TaskChooseActivity.class);
+                case R.id.security_statistics:
+                    Intent intent4 = new Intent(getActivity(), SecurityStatisticsActivity.class);
                     startActivity(intent4);
+                    break;
+                case R.id.task_choose:
+                    Intent intent5 = new Intent(getActivity(), TaskChooseActivity.class);
+                    startActivityForResult(intent5,100);
                     break;
             }
         }
     };
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+    }
 }

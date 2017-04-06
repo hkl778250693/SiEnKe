@@ -62,16 +62,6 @@ public class SecurityChooseActivity extends FragmentActivity {
         defaultSetting();//初始化设置
         setViewPager();//设置viewPager
         setViewClickListener();//点击事件
-
-        //获取任务选择页面传过来的参数，如果参数为 1 ，则让viewpager显示数据传输fragment
-        Intent intent = getIntent();
-        if(intent != null){
-            int number = intent.getIntExtra("down",0);
-            if(number == 1){
-                dataTransferRbt.setChecked(true);
-                viewPager.setCurrentItem(1);
-            }
-        }
     }
 
     //绑定控件
@@ -214,6 +204,26 @@ public class SecurityChooseActivity extends FragmentActivity {
             adapter = new SecurityCheckViewPagerAdapter(getSupportFragmentManager(), fragmentList);
         }
         viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        fragmentList.get(0).onActivityResult(requestCode,resultCode, data);
+        if(resultCode == RESULT_OK){
+            Log.i("SecurityChooseActivity=", "返回码="+resultCode);
+            Log.i("SecurityChooseActivity=", "请求码="+requestCode);
+            if(requestCode == 100){  //获取任务选择页面传过来的参数，如果参数为 1 ，则让viewpager显示数据传输fragment
+                if(data != null){
+                    int number = data.getIntExtra("down",0);
+                    Log.i("SecurityChooseActivity=", "返回的结果="+number);
+                    if(number == 1){
+                        dataTransferRbt.setChecked(true);
+                        viewPager.setCurrentItem(1);
+                    }
+                }
+            }
+        }
     }
 
     /**
