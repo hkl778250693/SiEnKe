@@ -21,6 +21,7 @@ import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -37,12 +38,11 @@ public class NoCheckUserListActivity extends Activity {
     private Cursor cursor;
     private TextView noData;
     private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
-    private int task_total_numb;
+    private int task_total_numb = 0;
     private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
     private UserListviewItem item;
     private int currentPosition;  //点击listview  当前item的位置
     private NoCheckUserAdapter noCheckUserAdapter;
-    private int checkedNumber = 0;   //已检户数
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +56,11 @@ public class NoCheckUserListActivity extends Activity {
         new Thread() {
             @Override
             public void run() {
-                Log.i("NoCheckUserListActivity", "查询本地数据循环进来了！"+integers.size());
-                if(integers.size() != 0){
+                if(task_total_numb != 0){
                     if (noData.getVisibility() == View.VISIBLE) {
                         noData.setVisibility(View.GONE);
                     }
-                    for (int i = 0; i < integers.size(); i++) {
+                    for (int i = 0; i < task_total_numb; i++) {
                         getUserInfo(stringList.get(i));//读取未检任务数据
                         Log.i("NoCheckUserListActivity", "查询的任务编号是：" + stringList.get(i));
                     }
@@ -114,6 +113,12 @@ public class NoCheckUserListActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.security_nocheck_back:
+                    for (int i = 0; i < task_total_numb; i++) {
+                        getContinueCheckPosition(stringList.get(i));//读取下载到本地的任务数据
+                        if(!sharedPreferences.getString("continuePosition","").equals("")){
+                            break;
+                        }
+                    }
                     NoCheckUserListActivity.this.finish();
                     break;
             }
@@ -122,19 +127,12 @@ public class NoCheckUserListActivity extends Activity {
 
     //获取任务编号参数
     public void getTaskParams() {
-        Intent intent = getIntent();
-        if (intent != null) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                task_total_numb = bundle.getInt("task_total_numb", 0);
-                Log.i("UserListActivity=", "task_total_numb=" + task_total_numb);
-                integers = bundle.getIntegerArrayList("integerList");
-                Log.i("UserListActivity=", "integers：" + integers.size());
-                stringList = bundle.getStringArrayList("taskId");
-                for (int i = 0; i < stringList.size(); i++) {
-                    Log.i("UserListActivitygetS=", "得到的参数为：" + stringList);
-                }
+        if (sharedPreferences.getStringSet("stringSet",null) != null && sharedPreferences.getInt("task_total_numb",0) != 0) {
+            Iterator iterator = sharedPreferences.getStringSet("stringSet",null).iterator();
+            while (iterator.hasNext()){
+                stringList.add(iterator.next().toString());
             }
+            task_total_numb = sharedPreferences.getInt("task_total_numb",0);
         }
     }
 
@@ -162,6 +160,29 @@ public class NoCheckUserListActivity extends Activity {
         cursor.close();
     }
 
+    //获取继续安检的item位置
+    public void getContinueCheckPosition(String taskId) {
+        Log.i("ContinueCheckPosition", "获取继续安检位置进来了！");
+        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+        //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
+        if(cursor.getCount() == 0){
+            return;
+        }
+        while (cursor.moveToNext()) {
+            Log.i("ContinueCheckPosition", "游标进来了");
+            Log.i("ContinueCheckPosition", "安检状态为 = "+cursor.getString(10));
+            if(cursor.getString(10).equals("false")){
+                Log.i("ContinueCheckPosition", "安检状态为 = "+cursor.getString(10));
+                Log.i("ContinueCheckPosition", "安检状态为false,此时的item位置为："+cursor.getPosition());
+                Log.i("ContinueCheckPosition", "安检状态为false,此时的item的用户名为："+cursor.getColumnName(2));
+                editor.putString("continuePosition",cursor.getPosition()+"");
+                editor.commit();
+                break;
+            }
+        }
+        cursor.close(); //游标关闭
+    }
+
     //更新用户表是否安检状态
     public void updateUserCheckedState(){
         ContentValues values = new ContentValues();
@@ -179,8 +200,7 @@ public class NoCheckUserListActivity extends Activity {
                 item.setIfEdit(R.mipmap.userlist_gray);
                 noCheckUserItemList.remove(currentPosition);
                 noCheckUserAdapter.notifyDataSetChanged();
-                checkedNumber++;
-                editor.putInt("checkedNumber",checkedNumber);
+                editor.putInt("checkedNumber",sharedPreferences.getInt("checkedNumber",0)+1);
                 editor.commit();
                 Log.i("UserList=ActivityResult", "页面回调进来了");
             }

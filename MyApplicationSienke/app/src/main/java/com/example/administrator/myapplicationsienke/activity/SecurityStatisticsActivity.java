@@ -59,12 +59,12 @@ public class SecurityStatisticsActivity extends Activity {
         }
         if(sharedPreferences.getInt("totalCount",0) !=0 && sharedPreferences.getInt("checkedNumber",0) != 0){
             notChecked = sharedPreferences.getInt("totalCount",0) - sharedPreferences.getInt("checkedNumber",0);
-            notCheckedNumber.setText(notChecked+"");
+            notCheckedNumber.setText(String.valueOf(notChecked));
         }else {
             notCheckedNumber.setText("0");
         }
         if(sharedPreferences.getInt("totalCount",0) != 0){
-            finishingRate = sharedPreferences.getInt("checkedNumber",0)/sharedPreferences.getInt("totalCount",0);
+            finishingRate = (sharedPreferences.getInt("checkedNumber",0)/sharedPreferences.getInt("totalCount",0))*100;
             Log.i("StatisticsActivity===>", "完成率="+finishingRate+"%");
             finishRate.setText(String.valueOf(finishingRate));
         }else {

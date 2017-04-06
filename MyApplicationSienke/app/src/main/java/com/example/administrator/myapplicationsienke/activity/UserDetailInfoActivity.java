@@ -77,7 +77,6 @@ public class UserDetailInfoActivity extends Activity {
     private GridviewImage image;
     private GridviewImageAdapter adapter;
     private boolean isShowDelete = false;
-    private int problemNumber = 0;   //存在问题的户数
 
 
     @Override
@@ -181,6 +180,13 @@ public class UserDetailInfoActivity extends Activity {
     private void defaultSetting() {
         sharedPreferences = UserDetailInfoActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        securityCheckCase.setText("安检合格");
+        securityHiddenType.setText("常规安检");
+        securityHiddenReason.setText("户内立管内");
+        if(hiddenTypeRoot.getVisibility() == View.VISIBLE && hiddenReasonRoot.getVisibility() == View.VISIBLE){
+            hiddenTypeRoot.setVisibility(View.GONE);
+            hiddenReasonRoot.setVisibility(View.GONE);
+        }
     }
 
     //弹出拍照popupwindow
@@ -279,7 +285,6 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(notSecurityCheck.getText());
-                Log.i("UserDetailInfoActivity=", "存在问题的户数="+sharedPreferences.getInt("problem_number",0)+"户");
                 showHiddenTypeAndReason();
             }
         });
@@ -302,7 +307,6 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(notPassSecurityCheck.getText());
-                Log.i("UserDetailInfoActivity=", "存在问题的户数="+sharedPreferences.getInt("problem_number",0)+"户");
                 showHiddenTypeAndReason();
             }
         });
@@ -311,7 +315,6 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(overSecurityCheckTime.getText());
-                Log.i("UserDetailInfoActivity=", "存在问题的户数="+sharedPreferences.getInt("problem_number",0)+"户");
                 showHiddenTypeAndReason();
             }
         });
@@ -320,7 +323,6 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(nobodyHere.getText());
-                Log.i("UserDetailInfoActivity=", "存在问题的户数="+sharedPreferences.getInt("problem_number",0)+"户");
                 showHiddenTypeAndReason();
             }
         });
