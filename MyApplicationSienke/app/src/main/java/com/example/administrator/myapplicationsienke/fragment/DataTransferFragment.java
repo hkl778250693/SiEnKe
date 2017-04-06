@@ -64,7 +64,7 @@ public class DataTransferFragment extends Fragment {
     private List<DownloadListvieItem> downloadListvieItemList = new ArrayList<>();
     private JSONObject taskObject, userObject;
     private SQLiteDatabase db;  //数据库
-    private String taskNumb = null;  //任务编号
+    private int totalCount = 0;  //总户数
     List<String> taskNumbList = new ArrayList<>();
     @Nullable
     @Override
@@ -378,6 +378,9 @@ public class DataTransferFragment extends Fragment {
                         }
                         Log.i("taskNumbList====>", "一共有"+taskNumbList.size()+"个任务");
                         Thread.sleep(1000);
+                        editor.putInt("totalCount",totalCount);
+                        editor.commit();
+                        Log.i("totalCount==========>", "总户数="+totalCount);
                         Toast.makeText(getActivity(), "任务下载完成，用户信息正在下载，请稍等...", Toast.LENGTH_SHORT).show();
                         startAsyncTask();//开启异步任务获取所有任务编号的用户数据
                         popupWindow.dismiss();
@@ -408,7 +411,7 @@ public class DataTransferFragment extends Fragment {
         values.put("taskId", taskObject.optInt("safetyplanId", 0) + "");
         values.put("securityType", taskObject.optString("securityName", ""));
         values.put("totalCount", taskObject.optInt("countRs", 0) + "");
-        Log.i("totalCount==========>", "totalCount="+taskObject.optInt("countRs", 0));
+        totalCount += taskObject.optInt("countRs", 0);
         values.put("endTime", taskObject.optString("safetyEnd", ""));
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
@@ -426,8 +429,10 @@ public class DataTransferFragment extends Fragment {
         values.put("userPhone", userObject.optString("userPhone", ""));
         values.put("securityType", userObject.optString("securityName", ""));
         values.put("oldUserId", userObject.optString("oldUserId", ""));
-        values.put("taskId", userObject.optInt("safetyPlan", 0) + "");
         values.put("newUserId", userObject.optString("userId", ""));
+        values.put("userAddress", userObject.optString("userAdress", ""));
+        values.put("taskId", userObject.optInt("safetyPlan", 0) + "");
+        values.put("ifChecked", "false");
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象

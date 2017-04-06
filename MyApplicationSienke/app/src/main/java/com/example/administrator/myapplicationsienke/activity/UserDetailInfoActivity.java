@@ -77,6 +77,7 @@ public class UserDetailInfoActivity extends Activity {
     private GridviewImage image;
     private GridviewImageAdapter adapter;
     private boolean isShowDelete = false;
+    private int problemNumber = 0;   //存在问题的户数
 
 
     @Override
@@ -178,10 +179,8 @@ public class UserDetailInfoActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
-        Log.i("defaultSetting===>","defaultSetting");
         sharedPreferences = UserDetailInfoActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        Log.i("defaultSetting===>",""+editor);
     }
 
     //弹出拍照popupwindow
@@ -240,11 +239,15 @@ public class UserDetailInfoActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
+                Intent intent = new Intent();
+                setResult(Activity.RESULT_OK,intent);
+                if(!securityCheckCase.getText().equals("安检合格")){
+                    editor.putInt("problem_number",sharedPreferences.getInt("problem_number",0)+1);  //保存到sharedPreferences
+                    editor.commit();
+                }
                 finish();
             }
         });
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
         popupWindow.update();
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.business_check_shape));
         popupWindow.setAnimationStyle(R.style.camera);
@@ -276,6 +279,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(notSecurityCheck.getText());
+                Log.i("UserDetailInfoActivity=", "存在问题的户数="+sharedPreferences.getInt("problem_number",0)+"户");
                 showHiddenTypeAndReason();
             }
         });
@@ -298,6 +302,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(notPassSecurityCheck.getText());
+                Log.i("UserDetailInfoActivity=", "存在问题的户数="+sharedPreferences.getInt("problem_number",0)+"户");
                 showHiddenTypeAndReason();
             }
         });
@@ -306,6 +311,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(overSecurityCheckTime.getText());
+                Log.i("UserDetailInfoActivity=", "存在问题的户数="+sharedPreferences.getInt("problem_number",0)+"户");
                 showHiddenTypeAndReason();
             }
         });
@@ -314,6 +320,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(nobodyHere.getText());
+                Log.i("UserDetailInfoActivity=", "存在问题的户数="+sharedPreferences.getInt("problem_number",0)+"户");
                 showHiddenTypeAndReason();
             }
         });

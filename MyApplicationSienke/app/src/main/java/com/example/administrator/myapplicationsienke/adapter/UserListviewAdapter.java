@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.administrator.myapplicationsienke.R;
@@ -69,6 +70,7 @@ public class UserListviewAdapter extends BaseAdapter {
             viewHolder.security_type = (TextView) convertView.findViewById(R.id.security_type);
             viewHolder.user_id = (TextView) convertView.findViewById(R.id.user_id);
             viewHolder.address = (TextView) convertView.findViewById(R.id.address);
+            viewHolder.if_edit = (ImageView) convertView.findViewById(R.id.if_edit);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -80,13 +82,18 @@ public class UserListviewAdapter extends BaseAdapter {
         viewHolder.number.setText(userListviewItem.getNumber());
         viewHolder.phone_number.setText(userListviewItem.getPhoneNumber());
         viewHolder.security_type.setText(userListviewItem.getSecurityType());
-        viewHolder.user_id.setText(userListviewItem.getUserId());
+        if(!userListviewItem.getUserId().equals("null")){
+            viewHolder.user_id.setText(userListviewItem.getUserId());
+        }else {
+            viewHolder.user_id.setText("无");
+        }
         viewHolder.address.setText(userListviewItem.getAdress());
+        viewHolder.if_edit.setImageResource(userListviewItem.getIfEdit());
 
         return convertView;
     }
 
-    class ViewHolder {
+    public class ViewHolder {
         TextView security_number;  //安检编号
         TextView user_name;  //姓名
         TextView number;  //表编号
@@ -94,6 +101,7 @@ public class UserListviewAdapter extends BaseAdapter {
         TextView security_type;   //安检类型
         TextView user_id;  //用户编号
         TextView address;   //地址
+        ImageView if_edit;   //是否编辑
     }
 
     private NameFilter nameFilter;
