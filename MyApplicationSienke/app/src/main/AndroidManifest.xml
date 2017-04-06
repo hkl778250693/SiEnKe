@@ -44,6 +44,7 @@
         <activity android:name=".activity.FileManageActivity"/>
         <activity android:name=".activity.IpSettingActivity"/>
         <activity android:name=".activity.SystemSettingActivity"/>
+        <activity android:name=".activity.NewTaskDetailActivity"/>
 
     </application>
 

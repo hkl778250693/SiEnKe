@@ -6,8 +6,6 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -27,7 +25,6 @@ import android.widget.TextView;
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.UserListviewAdapter;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
-import com.example.administrator.myapplicationsienke.model.TaskChoose;
 import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
 import java.util.ArrayList;
@@ -138,10 +135,14 @@ public class UserListActivity extends Activity {
                     searchBtn.setVisibility(View.GONE);
                 }
             }
+
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
     }
 
