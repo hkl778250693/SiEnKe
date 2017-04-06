@@ -70,9 +70,19 @@ public class ContinueCheckUserActivity extends Activity {
         new Thread() {
             @Override
             public void run() {
-                for (int i = 0; i < integers.size(); i++) {
-                    getUserData(stringList.get(i));//读取下载到本地的任务数据
-                    Log.i("UserListActivity=", "查询的任务编号是：" + stringList.get(i));
+                if(integers.size() != 0){
+                    if (noData.getVisibility() == View.VISIBLE) {
+                        noData.setVisibility(View.GONE);
+                    }
+                    for (int i = 0; i < integers.size(); i++) {
+                        getUserData(stringList.get(i));//读取继续安检用户数据
+                        Log.i("ContinueCheckActivity", "查询的任务编号是：" + stringList.get(i));
+                    }
+                }else {
+                    if (noData.getVisibility() == View.GONE) {
+                        Log.i("ContinueCheckActivity", "显示没有用户数据照片！");
+                        noData.setVisibility(View.VISIBLE);
+                    }
                 }
                 super.run();
             }
@@ -132,8 +142,10 @@ public class ContinueCheckUserActivity extends Activity {
                 startActivityForResult(intent,position);
             }
         });
-        listView.setSelection(Integer.parseInt(continuePosition));  //让listview显示上次安检的位置
-        Log.i("Continue_setSelection", "列表显示当前的位置是：" + continuePosition);
+        if(!continuePosition.equals("")){
+            listView.setSelection(Integer.parseInt(continuePosition));  //让listview显示上次安检的位置
+            Log.i("Continue_setSelection", "列表显示当前的位置是：" + continuePosition);
+        }
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -258,22 +270,10 @@ public class ContinueCheckUserActivity extends Activity {
     //读取下载到本地的任务数据
     public void getUserData(String taskId) {
         Log.i("ContinueCheckActivity=", "查询用户数据进来了：！");
-        //Cursor cursor = db.query("User", null, null, null, null, null, null, null);//查询并获得游标
         Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});
         Log.i("ContinueCheckActivity=", "数据库进来了：！");
         Log.i("ContinueCheckActivity=", "任务编号是：" + taskId);
         Log.i("ContinueCheckActivity=", "有" + cursor.getCount() + "条数据！");
-        //如果游标为空，则显示没有数据图片
-        if (cursor.getCount() == 0) {
-            if (noData.getVisibility() == View.GONE) {
-                noData.setVisibility(View.VISIBLE);
-            }
-            return;
-        }
-        if (noData.getVisibility() == View.VISIBLE) {
-            noData.setVisibility(View.GONE);
-        }
-
         while (cursor.moveToNext()) {
             UserListviewItem userListviewItem = new UserListviewItem();
             userListviewItem.setSecurityNumber(cursor.getString(1));
@@ -312,6 +312,7 @@ public class ContinueCheckUserActivity extends Activity {
             if(requestCode == currentPosition){
                 updateUserCheckedState(); //更新本地数据库用户表安检状态
                 item.setIfEdit(R.mipmap.userlist_gray);
+                userListviewItemList.remove(currentPosition);
                 userListviewAdapter.notifyDataSetChanged();
                 checkedNumber++;
                 editor.putInt("checkedNumber",checkedNumber);

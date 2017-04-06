@@ -69,10 +69,17 @@ public class NewTaskDetailActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_task_datail);
 
-        bindView();//绑定控件
+        //开启支线程进行请求任务信息
+        new Thread() {
+            @Override
+            public void run() {
+                requireMyTask("getUserCheck.do","safetyPlan=11");
+                super.run();
+            }
+        }.start();
         defaultSetting();//初始化设置
+        bindView();//绑定控件
         setOnClickListener();//点击事件
-
     }
 
     //绑定控件ID
@@ -92,9 +99,6 @@ public class NewTaskDetailActivity extends Activity {
         backBtn.setOnClickListener(onClickListener);
         nextBtn.setOnClickListener(onClickListener);
         securityCheckCase.setOnClickListener(onClickListener);
-        Log.i("NewTaskDetailActivity", "setOnClickListener" + newTaskListviewItemList.size());
-        newTaskListviewAdapter = new NewTaskListviewAdapter(NewTaskDetailActivity.this, newTaskListviewItemList);
-        listView.setAdapter(newTaskListviewAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -122,14 +126,6 @@ public class NewTaskDetailActivity extends Activity {
     private void defaultSetting() {
         sharedPreferences = NewTaskDetailActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        //开启支线程进行请求任务信息
-        new Thread() {
-            @Override
-            public void run() {
-                requireMyTask("getUserCheck.do","safetyPlan=11");
-                super.run();
-            }
-        }.start();
     }
 
     //popupwindow
@@ -288,7 +284,11 @@ public class NewTaskDetailActivity extends Activity {
                             item.setAdress(object.optString("userAdress", ""));
                             newTaskListviewItemList.add(item);
                         }
-                        Log.i("NewTaskDetailActivity", "newTaskListviewItemList" + newTaskListviewItemList.size());
+                        if(newTaskListviewItemList.size() != 0){
+                            Log.i("NewTaskDetailActivity", "传入的数据长度为：" + newTaskListviewItemList.size());
+                            newTaskListviewAdapter = new NewTaskListviewAdapter(NewTaskDetailActivity.this, newTaskListviewItemList);
+                            listView.setAdapter(newTaskListviewAdapter);
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
