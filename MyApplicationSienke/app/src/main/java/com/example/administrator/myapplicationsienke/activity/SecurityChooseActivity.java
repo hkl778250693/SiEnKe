@@ -1,6 +1,8 @@
 package com.example.administrator.myapplicationsienke.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -42,6 +44,8 @@ public class SecurityChooseActivity extends FragmentActivity {
     private ViewPager viewPager;
     private SecurityCheckViewPagerAdapter adapter;
     private long exitTime = 0;//退出程序
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
 
     //强制竖屏
@@ -191,6 +195,11 @@ public class SecurityChooseActivity extends FragmentActivity {
     //初始化设置
     private void defaultSetting() {
         optionRbt.setChecked(true);
+        sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        editor.putInt("problem_number",sharedPreferences.getInt("problem_number",0));
+        editor.putInt("checkedNumber",sharedPreferences.getInt("checkedNumber",0));
+        editor.commit();
     }
 
     //设置viewPager

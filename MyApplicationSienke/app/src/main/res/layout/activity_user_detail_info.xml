@@ -343,7 +343,7 @@
                     android:paddingLeft="20dp"
                     android:paddingRight="10dp"
                     android:paddingTop="4dp"
-                    android:text="安全隐患"
+                    android:text=""
                     android:textColor="@color/text_gray" />
             </RelativeLayout>
 
@@ -434,7 +434,7 @@
                     android:paddingLeft="20dp"
                     android:paddingRight="10dp"
                     android:paddingTop="4dp"
-                    android:text="安全隐患"
+                    android:text=""
                     android:textColor="@color/text_gray" />
             </RelativeLayout>
 
@@ -467,7 +467,7 @@
                     android:paddingLeft="20dp"
                     android:paddingRight="10dp"
                     android:paddingTop="4dp"
-                    android:text="安全隐患"
+                    android:text=""
                     android:textColor="@color/text_gray" />
             </RelativeLayout>
 
