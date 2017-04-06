@@ -103,49 +103,4 @@ public class UserListviewAdapter extends BaseAdapter {
         TextView address;   //地址
         ImageView if_edit;   //是否编辑
     }
-
-    private NameFilter nameFilter;
-
-    public NameFilter getFilter() {
-        if (nameFilter == null) {
-            nameFilter = new NameFilter();
-        }
-        return nameFilter;
-    }
-
-    //过滤数据
-    class NameFilter extends Filter {
-        //执行筛选
-        @Override
-        protected FilterResults performFiltering(CharSequence charSequence) {
-            FilterResults filterResults = new FilterResults();
-
-            if (TextUtils.isEmpty(charSequence)) {
-                mFilteredArrayList.clear();//清除一下
-                filterResults.values = userListviewList;
-                return filterResults;
-            } else {
-                mFilteredArrayList.clear();//清除一下
-                for (Iterator<UserListviewItem> iterator = userListviewList.iterator(); iterator.hasNext(); ) {
-                    UserListviewItem name = iterator.next();
-                    if (name.getUserName().contains(charSequence)) {
-                        mFilteredArrayList.add(name);
-                    }
-                }
-                filterResults.values = mFilteredArrayList;
-                return filterResults;
-            }
-        }
-
-        //筛选结果
-        @Override
-        protected void publishResults(CharSequence arg0, FilterResults results) {
-            myPeopleList = (ArrayList<UserListviewItem>) results.values;
-            if (results.count > 0) {
-                notifyDataSetChanged();
-            } else {
-                notifyDataSetInvalidated();
-            }
-        }
-    }
 }

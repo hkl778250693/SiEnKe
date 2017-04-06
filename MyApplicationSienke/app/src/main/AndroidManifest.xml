@@ -46,6 +46,7 @@
         <activity android:name=".activity.SystemSettingActivity"/>
         <activity android:name=".activity.NewTaskDetailActivity"/>
         <activity android:name=".activity.ContinueCheckUserActivity"/>
+        <activity android:name=".activity.EdiTextListViewActivity"/>
 
     </application>
 

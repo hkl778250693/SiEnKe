@@ -20,11 +20,9 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.NewTaskListviewAdapter;
-import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.NewTaskListviewItem;
 
 import org.json.JSONArray;
@@ -50,7 +48,7 @@ public class NewTaskDetailActivity extends Activity {
     private ListView listView;
     private TextView securityCheckCase;
     private EditText setEsearchTextChanged;//搜索框
-    private Button backBtn, nextBtn, searchBtn;
+    private Button  searchBtn;
     private PopupWindow popupWindow;
     private View securityCaseView;
     private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck;
@@ -87,8 +85,6 @@ public class NewTaskDetailActivity extends Activity {
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
         securityCheckCase = (TextView) findViewById(R.id.security_check_case);
-        backBtn = (Button) findViewById(R.id.back_btn);
-        nextBtn = (Button) findViewById(R.id.next_btn);
         setEsearchTextChanged = (EditText) findViewById(R.id.etSearch);
         searchBtn = (Button) findViewById(R.id.search_btn);
     }
@@ -96,8 +92,6 @@ public class NewTaskDetailActivity extends Activity {
     //点击事件
     private void setOnClickListener() {
         back.setOnClickListener(onClickListener);
-        backBtn.setOnClickListener(onClickListener);
-        nextBtn.setOnClickListener(onClickListener);
         securityCheckCase.setOnClickListener(onClickListener);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
