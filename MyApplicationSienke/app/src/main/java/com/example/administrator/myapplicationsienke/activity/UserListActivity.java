@@ -31,6 +31,7 @@ import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -48,8 +49,7 @@ public class UserListActivity extends Activity {
     private PopupWindow popupWindow;
     private List<UserListviewItem> userListviewItemList = new ArrayList<>();
     private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
-    private int task_total_numb;
-    private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
+    private int task_total_numb = 0;
     private SQLiteDatabase db;  //数据库
     private MySqliteHelper helper; //数据库帮助类
     private int currentPosition;  //点击listview  当前item的位置
@@ -57,7 +57,6 @@ public class UserListActivity extends Activity {
     private UserListviewItem item;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private int checkedNumber = 0;   //已检户数
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,11 +68,15 @@ public class UserListActivity extends Activity {
         new Thread() {
             @Override
             public void run() {
+<<<<<<< HEAD
                 if (integers.size() != 0) {
+=======
+                if(task_total_numb != 0){
+>>>>>>> 5d9691dbdf99c5baa0ce85a454a6435b73c51bba
                     if (noData.getVisibility() == View.VISIBLE) {
                         noData.setVisibility(View.GONE);
                     }
-                    for (int i = 0; i < integers.size(); i++) {
+                    for (int i = 0; i < task_total_numb; i++) {
                         getUserData(stringList.get(i));//读取所有安检用户数据
                         Log.i("UserListActivity", "查询的任务编号是：" + stringList.get(i));
                     }
@@ -118,8 +121,11 @@ public class UserListActivity extends Activity {
         db = helper.getWritableDatabase();
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+<<<<<<< HEAD
         editor.putInt("problem_number", 0);
         editor.commit();
+=======
+>>>>>>> 5d9691dbdf99c5baa0ce85a454a6435b73c51bba
     }
 
     //点击事件
@@ -148,9 +154,15 @@ public class UserListActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.back:
+<<<<<<< HEAD
                     for (int i = 0; i < integers.size(); i++) {
                         getContinueCheckPosition(stringList.get(i));//读取下载到本地的任务数据
                         if (!sharedPreferences.getString("continuePosition", "").equals("")) {
+=======
+                    for (int i = 0; i < task_total_numb; i++) {
+                        getContinueCheckPosition(stringList.get(i)); //获取继续安检的item位置
+                        if(!sharedPreferences.getString("continuePosition","").equals("")){
+>>>>>>> 5d9691dbdf99c5baa0ce85a454a6435b73c51bba
                             break;
                         }
                     }
@@ -167,19 +179,12 @@ public class UserListActivity extends Activity {
 
     //获取任务编号参数
     public void getTaskParams() {
-        Intent intent = getIntent();
-        if (intent != null) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                task_total_numb = bundle.getInt("task_total_numb", 0);
-                Log.i("UserListActivity=", "task_total_numb=" + task_total_numb);
-                integers = bundle.getIntegerArrayList("integerList");
-                Log.i("UserListActivity=", "integers：" + integers.size());
-                stringList = bundle.getStringArrayList("taskId");
-                for (int i = 0; i < stringList.size(); i++) {
-                    Log.i("UserListActivitygetS=", "得到的参数为：" + stringList);
-                }
+        if (sharedPreferences.getStringSet("stringSet",null) != null && sharedPreferences.getInt("task_total_numb",0) != 0) {
+            Iterator iterator = sharedPreferences.getStringSet("stringSet",null).iterator();
+            while (iterator.hasNext()){
+                stringList.add(iterator.next().toString());
             }
+            task_total_numb = sharedPreferences.getInt("task_total_numb",0);
         }
     }
 
@@ -348,8 +353,12 @@ public class UserListActivity extends Activity {
                 updateUserCheckedState(); //更新本地数据库用户表安检状态
                 item.setIfEdit(R.mipmap.userlist_gray);
                 userListviewAdapter.notifyDataSetChanged();
+<<<<<<< HEAD
                 checkedNumber++;
                 editor.putInt("checkedNumber", checkedNumber);
+=======
+                editor.putInt("checkedNumber",sharedPreferences.getInt("checkedNumber",0)+1);
+>>>>>>> 5d9691dbdf99c5baa0ce85a454a6435b73c51bba
                 editor.commit();
                 Log.i("UserList=ActivityResult", "页面回调进来了");
             }
