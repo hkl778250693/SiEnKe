@@ -276,7 +276,7 @@ public class CostListviewActivity extends Activity {
                         queryListviewItem.setIntegrated_water(object.optDouble("totalAmount",0.0));
                         queryListviewItemList.add(queryListviewItem);
                     }
-                    if (queryListviewItemList!=null){
+                    if (queryListviewItemList.size() != 0){
                         adapter = new QueryAdapter(CostListviewActivity.this,queryListviewItemList);
                         listView.setAdapter(adapter);
                     }
