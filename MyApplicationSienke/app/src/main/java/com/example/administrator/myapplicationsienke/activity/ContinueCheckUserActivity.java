@@ -105,6 +105,7 @@ public class ContinueCheckUserActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
+        Log.i("ContinueCheckActivity", "defaultSetting进来了");
         helper = new MySqliteHelper(ContinueCheckUserActivity.this, 1);
         db = helper.getWritableDatabase();
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
@@ -120,8 +121,6 @@ public class ContinueCheckUserActivity extends Activity {
         nextBtn.setOnClickListener(onClickListener);
         securityCheckCase.setOnClickListener(onClickListener);
         userListviewAdapter = new UserListviewAdapter(ContinueCheckUserActivity.this, userListviewItemList);
-        listView.setSelection(Integer.parseInt(continuePosition));  //让listview显示上次安检的位置
-        Log.i("ContinueCheckActivity", "列表显示当前的位置是：" + continuePosition);
         listView.setAdapter(userListviewAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -133,6 +132,8 @@ public class ContinueCheckUserActivity extends Activity {
                 startActivityForResult(intent,position);
             }
         });
+        listView.setSelection(Integer.parseInt(continuePosition));  //让listview显示上次安检的位置
+        Log.i("Continue_setSelection", "列表显示当前的位置是：" + continuePosition);
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -158,12 +159,12 @@ public class ContinueCheckUserActivity extends Activity {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
                 task_total_numb = bundle.getInt("task_total_numb", 0);
-                Log.i("UserListActivity=", "task_total_numb=" + task_total_numb);
+                Log.i("ContinueCheckActivity=", "task_total_numb=" + task_total_numb);
                 integers = bundle.getIntegerArrayList("integerList");
-                Log.i("UserListActivity=", "integers：" + integers.size());
+                Log.i("ContinueCheckActivity=", "integers：" + integers.size());
                 stringList = bundle.getStringArrayList("taskId");
                 for (int i = 0; i < stringList.size(); i++) {
-                    Log.i("UserListActivitygetS=", "得到的参数为：" + stringList);
+                    Log.i("ContinueCheckActivity=", "得到的参数为：" + stringList);
                 }
             }
         }
@@ -256,12 +257,12 @@ public class ContinueCheckUserActivity extends Activity {
 
     //读取下载到本地的任务数据
     public void getUserData(String taskId) {
-        Log.i("UserListActivityget=", "查询用户数据进来了：！");
+        Log.i("ContinueCheckActivity=", "查询用户数据进来了：！");
         //Cursor cursor = db.query("User", null, null, null, null, null, null, null);//查询并获得游标
         Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});
-        Log.i("UserListActivityget=", "数据库进来了：！");
-        Log.i("UserListActivityget=", "任务编号是：" + taskId);
-        Log.i("UserListActivityget=", "有" + cursor.getCount() + "条数据！");
+        Log.i("ContinueCheckActivity=", "数据库进来了：！");
+        Log.i("ContinueCheckActivity=", "任务编号是：" + taskId);
+        Log.i("ContinueCheckActivity=", "有" + cursor.getCount() + "条数据！");
         //如果游标为空，则显示没有数据图片
         if (cursor.getCount() == 0) {
             if (noData.getVisibility() == View.GONE) {
@@ -282,16 +283,16 @@ public class ContinueCheckUserActivity extends Activity {
             userListviewItem.setSecurityType(cursor.getString(5));
             userListviewItem.setUserId(cursor.getString(6));
             userListviewItem.setAdress(cursor.getString(8));
-            Log.i("UserList=cursor", "安检状态为 = "+cursor.getString(10));
+            Log.i("ContinueCheckActivity", "安检状态为 = "+cursor.getString(10));
             if(cursor.getString(10).equals("true")){
-                Log.i("UserList=cursor", "安检状态为true");
+                Log.i("ContinueCheckActivity", "安检状态为true");
                 userListviewItem.setIfEdit(R.mipmap.userlist_gray);
             }else {
-                Log.i("UserList=cursor", "安检状态为false");
+                Log.i("ContinueCheckActivity", "安检状态为false");
                 userListviewItem.setIfEdit(R.mipmap.userlist_red);
             }
             userListviewItemList.add(userListviewItem);
-            Log.i("UserListActivityget=", "用户列表的长度为：" + userListviewItemList.size());
+            Log.i("ContinueCheckActivity", "用户列表的长度为：" + userListviewItemList.size());
         }
         cursor.close();
     }
@@ -300,7 +301,7 @@ public class ContinueCheckUserActivity extends Activity {
     public void updateUserCheckedState(){
         ContentValues values = new ContentValues();
         values.put("ifChecked","true");
-        Log.i("UserList=update", "更新安检状态为true");
+        Log.i("ContinueCheckActivity", "更新安检状态为true");
         db.update("User",values,"securityNumber=?",new String[]{item.getSecurityNumber()});
     }
 
@@ -315,7 +316,7 @@ public class ContinueCheckUserActivity extends Activity {
                 checkedNumber++;
                 editor.putInt("checkedNumber",checkedNumber);
                 editor.commit();
-                Log.i("UserList=ActivityResult", "页面回调进来了");
+                Log.i("ContinueCheckActivity", "页面回调进来了");
             }
         }
     }

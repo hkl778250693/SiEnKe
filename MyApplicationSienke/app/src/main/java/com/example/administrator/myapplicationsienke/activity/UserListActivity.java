@@ -337,15 +337,16 @@ public class UserListActivity extends Activity {
             return;
         }
         while (cursor.moveToNext()) {
+            Log.i("ContinueCheckPosition", "游标进来了");
+            Log.i("ContinueCheckPosition", "安检状态为 = "+cursor.getString(10));
             if(cursor.getString(10).equals("false")){
                 Log.i("ContinueCheckPosition", "安检状态为 = "+cursor.getString(10));
-                userListviewAdapter.getItemId(cursor.getPosition());
                 Log.i("ContinueCheckPosition", "安检状态为false,此时的item位置为："+cursor.getPosition());
                 Log.i("ContinueCheckPosition", "安检状态为false,此时的item的用户名为："+cursor.getColumnName(2));
                 editor.putString("continuePosition",cursor.getPosition()+"");
                 editor.commit();
+                break;
             }
-            break;
         }
         cursor.close(); //游标关闭
     }

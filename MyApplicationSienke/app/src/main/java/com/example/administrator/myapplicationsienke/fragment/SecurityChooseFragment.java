@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.example.administrator.myapplicationsienke.R;
+import com.example.administrator.myapplicationsienke.activity.ContinueCheckUserActivity;
 import com.example.administrator.myapplicationsienke.activity.NewTaskActivity;
 import com.example.administrator.myapplicationsienke.activity.NoCheckUserListActivity;
 import com.example.administrator.myapplicationsienke.activity.SecurityStatisticsActivity;
@@ -83,7 +84,7 @@ public class SecurityChooseFragment extends Fragment {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.continue_security:    //继续安检
-                    Intent intent = new Intent(getActivity(), UserListActivity.class);
+                    Intent intent = new Intent(getActivity(), ContinueCheckUserActivity.class);
                     if(params != null && stringList.size() != 0 && integers.size() != 0){
                         Bundle bundle = new Bundle();
                         bundle.putStringArrayList("taskId", stringList);
