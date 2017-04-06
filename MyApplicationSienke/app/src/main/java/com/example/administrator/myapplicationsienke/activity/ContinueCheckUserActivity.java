@@ -9,8 +9,6 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -30,7 +28,6 @@ import android.widget.TextView;
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.UserListviewAdapter;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
-import com.example.administrator.myapplicationsienke.model.TaskChoose;
 import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
 import java.util.ArrayList;
@@ -39,7 +36,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/3/16.
  */
-public class UserListActivity extends Activity {
+public class ContinueCheckUserActivity extends Activity {
     private ImageView back, tiaoZhuan;
     private ListView listView;
     private TextView securityCheckCase, noData;
@@ -61,7 +58,7 @@ public class UserListActivity extends Activity {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private int checkedNumber = 0;   //已检户数
-    private Cursor cursor;
+    private String continuePosition = "";  //继续安检位置
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,12 +105,11 @@ public class UserListActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
-        helper = new MySqliteHelper(UserListActivity.this, 1);
+        helper = new MySqliteHelper(ContinueCheckUserActivity.this, 1);
         db = helper.getWritableDatabase();
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        editor.putInt("problem_number",0);
-        editor.commit();
+        continuePosition = sharedPreferences.getString("continuePosition","");
     }
 
     //点击事件
@@ -123,41 +119,19 @@ public class UserListActivity extends Activity {
         backBtn.setOnClickListener(onClickListener);
         nextBtn.setOnClickListener(onClickListener);
         securityCheckCase.setOnClickListener(onClickListener);
-        userListviewAdapter = new UserListviewAdapter(UserListActivity.this, userListviewItemList);
+        userListviewAdapter = new UserListviewAdapter(ContinueCheckUserActivity.this, userListviewItemList);
+        listView.setSelection(Integer.parseInt(continuePosition));  //让listview显示上次安检的位置
+        Log.i("ContinueCheckActivity", "列表显示当前的位置是：" + continuePosition);
         listView.setAdapter(userListviewAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 item = userListviewItemList.get((int) parent.getAdapter().getItemId(position));
                 currentPosition = position;
-                Intent intent = new Intent(UserListActivity.this, UserDetailInfoActivity.class);
+                Intent intent = new Intent(ContinueCheckUserActivity.this, UserDetailInfoActivity.class);
                 intent.putExtra("position",position);
                 startActivityForResult(intent,position);
             }
-        });
-
-
-        /*查询*/
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setEsearchTextChanged.setText("");
-            }
-        });
-        setEsearchTextChanged.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                userListviewAdapter.getFilter();
-                if (s.length() > 0) {
-                    searchBtn.setVisibility(View.VISIBLE);
-                } else {
-                    searchBtn.setVisibility(View.GONE);
-                }
-            }
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void afterTextChanged(Editable s) {}
         });
     }
 
@@ -166,13 +140,7 @@ public class UserListActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.back:
-                    for (int i = 0; i < integers.size(); i++) {
-                        getContinueCheckPosition(stringList.get(i));//读取下载到本地的任务数据
-                        if(!sharedPreferences.getString("continuePosition","").equals("")){
-                            break;
-                        }
-                    }
-                    UserListActivity.this.finish();
+                    ContinueCheckUserActivity.this.finish();
                     break;
                 case R.id.security_check_case:
                     createSecurityCasePopupwindow();
@@ -203,7 +171,7 @@ public class UserListActivity extends Activity {
 
     //popupwindow
     public void createSecurityCasePopupwindow() {
-        inflater = LayoutInflater.from(UserListActivity.this);
+        inflater = LayoutInflater.from(ContinueCheckUserActivity.this);
         securityCaseView = inflater.inflate(R.layout.popupwindow_userlist_choose, null);
         popupWindow = new PopupWindow(securityCaseView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
@@ -289,7 +257,8 @@ public class UserListActivity extends Activity {
     //读取下载到本地的任务数据
     public void getUserData(String taskId) {
         Log.i("UserListActivityget=", "查询用户数据进来了：！");
-        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+        //Cursor cursor = db.query("User", null, null, null, null, null, null, null);//查询并获得游标
+        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});
         Log.i("UserListActivityget=", "数据库进来了：！");
         Log.i("UserListActivityget=", "任务编号是：" + taskId);
         Log.i("UserListActivityget=", "有" + cursor.getCount() + "条数据！");
@@ -324,29 +293,7 @@ public class UserListActivity extends Activity {
             userListviewItemList.add(userListviewItem);
             Log.i("UserListActivityget=", "用户列表的长度为：" + userListviewItemList.size());
         }
-        cursor.close(); //游标关闭
-    }
-
-    //获取继续安检的item位置
-    public void getContinueCheckPosition(String taskId) {
-        Log.i("ContinueCheckPosition", "获取继续安检位置进来了！");
-        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
-        //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
-        if(cursor.getCount() == 0){
-            return;
-        }
-        while (cursor.moveToNext()) {
-            if(cursor.getString(10).equals("false")){
-                Log.i("ContinueCheckPosition", "安检状态为 = "+cursor.getString(10));
-                userListviewAdapter.getItemId(cursor.getPosition());
-                Log.i("ContinueCheckPosition", "安检状态为false,此时的item位置为："+cursor.getPosition());
-                Log.i("ContinueCheckPosition", "安检状态为false,此时的item的用户名为："+cursor.getColumnName(2));
-                editor.putString("continuePosition",cursor.getPosition()+"");
-                editor.commit();
-            }
-            break;
-        }
-        cursor.close(); //游标关闭
+        cursor.close();
     }
 
     //更新用户表是否安检状态
@@ -376,7 +323,8 @@ public class UserListActivity extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        db.close(); //释放和数据库的连接
+        //释放和数据库的连接
+        db.close();
     }
     //查询
 
