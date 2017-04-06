@@ -29,6 +29,7 @@ public class SecurityChooseFragment extends Fragment {
     private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
     private int task_total_numb;
     private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
+    private Bundle params;
 
     @Nullable
     @Override
@@ -46,14 +47,14 @@ public class SecurityChooseFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (intent != null) {
             Log.i("SecurityChooseFragment=", "intent不为空");
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
+            params = intent.getExtras();
+            if (params != null) {
                 Log.i("SecurityChooseFragment=", "bundle不为空");
-                task_total_numb = bundle.getInt("task_total_numb", 0);
+                task_total_numb = params.getInt("task_total_numb", 0);
                 Log.i("SecurityChooseFragment=", "task_total_numb=" + task_total_numb);
-                integers = bundle.getIntegerArrayList("integerList");
+                integers = params.getIntegerArrayList("integerList");
                 //Log.i("SecurityChooseFragment=", "integers：" + integers.size());
-                stringList = bundle.getStringArrayList("taskId");
+                stringList = params.getStringArrayList("taskId");
                 /*for (int i = 0; i < stringList.size(); i++) {
                     Log.i("intent.getStringExtra=", "得到的参数为：" + stringList);
                 }*/
@@ -89,7 +90,7 @@ public class SecurityChooseFragment extends Fragment {
                     break;
                 case R.id.user_list:
                     Intent intent = new Intent(getActivity(), UserListActivity.class);
-                    if(stringList.size() != 0 && integers.size() != 0){
+                    if(params != null && stringList.size() != 0 && integers.size() != 0){
                         Bundle bundle = new Bundle();
                         bundle.putStringArrayList("taskId", stringList);
                         bundle.putInt("task_total_numb", integers.size());

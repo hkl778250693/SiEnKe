@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,13 +52,15 @@ public class UserDetailInfoActivity extends Activity {
     private ImageView back,more;  //返回，更多
     private GridView gridView;
     private LinearLayout rootLinearlayout;  //添加图片
+    private RelativeLayout hiddenTypeRoot,hiddenReasonRoot;
     private TextView securityCheckCase,securityHiddenType,securityHiddenReason;  //安全情况,安全隐患类型，安全隐患原因
     private Button saveBtn,takePhoto,photoAlbum,cancel;  //保存、拍照、相册、取消
     private RadioButton notSecurityCheck,passSecurityCheck,notPassSecurityCheck,overSecurityCheckTime,nobodyHere,refuseSecurityCheck;
     private RadioButton commonSecurityCheck,yearPlan,recheck,passGasSecurityCheck;
     private RadioButton indoorStandPipe,indoorBranchPipe,fuelGasMeter,burningAppliances,gasFacilitiesRoom,threeWayPipe;
+    private RadioButton cancelRb,saveRb;
     private LayoutInflater inflater;  //转换器
-    private View popupwindowView,securityCaseView,securityHiddenTypeView,securityHiddenreasonView;
+    private View popupwindowView,securityCaseView,securityHiddenTypeView,securityHiddenreasonView,saveView;
     private PopupWindow popupWindow;
     private Bitmap bitmap;
     int sdkVersion = Build.VERSION.SDK_INT;  //当前SDK版本
@@ -93,10 +96,11 @@ public class UserDetailInfoActivity extends Activity {
         securityCheckCase = (TextView) findViewById(R.id.security_check_case);
         securityHiddenType = (TextView) findViewById(R.id.security_hidden_type);
         securityHiddenReason = (TextView) findViewById(R.id.security_hidden_reason);
+        hiddenTypeRoot = (RelativeLayout) findViewById(R.id.hidden_type_root);
+        hiddenReasonRoot = (RelativeLayout) findViewById(R.id.hidden_reason_root);
         saveBtn = (Button) findViewById(R.id.save_btn);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
         gridView = (GridView) findViewById(R.id.gridview);
-
     }
 
     //点击事件
@@ -166,6 +170,7 @@ public class UserDetailInfoActivity extends Activity {
                     createSecurityHiddenReasonPopupwindow();
                     break;
                 case R.id.save_btn:  //保存
+                    createSavePopupwindow();
                     break;
             }
         }
@@ -216,6 +221,43 @@ public class UserDetailInfoActivity extends Activity {
         });
     }
 
+    //弹出是否保存popupwindow
+    public void createSavePopupwindow(){
+        inflater = LayoutInflater.from(UserDetailInfoActivity.this);
+        saveView = inflater.inflate(R.layout.popupwindow_user_detail_info_save,null);
+        popupWindow = new PopupWindow(saveView, LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+        //绑定控件ID
+        cancelRb = (RadioButton) saveView.findViewById(R.id.cancel_rb);
+        saveRb = (RadioButton) saveView.findViewById(R.id.save_rb);
+        //设置点击事件
+        cancelRb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+        saveRb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+                finish();
+            }
+        });
+        popupWindow.setFocusable(true);
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.update();
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.business_check_shape));
+        popupWindow.setAnimationStyle(R.style.camera);
+        backgroundAlpha(0.8F);   //背景变暗
+        popupWindow.showAtLocation(rootLinearlayout,Gravity.CENTER,0,0);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                backgroundAlpha(1.0F);
+            }
+        });
+    }
+
     //弹出安全情况popupwindow
     public void createSecurityCasePopupwindow(){
         inflater = LayoutInflater.from(UserDetailInfoActivity.this);
@@ -234,6 +276,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(notSecurityCheck.getText());
+                showHiddenTypeAndReason();
             }
         });
         passSecurityCheck.setOnClickListener(new View.OnClickListener() {
@@ -241,6 +284,13 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(passSecurityCheck.getText());
+                if(securityCheckCase.getText().equals("安检合格")){
+                    Log.i("securityCheckCase","安检合格");
+                    if(hiddenTypeRoot.getVisibility() == View.VISIBLE && hiddenReasonRoot.getVisibility() == View.VISIBLE){
+                        hiddenTypeRoot.setVisibility(View.GONE);
+                        hiddenReasonRoot.setVisibility(View.GONE);
+                    }
+                }
             }
         });
         notPassSecurityCheck.setOnClickListener(new View.OnClickListener() {
@@ -248,6 +298,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(notPassSecurityCheck.getText());
+                showHiddenTypeAndReason();
             }
         });
         overSecurityCheckTime.setOnClickListener(new View.OnClickListener() {
@@ -255,6 +306,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(overSecurityCheckTime.getText());
+                showHiddenTypeAndReason();
             }
         });
         nobodyHere.setOnClickListener(new View.OnClickListener() {
@@ -262,6 +314,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(nobodyHere.getText());
+                showHiddenTypeAndReason();
             }
         });
         refuseSecurityCheck.setOnClickListener(new View.OnClickListener() {
@@ -269,6 +322,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(refuseSecurityCheck.getText());
+                showHiddenTypeAndReason();
             }
         });
         popupWindow.setFocusable(true);
@@ -284,6 +338,14 @@ public class UserDetailInfoActivity extends Activity {
                 backgroundAlpha(1.0F);
             }
         });
+    }
+
+    //当不是安检合格的时候，显示安全隐患和安全隐患原因
+    public void showHiddenTypeAndReason(){
+        if(hiddenTypeRoot.getVisibility() == View.GONE && hiddenReasonRoot.getVisibility() == View.GONE){
+            hiddenTypeRoot.setVisibility(View.VISIBLE);
+            hiddenReasonRoot.setVisibility(View.VISIBLE);
+        }
     }
 
     //弹出安全隐患类型popupwindow
