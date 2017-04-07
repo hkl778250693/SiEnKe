@@ -26,17 +26,9 @@ public class UserListviewAdapter extends BaseAdapter {
     private Context context;
     private List<UserListviewItem> userListviewList;
     private LayoutInflater layoutInflater;
-    private List<UserListviewItem> mFilteredArrayList;//这个是过滤的时候记载满足要求的那些数据的集合
-    private List<UserListviewItem> myPeopleList;//这个是要设置给adapter的
-
     public UserListviewAdapter(Context context, List<UserListviewItem> userListviewList) {
         this.context = context;
         this.userListviewList = userListviewList;
-        //这个时候把我们的一些中间变量给初始化一下
-        mFilteredArrayList = new ArrayList<UserListviewItem>();
-        myPeopleList = new ArrayList<UserListviewItem>();
-        //把我们传递过来的数据,弄到这个集合里面.保存原始集合的完整性
-        myPeopleList.addAll(userListviewList);
         if (context != null) {
             layoutInflater = LayoutInflater.from(context);
         }
