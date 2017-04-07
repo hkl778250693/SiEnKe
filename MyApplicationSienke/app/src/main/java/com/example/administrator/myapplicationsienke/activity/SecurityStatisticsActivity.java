@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.example.administrator.myapplicationsienke.R;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 /**
  * Created by Administrator on 2017/3/16.
@@ -65,11 +66,14 @@ public class SecurityStatisticsActivity extends Activity {
             notCheckedNumber.setText("0");
         }
         if (sharedPreferences.getInt("totalCount", 0) != 0) {
-            double finishingRate = (sharedPreferences.getInt("checkedNumber", 0) * 100) / sharedPreferences.getInt("totalCount", 0);  //完成率
-            BigDecimal bigDecimal = new BigDecimal(finishingRate);
-            double finalRate = bigDecimal.setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue();    //四舍五入，保留一位小数
-            Log.i("StatisticsActivity===>", "完成率=" + finalRate + "%");
-            finishRate.setText(String.valueOf(finalRate));
+            double checkedNumber = (double) sharedPreferences.getInt("checkedNumber", 0)* 100;
+            double totalCount = (double) sharedPreferences.getInt("totalCount", 0);
+            double finishingRate = checkedNumber/totalCount;  //完成率
+            Log.i("StatisticsActivity===>", "完成率=" + finishingRate + "%");
+            DecimalFormat df = new DecimalFormat("#.0");
+            String result = df.format(finishingRate);
+            Log.i("StatisticsActivity===>", "完成率=" + result + "%");
+            finishRate.setText(result);
         } else {
             finishRate.setText("0");
         }

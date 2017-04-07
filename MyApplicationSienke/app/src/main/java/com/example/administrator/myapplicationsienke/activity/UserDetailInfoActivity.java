@@ -76,7 +76,7 @@ public class UserDetailInfoActivity extends Activity {
     private Bitmap addImageBitmap;  //添加照片
     private GridviewImage image;
     private GridviewImageAdapter adapter;
-    private boolean isShowDelete = false;
+    private boolean isShowDelete ;
 
 
     @Override

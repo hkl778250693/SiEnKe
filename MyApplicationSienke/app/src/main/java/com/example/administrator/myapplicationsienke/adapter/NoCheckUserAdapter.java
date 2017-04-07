@@ -69,11 +69,15 @@ public class NoCheckUserAdapter extends BaseAdapter {
         Log.i("security_number=====>", "security_number=" + item.getSecurityNumber());
         viewHolder.user_name.setText(item.getUserName());
         viewHolder.number.setText(item.getNumber());
-        viewHolder.phone_number.setText(item.getPhoneNumber());
+        if (!item.getPhoneNumber().equals("null")) {
+            viewHolder.phone_number.setText(item.getPhoneNumber());
+        } else {
+            viewHolder.phone_number.setText("无");
+        }
         viewHolder.security_type.setText(item.getSecurityType());
-        if(!item.getUserId().equals("null")){
+        if (!item.getUserId().equals("null")) {
             viewHolder.user_id.setText(item.getUserId());
-        }else {
+        } else {
             viewHolder.user_id.setText("无");
         }
         viewHolder.address.setText(item.getAdress());

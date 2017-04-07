@@ -7,11 +7,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -20,11 +22,13 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.FileManagerListviewAdapter;
+import com.example.administrator.myapplicationsienke.mode.MySlideDelete;
 import com.example.administrator.myapplicationsienke.model.FileManagerListviewItem;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by Administrator on 2017/3/17.
@@ -33,6 +37,7 @@ public class FileManageActivity extends Activity {
     private ImageView back;
     private ListView slideCutListView;
     private List<FileManagerListviewItem> fileManagerListviewItemList = new ArrayList<>();
+    private FileManagerListviewAdapter fileManagerListviewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,16 +61,16 @@ public class FileManageActivity extends Activity {
     //点击事件
     private void setOnClickListener() {
         back.setOnClickListener(clickListener);
-        final FileManagerListviewAdapter fileManagerListviewAdapter = new FileManagerListviewAdapter(FileManageActivity.this, fileManagerListviewItemList);
+        fileManagerListviewAdapter = new FileManagerListviewAdapter(FileManageActivity.this, fileManagerListviewItemList);
         slideCutListView.setAdapter(fileManagerListviewAdapter);
-        slideCutListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        slideCutListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(FileManageActivity.this, TaskChooseActivity.class);
                 startActivity(intent);
             }
         });
-        //长按删除Item
+        /*//长按删除Item
         slideCutListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -99,6 +104,20 @@ public class FileManageActivity extends Activity {
                 builder.create().show();
                 return true;
             }
+        });*/
+        slideCutListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if(scrollState == SCROLL_STATE_FLING || scrollState == SCROLL_STATE_TOUCH_SCROLL){
+                    fileManagerListviewAdapter.closeOtherItem();
+                    Log.i("onScrollStateChanged=>","垂直滑动进来了！");
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+            }
         });
     }
     View.OnClickListener clickListener = new View.OnClickListener() {
@@ -115,11 +134,9 @@ public class FileManageActivity extends Activity {
     //暂时获取假数据
     public void getData() {
         for (int i = 0; i < 20; i++) {
-            FileManagerListviewItem fileManagerListviewItem = new FileManagerListviewItem();
-            fileManagerListviewItemList.add(fileManagerListviewItem);
+            FileManagerListviewItem item = new FileManagerListviewItem();
+            item.setSlideContent("安检任务");
+            fileManagerListviewItemList.add(item);
         }
-
-
     }
-
 }
