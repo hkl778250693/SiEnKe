@@ -9,6 +9,8 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -38,9 +40,9 @@ import java.util.List;
  * Created by Administrator on 2017/3/16.
  */
 public class UserListActivity extends Activity {
-    private ImageView back, tiaoZhuan;
+    private ImageView back, tiaoZhuan, editDelete;
     private ListView listView;
-    private TextView securityCheckCase, noData;
+    private TextView filter, noData;
     private Button backBtn, nextBtn, searchBtn;
     private LayoutInflater inflater;  //转换器
     private View securityCaseView;
@@ -56,6 +58,7 @@ public class UserListActivity extends Activity {
     private UserListviewItem item;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private EditText etSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +67,11 @@ public class UserListActivity extends Activity {
 
         defaultSetting();//初始化设置
         getTaskParams();//获取任务编号参数
+        bindView();//绑定控件
         new Thread() {
             @Override
             public void run() {
-                if(task_total_numb != 0){
+                if (task_total_numb != 0) {
                     if (noData.getVisibility() == View.VISIBLE) {
                         noData.setVisibility(View.GONE);
                     }
@@ -75,7 +79,7 @@ public class UserListActivity extends Activity {
                         getUserData(stringList.get(i));//读取所有安检用户数据
                         Log.i("UserListActivity", "查询的任务编号是：" + stringList.get(i));
                     }
-                }else {
+                } else {
                     if (noData.getVisibility() == View.GONE) {
                         Log.i("UserListActivity", "显示没有用户数据照片！");
                         noData.setVisibility(View.VISIBLE);
@@ -84,7 +88,6 @@ public class UserListActivity extends Activity {
                 super.run();
             }
         }.start();
-        bindView();//绑定控件
         setOnClickListener();//点击事件
     }
 
@@ -94,6 +97,7 @@ public class UserListActivity extends Activity {
         if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
+        Log.i("UserListActivity", "onResume进来了" );
         super.onResume();
     }
 
@@ -101,12 +105,14 @@ public class UserListActivity extends Activity {
     private void bindView() {
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
-        securityCheckCase = (TextView) findViewById(R.id.security_check_case);
+        filter = (TextView) findViewById(R.id.filter);
         tiaoZhuan = (ImageView) findViewById(R.id.tiaozhuan);
         backBtn = (Button) findViewById(R.id.back_btn);
         nextBtn = (Button) findViewById(R.id.next_btn);
         noData = (TextView) findViewById(R.id.no_data);
         searchBtn = (Button) findViewById(R.id.search_btn);
+        etSearch = (EditText) findViewById(R.id.etSearch);
+        editDelete = (ImageView) findViewById(R.id.edit_delete);
     }
 
     //初始化设置
@@ -123,7 +129,8 @@ public class UserListActivity extends Activity {
         tiaoZhuan.setOnClickListener(onClickListener);
         backBtn.setOnClickListener(onClickListener);
         nextBtn.setOnClickListener(onClickListener);
-        securityCheckCase.setOnClickListener(onClickListener);
+        filter.setOnClickListener(onClickListener);
+        editDelete.setOnClickListener(onClickListener);
         userListviewAdapter = new UserListviewAdapter(UserListActivity.this, userListviewItemList);
         listView.setAdapter(userListviewAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -132,8 +139,54 @@ public class UserListActivity extends Activity {
                 item = userListviewItemList.get((int) parent.getAdapter().getItemId(position));
                 currentPosition = position;
                 Intent intent = new Intent(UserListActivity.this, UserDetailInfoActivity.class);
-                intent.putExtra("position",position);
-                startActivityForResult(intent,position);
+                intent.putExtra("position", position);
+                startActivityForResult(intent, position);
+            }
+        });
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.i("UserListActivity", "onTextChanged进来了" );
+                /*if (s.length() == 0) {
+                    if (editDelete.getVisibility() == View.VISIBLE) {
+                        editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
+                        for (int i = 0; i < task_total_numb; i++) {
+                            getUserData(stringList.get(i));//读取所有安检用户数据
+                        }
+                        handler.sendEmptyMessage(2);
+                    }
+                } else {
+                    if (editDelete.getVisibility() == View.GONE) {
+                        editDelete.setVisibility(View.VISIBLE);  //反之则显示
+                        handler.post(editChanged);
+                        //handler.sendEmptyMessage(0);
+                    }
+                }*/
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.i("UserListActivity_after", "afterTextChanged进来了" );
+                if (s.length() == 0) {
+                    if (editDelete.getVisibility() == View.VISIBLE) {
+                        editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
+                        for (int i = 0; i < task_total_numb; i++) {
+                            getUserData(stringList.get(i));//读取所有安检用户数据
+                        }
+                        handler.sendEmptyMessage(2);
+                    }
+                } else {
+                    if (editDelete.getVisibility() == View.GONE) {
+                        editDelete.setVisibility(View.VISIBLE);  //反之则显示
+                        handler.post(editChanged);
+                        //handler.sendEmptyMessage(0);
+                    }
+                }
             }
         });
     }
@@ -145,7 +198,7 @@ public class UserListActivity extends Activity {
                 case R.id.back:
                     for (int i = 0; i < task_total_numb; i++) {
                         getContinueCheckPosition(stringList.get(i)); //获取继续安检的item位置
-                        if(!sharedPreferences.getString("continuePosition","").equals("")){
+                        if (!sharedPreferences.getString("continuePosition", "").equals("")) {
                             break;
                         }
                     }
@@ -156,18 +209,91 @@ public class UserListActivity extends Activity {
                     break;
                 case R.id.tiaozhuan:
                     break;
+                case R.id.edit_delete:
+                    etSearch.setText("");
+                    editDelete.setVisibility(View.GONE);
+                    for (int i = 0; i < task_total_numb; i++) {
+                        getUserData(stringList.get(i));//读取所有安检用户数据
+                        Log.i("UserListActivity", "查询的任务编号是：" + stringList.get(i));
+                    }
+                    handler.sendEmptyMessage(1);
+                    break;
             }
         }
     };
 
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 0:
+
+                    break;
+                case 1:
+                    userListviewAdapter.notifyDataSetChanged();
+                    break;
+                case 2:
+                    userListviewAdapter.notifyDataSetChanged();
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+    };
+
+    Runnable editChanged = new Runnable() {
+        @Override
+        public void run() {
+            String inputData = etSearch.getText().toString();   //编辑框输入的内容
+            userListviewItemList.clear();
+            Log.i("editChanged", "查询的任务个数为：" + task_total_numb);
+            for (int i = 0; i < task_total_numb; i++) {
+                getInputDataSub(userListviewItemList, inputData,stringList.get(i));//读取相应任务编号的安检用户数据
+                Log.i("editChanged", "查询的任务编号是：" + stringList.get(i));
+            }
+            userListviewAdapter.notifyDataSetChanged();
+        }
+    };
+
+    private void getInputDataSub(List<UserListviewItem> list, String inputData,String taskId) {
+        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+        Log.i("getInputDataSub", "进来了！");
+        for (int i = 0; i < 10; i++) {
+            Log.i("getInputDataSub", "循环进来了！");
+            while (cursor.moveToNext()) {
+                if(cursor.getColumnName(1).contains(inputData)){
+                    Log.i("getInputDataSub", "模糊查询进来了！");
+                    UserListviewItem listviewItem = new UserListviewItem();
+                    listviewItem.setSecurityNumber(cursor.getString(1));
+                    listviewItem.setUserName(cursor.getString(2));
+                    listviewItem.setNumber(cursor.getString(3));
+                    listviewItem.setPhoneNumber(cursor.getString(4));
+                    listviewItem.setSecurityType(cursor.getString(5));
+                    listviewItem.setUserId(cursor.getString(6));
+                    listviewItem.setAdress(cursor.getString(8));
+                    Log.i("getInputDataSub", "安检状态为 = " + cursor.getString(10));
+                    if (cursor.getString(10).equals("true")) {
+                        Log.i("getInputDataSub", "安检状态为true");
+                        listviewItem.setIfEdit(R.mipmap.userlist_gray);
+                    } else {
+                        Log.i("getInputDataSub", "安检状态为false");
+                        listviewItem.setIfEdit(R.mipmap.userlist_red);
+                    }
+                    list.add(listviewItem);
+                    Log.i("getInputDataSub", "模糊查询的结果长度为："+list.size());
+                }
+            }
+        }
+        cursor.close();
+    }
+
     //获取任务编号参数
     public void getTaskParams() {
-        if (sharedPreferences.getStringSet("stringSet",null) != null && sharedPreferences.getInt("task_total_numb",0) != 0) {
-            Iterator iterator = sharedPreferences.getStringSet("stringSet",null).iterator();
-            while (iterator.hasNext()){
+        if (sharedPreferences.getStringSet("stringSet", null) != null && sharedPreferences.getInt("task_total_numb", 0) != 0) {
+            Iterator iterator = sharedPreferences.getStringSet("stringSet", null).iterator();
+            while (iterator.hasNext()) {
                 stringList.add(iterator.next().toString());
             }
-            task_total_numb = sharedPreferences.getInt("task_total_numb",0);
+            task_total_numb = sharedPreferences.getInt("task_total_numb", 0);
         }
     }
 
@@ -185,21 +311,21 @@ public class UserListActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(notSecurityCheck.getText());
+                filter.setText(notSecurityCheck.getText());
             }
         });
         passSecurityCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(passSecurityCheck.getText());
+                filter.setText(passSecurityCheck.getText());
             }
         });
         notPassSecurityCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(notPassSecurityCheck.getText());
+                filter.setText(notPassSecurityCheck.getText());
             }
         });
         popupWindow.setFocusable(true);
@@ -208,7 +334,7 @@ public class UserListActivity extends Activity {
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(securityCheckCase, 200, 0);
+        popupWindow.showAsDropDown(filter, 200, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -283,11 +409,11 @@ public class UserListActivity extends Activity {
             userListviewItem.setSecurityType(cursor.getString(5));
             userListviewItem.setUserId(cursor.getString(6));
             userListviewItem.setAdress(cursor.getString(8));
-            Log.i("UserList=cursor", "安检状态为 = "+cursor.getString(10));
-            if(cursor.getString(10).equals("true")){
+            Log.i("UserList=cursor", "安检状态为 = " + cursor.getString(10));
+            if (cursor.getString(10).equals("true")) {
                 Log.i("UserList=cursor", "安检状态为true");
                 userListviewItem.setIfEdit(R.mipmap.userlist_gray);
-            }else {
+            } else {
                 Log.i("UserList=cursor", "安检状态为false");
                 userListviewItem.setIfEdit(R.mipmap.userlist_red);
             }
@@ -302,17 +428,17 @@ public class UserListActivity extends Activity {
         Log.i("ContinueCheckPosition", "获取继续安检位置进来了！");
         Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
         //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
-        if(cursor.getCount() == 0){
+        if (cursor.getCount() == 0) {
             return;
         }
         while (cursor.moveToNext()) {
             Log.i("ContinueCheckPosition", "游标进来了");
-            Log.i("ContinueCheckPosition", "安检状态为 = "+cursor.getString(10));
-            if(cursor.getString(10).equals("false")){
-                Log.i("ContinueCheckPosition", "安检状态为 = "+cursor.getString(10));
-                Log.i("ContinueCheckPosition", "安检状态为false,此时的item位置为："+cursor.getPosition());
-                Log.i("ContinueCheckPosition", "安检状态为false,此时的item的用户名为："+cursor.getColumnName(2));
-                editor.putString("continuePosition",cursor.getPosition()+"");
+            Log.i("ContinueCheckPosition", "安检状态为 = " + cursor.getString(10));
+            if (cursor.getString(10).equals("false")) {
+                Log.i("ContinueCheckPosition", "安检状态为 = " + cursor.getString(10));
+                Log.i("ContinueCheckPosition", "安检状态为false,此时的item位置为：" + cursor.getPosition());
+                Log.i("ContinueCheckPosition", "安检状态为false,此时的item的用户名为：" + cursor.getColumnName(2));
+                editor.putString("continuePosition", cursor.getPosition() + "");
                 editor.commit();
                 break;
             }
@@ -321,22 +447,22 @@ public class UserListActivity extends Activity {
     }
 
     //更新用户表是否安检状态
-    public void updateUserCheckedState(){
+    public void updateUserCheckedState() {
         ContentValues values = new ContentValues();
-        values.put("ifChecked","true");
+        values.put("ifChecked", "true");
         Log.i("UserList=update", "更新安检状态为true");
-        db.update("User",values,"securityNumber=?",new String[]{item.getSecurityNumber()});
+        db.update("User", values, "securityNumber=?", new String[]{item.getSecurityNumber()});
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK){
-            if(requestCode == currentPosition){
+        if (resultCode == RESULT_OK) {
+            if (requestCode == currentPosition) {
                 updateUserCheckedState(); //更新本地数据库用户表安检状态
                 item.setIfEdit(R.mipmap.userlist_gray);
                 userListviewAdapter.notifyDataSetChanged();
-                editor.putInt("checkedNumber",sharedPreferences.getInt("checkedNumber",0)+1);
+                editor.putInt("checkedNumber", sharedPreferences.getInt("checkedNumber", 0) + 1);
                 editor.commit();
                 Log.i("UserList=ActivityResult", "页面回调进来了");
             }

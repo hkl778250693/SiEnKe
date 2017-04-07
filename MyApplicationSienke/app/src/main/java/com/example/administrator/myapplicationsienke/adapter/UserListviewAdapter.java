@@ -26,6 +26,7 @@ public class UserListviewAdapter extends BaseAdapter {
     private Context context;
     private List<UserListviewItem> userListviewList;
     private LayoutInflater layoutInflater;
+
     public UserListviewAdapter(Context context, List<UserListviewItem> userListviewList) {
         this.context = context;
         this.userListviewList = userListviewList;
@@ -72,11 +73,15 @@ public class UserListviewAdapter extends BaseAdapter {
         Log.i("security_number=====>", "security_number=" + userListviewItem.getSecurityNumber());
         viewHolder.user_name.setText(userListviewItem.getUserName());
         viewHolder.number.setText(userListviewItem.getNumber());
-        viewHolder.phone_number.setText(userListviewItem.getPhoneNumber());
+        if (!userListviewItem.getPhoneNumber().equals("null")) {
+            viewHolder.phone_number.setText(userListviewItem.getPhoneNumber());
+        } else {
+            viewHolder.phone_number.setText("无");
+        }
         viewHolder.security_type.setText(userListviewItem.getSecurityType());
-        if(!userListviewItem.getUserId().equals("null")){
+        if (!userListviewItem.getUserId().equals("null")) {
             viewHolder.user_id.setText(userListviewItem.getUserId());
-        }else {
+        } else {
             viewHolder.user_id.setText("无");
         }
         viewHolder.address.setText(userListviewItem.getAdress());
