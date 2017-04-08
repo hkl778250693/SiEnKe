@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,14 +23,17 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/3/16.
  */
-public class UserListviewAdapter extends BaseAdapter {
+public class UserListviewAdapter extends BaseAdapter implements Filterable {
     private Context context;
-    private List<UserListviewItem> userListviewList;
+    private List<UserListviewItem> userListviewList;  //传递过来的数据源   这个数据是会改变的，所以要有个变量来备份一下原始数据
+    private List<UserListviewItem> backList;  //备用数据源
     private LayoutInflater layoutInflater;
+    private MyFilter myFilter;
 
     public UserListviewAdapter(Context context, List<UserListviewItem> userListviewList) {
         this.context = context;
         this.userListviewList = userListviewList;
+        backList = userListviewList;
         if (context != null) {
             layoutInflater = LayoutInflater.from(context);
         }
@@ -99,5 +103,45 @@ public class UserListviewAdapter extends BaseAdapter {
         TextView user_id;  //用户编号
         TextView address;   //地址
         ImageView if_edit;   //是否编辑
+    }
+
+    //当ListView调用setTextFilter()方法的时候，便会调用该方法
+    @Override
+    public Filter getFilter() {
+        if (myFilter == null) {
+            myFilter = new MyFilter();
+        }
+        return myFilter;
+    }
+
+    class MyFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+            List<UserListviewItem> list;
+            if (TextUtils.isEmpty(constraint)) {  //当过滤的关键字为空的时候，则显示所有的数据
+                list = backList;
+            } else {    //否则把符合条件的数据对象添加到集合中
+                list = new ArrayList<>();
+                for (UserListviewItem item : backList) {
+                    if (item.getPhoneNumber().contains(constraint)) {
+                        list.add(item);
+                    }
+                }
+            }
+            results.values = list;    //将得到的集合保存到FilterResults的value变量中
+            results.count = list.size();   //将集合的大小保存到FilterResults的count变量中
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            userListviewList = (List<UserListviewItem>) results.values;
+            if (results.count > 0) {
+                notifyDataSetChanged();  //通知数据发生了改变
+            }else {
+                notifyDataSetInvalidated();  //通知数据失效
+            }
+        }
     }
 }

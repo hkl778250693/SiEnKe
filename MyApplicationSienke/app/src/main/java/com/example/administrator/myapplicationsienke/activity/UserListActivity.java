@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -133,6 +134,7 @@ public class UserListActivity extends Activity {
         editDelete.setOnClickListener(onClickListener);
         userListviewAdapter = new UserListviewAdapter(UserListActivity.this, userListviewItemList);
         listView.setAdapter(userListviewAdapter);
+        listView.setTextFilterEnabled(true);  // 开启过滤功能
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -152,21 +154,20 @@ public class UserListActivity extends Activity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.i("UserListActivity", "onTextChanged进来了" );
-                /*if (s.length() == 0) {
+                if(TextUtils.isEmpty(s.toString().trim())){
+                    listView.clearTextFilter();    //搜索文本为空时，清除ListView的过滤
                     if (editDelete.getVisibility() == View.VISIBLE) {
                         editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
                         for (int i = 0; i < task_total_numb; i++) {
                             getUserData(stringList.get(i));//读取所有安检用户数据
                         }
-                        handler.sendEmptyMessage(2);
                     }
-                } else {
+                }else {
+                    listView.setFilterText(s.toString().trim());  //设置过滤关键字
                     if (editDelete.getVisibility() == View.GONE) {
                         editDelete.setVisibility(View.VISIBLE);  //反之则显示
-                        handler.post(editChanged);
-                        //handler.sendEmptyMessage(0);
                     }
-                }*/
+                }
             }
 
             @Override
