@@ -133,15 +133,13 @@ public class NewTaskActivity extends Activity {
                     NewTaskActivity.this.finish();
                     break;
                 case R.id.newplan_add_btn:
-                    showPopupwindow();
-                    //开启支线程进行请求任务信息
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            requireMyTask("getUserCheck.do", "safetyPlan=11");
-                            super.run();
-                        }
-                    }.start();
+                    Intent intent1 = new Intent(NewTaskActivity.this, NewTaskDetailActivity.class);
+                    startActivity(intent1);
+                    finish();
+                    break;
+                case R.id.save_btn:
+                    Toast.makeText(NewTaskActivity.this,"新增任务已保存",Toast.LENGTH_SHORT).show();
+                    NewTaskActivity.this.finish();
                     break;
                 case R.id.security_check_case:
                     createSecurityCasePopupwindow();
