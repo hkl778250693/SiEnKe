@@ -40,7 +40,7 @@ import java.util.List;
 public class ContinueCheckUserActivity extends Activity {
     private ImageView back, tiaoZhuan;
     private ListView listView;
-    private TextView securityCheckCase, noData;
+    private TextView filter, noData;
     private EditText setEsearchTextChanged;//搜索框
     private Button backBtn, nextBtn, searchBtn;
     private LayoutInflater inflater;  //转换器
@@ -103,7 +103,7 @@ public class ContinueCheckUserActivity extends Activity {
     private void bindView() {
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
-        securityCheckCase = (TextView) findViewById(R.id.security_check_case);
+        filter = (TextView) findViewById(R.id.filter);
         tiaoZhuan = (ImageView) findViewById(R.id.tiaozhuan);
         backBtn = (Button) findViewById(R.id.back_btn);
         nextBtn = (Button) findViewById(R.id.next_btn);
@@ -128,7 +128,7 @@ public class ContinueCheckUserActivity extends Activity {
         tiaoZhuan.setOnClickListener(onClickListener);
         backBtn.setOnClickListener(onClickListener);
         nextBtn.setOnClickListener(onClickListener);
-        securityCheckCase.setOnClickListener(onClickListener);
+        filter.setOnClickListener(onClickListener);
         userListviewAdapter = new UserListviewAdapter(ContinueCheckUserActivity.this, userListviewItemList);
         listView.setAdapter(userListviewAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -188,21 +188,21 @@ public class ContinueCheckUserActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(notSecurityCheck.getText());
+                filter.setText(notSecurityCheck.getText());
             }
         });
         passSecurityCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(passSecurityCheck.getText());
+                filter.setText(passSecurityCheck.getText());
             }
         });
         notPassSecurityCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(notPassSecurityCheck.getText());
+                filter.setText(notPassSecurityCheck.getText());
             }
         });
         popupWindow.setFocusable(true);
@@ -211,7 +211,7 @@ public class ContinueCheckUserActivity extends Activity {
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(securityCheckCase, 200, 0);
+        popupWindow.showAsDropDown(filter, 200, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {

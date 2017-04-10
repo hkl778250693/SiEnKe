@@ -15,9 +15,15 @@ public class MySqliteHelper extends SQLiteOpenHelper {
     //用户表
     final String CREATE_TABLE_SQL_USER = "CREATE TABLE User" +
             "(user_id integer primary key AUTOINCREMENT,securityNumber varchar(200),userName varchar(200),meterNumber varchar(200),userPhone varchar(200),securityType varchar(200),oldUserId varchar(200),newUserId varchar(200),userAddress  varchar(200),taskId varchar(200),ifChecked varchar(200))";
+
     //任务表
     final String CREATE_TABLE_SQL_TASK = "CREATE TABLE Task " +
             "(task_id integer primary key AUTOINCREMENT,taskName varchar(200),taskId varchar(200),securityType varchar(200),totalCount varchar(200),endTime varchar(200))";
+
+    //安全信息表
+    final String CREATE_TABLE_SQL_SECURITY_PHOTO_INFO = "CREATE TABLE security_photo " +
+            "(id integer primary key AUTOINCREMENT,photo_path varchar(200),u_id integer)";
+
     //安全情况表
     final String CREATE_TABLE_SQL_SECURITY_CASE = "CREATE TABLE security_case " +
             "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
@@ -59,6 +65,7 @@ public class MySqliteHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_SQL_USER);                           //用户表
         db.execSQL(CREATE_TABLE_SQL_TASK);                           //任务表
+        db.execSQL(CREATE_TABLE_SQL_SECURITY_PHOTO_INFO);            //用户安检图片关联表
         db.execSQL(CREATE_TABLE_SQL_SECURITY_CASE);                  //安全情况表
         db.execSQL(CREATE_TABLE_SQL_SECURITY_HIDDEEN_DANGER);        //安全隐患表
         db.execSQL(CREATE_TABLE_SQL_SECURITY_HIDDEEN_DENGER_REASON); //安全隐患原因表

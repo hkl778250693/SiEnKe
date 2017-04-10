@@ -119,18 +119,19 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();
             List<UserListviewItem> list;
-            if (TextUtils.isEmpty(constraint)) {  //当过滤的关键字为空的时候，则显示所有的数据
+            if (constraint == null|| constraint.length() == 0) {  //当过滤的关键字为空的时候，则显示所有的数据
                 list = backList;
             } else {    //否则把符合条件的数据对象添加到集合中
                 list = new ArrayList<>();
                 for (UserListviewItem item : backList) {
-                    if (item.getPhoneNumber().contains(constraint)) {
+                    if (item.getPhoneNumber().contains(constraint) || item.getUserName().contains(constraint) || item.getNumber().contains(constraint) || item.getAdress().contains(constraint)) {
                         list.add(item);
                     }
                 }
             }
             results.values = list;    //将得到的集合保存到FilterResults的value变量中
             results.count = list.size();   //将集合的大小保存到FilterResults的count变量中
+            Log.i("performFiltering", "performFiltering进来了！");
             return results;
         }
 
@@ -139,6 +140,7 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
             userListviewList = (List<UserListviewItem>) results.values;
             if (results.count > 0) {
                 notifyDataSetChanged();  //通知数据发生了改变
+                Log.i("publishResults", "publishResults进来了！");
             }else {
                 notifyDataSetInvalidated();  //通知数据失效
             }
