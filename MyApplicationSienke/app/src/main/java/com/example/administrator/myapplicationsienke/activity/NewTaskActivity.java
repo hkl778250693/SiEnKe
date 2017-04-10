@@ -79,6 +79,7 @@ public class NewTaskActivity extends Activity {
     private ImageView frameAnimation;
     private AnimationDrawable animationDrawable;
     private LinearLayout rootLinearlayout;
+    private ArrayList<NewTaskListviewItem> parclebleList =new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +87,9 @@ public class NewTaskActivity extends Activity {
         setContentView(R.layout.activity_new_task);
 
         bindView();//绑定控件
-        setViewClickListener();//点击事件
         defaultSetting();//初始化设置
+        setViewClickListener();//点击事件
+
     }
 
 
@@ -134,8 +136,7 @@ public class NewTaskActivity extends Activity {
                     break;
                 case R.id.newplan_add_btn:
                     Intent intent1 = new Intent(NewTaskActivity.this, NewTaskDetailActivity.class);
-                    startActivity(intent1);
-                    finish();
+                    startActivityForResult(intent1,100);
                     break;
                 case R.id.save_btn:
                     Toast.makeText(NewTaskActivity.this,"新增任务已保存",Toast.LENGTH_SHORT).show();
@@ -480,4 +481,18 @@ public class NewTaskActivity extends Activity {
             super.handleMessage(msg);
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == RESULT_OK){
+            if(requestCode == 100){
+                if (data != null ){
+                    parclebleList = data.getParcelableArrayListExtra("parclebleList");
+                    Log.i("NewTaskActivity","接收到的parclebleList长度为："+parclebleList.size());
+                }
+                Log.i("NewTaskActivity","default进来了："+parclebleList.size());
+            }
+        }
+    }
 }
