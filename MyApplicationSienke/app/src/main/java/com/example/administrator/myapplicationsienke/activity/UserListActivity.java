@@ -142,6 +142,7 @@ public class UserListActivity extends Activity {
                 currentPosition = position;
                 Intent intent = new Intent(UserListActivity.this, UserDetailInfoActivity.class);
                 intent.putExtra("position", position);
+                intent.putExtra("user_id",item.getUserId());
                 startActivityForResult(intent, position);
             }
         });
@@ -158,9 +159,6 @@ public class UserListActivity extends Activity {
                     listView.clearTextFilter();    //搜索文本为空时，清除ListView的过滤
                     if (editDelete.getVisibility() == View.VISIBLE) {
                         editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
-                        for (int i = 0; i < task_total_numb; i++) {
-                            getUserData(stringList.get(i));//读取所有安检用户数据
-                        }
                     }
                 }else {
                     listView.setFilterText(s.toString().trim());  //设置过滤关键字
@@ -173,21 +171,6 @@ public class UserListActivity extends Activity {
             @Override
             public void afterTextChanged(Editable s) {
                 Log.i("UserListActivity_after", "afterTextChanged进来了" );
-                if (s.length() == 0) {
-                    if (editDelete.getVisibility() == View.VISIBLE) {
-                        editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
-                        for (int i = 0; i < task_total_numb; i++) {
-                            getUserData(stringList.get(i));//读取所有安检用户数据
-                        }
-                        handler.sendEmptyMessage(2);
-                    }
-                } else {
-                    if (editDelete.getVisibility() == View.GONE) {
-                        editDelete.setVisibility(View.VISIBLE);  //反之则显示
-                        handler.post(editChanged);
-                        //handler.sendEmptyMessage(0);
-                    }
-                }
             }
         });
     }
@@ -205,7 +188,7 @@ public class UserListActivity extends Activity {
                     }
                     UserListActivity.this.finish();
                     break;
-                case R.id.security_check_case:
+                case R.id.filter:
                     createSecurityCasePopupwindow();
                     break;
                 case R.id.tiaozhuan:
@@ -228,12 +211,8 @@ public class UserListActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 0:
-
                     break;
                 case 1:
-                    userListviewAdapter.notifyDataSetChanged();
-                    break;
-                case 2:
                     userListviewAdapter.notifyDataSetChanged();
                     break;
             }
@@ -241,51 +220,6 @@ public class UserListActivity extends Activity {
         }
     };
 
-    Runnable editChanged = new Runnable() {
-        @Override
-        public void run() {
-            String inputData = etSearch.getText().toString();   //编辑框输入的内容
-            userListviewItemList.clear();
-            Log.i("editChanged", "查询的任务个数为：" + task_total_numb);
-            for (int i = 0; i < task_total_numb; i++) {
-                getInputDataSub(userListviewItemList, inputData,stringList.get(i));//读取相应任务编号的安检用户数据
-                Log.i("editChanged", "查询的任务编号是：" + stringList.get(i));
-            }
-            userListviewAdapter.notifyDataSetChanged();
-        }
-    };
-
-    private void getInputDataSub(List<UserListviewItem> list, String inputData,String taskId) {
-        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
-        Log.i("getInputDataSub", "进来了！");
-        for (int i = 0; i < 10; i++) {
-            Log.i("getInputDataSub", "循环进来了！");
-            while (cursor.moveToNext()) {
-                if(cursor.getColumnName(1).contains(inputData)){
-                    Log.i("getInputDataSub", "模糊查询进来了！");
-                    UserListviewItem listviewItem = new UserListviewItem();
-                    listviewItem.setSecurityNumber(cursor.getString(1));
-                    listviewItem.setUserName(cursor.getString(2));
-                    listviewItem.setNumber(cursor.getString(3));
-                    listviewItem.setPhoneNumber(cursor.getString(4));
-                    listviewItem.setSecurityType(cursor.getString(5));
-                    listviewItem.setUserId(cursor.getString(6));
-                    listviewItem.setAdress(cursor.getString(8));
-                    Log.i("getInputDataSub", "安检状态为 = " + cursor.getString(10));
-                    if (cursor.getString(10).equals("true")) {
-                        Log.i("getInputDataSub", "安检状态为true");
-                        listviewItem.setIfEdit(R.mipmap.userlist_gray);
-                    } else {
-                        Log.i("getInputDataSub", "安检状态为false");
-                        listviewItem.setIfEdit(R.mipmap.userlist_red);
-                    }
-                    list.add(listviewItem);
-                    Log.i("getInputDataSub", "模糊查询的结果长度为："+list.size());
-                }
-            }
-        }
-        cursor.close();
-    }
 
     //获取任务编号参数
     public void getTaskParams() {
@@ -350,6 +284,7 @@ public class UserListActivity extends Activity {
         lp.alpha = bgAlpha; //0.0-1.0
         getWindow().setAttributes(lp);
     }
+
 
     /**
      * 查询方法参数详解
