@@ -1,9 +1,12 @@
 package com.example.administrator.myapplicationsienke.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Administrator on 2017/4/5.
  */
-public class NewTaskListviewItem {
+public class NewTaskListviewItem implements Parcelable {
     private String userName;             //姓名
     private String number;                   //表编号
     private String phoneNumber;             //电话号码
@@ -49,5 +52,36 @@ public class NewTaskListviewItem {
     public void setAdress(String adress) {
         this.adress = adress;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(userName);
+        parcel.writeString(number);
+        parcel.writeString(phoneNumber);
+        parcel.writeString(userId);
+        parcel.writeString(adress);
+    }
+    public static final Parcelable.Creator<NewTaskListviewItem>CREATOR = new Parcelable.Creator<NewTaskListviewItem>(){
+        @Override
+        public NewTaskListviewItem createFromParcel(Parcel parcel) {
+            NewTaskListviewItem item = new NewTaskListviewItem();
+            item.userName = parcel.readString();
+            item.number = parcel.readString();
+            item.phoneNumber = parcel.readString();
+            item.userId = parcel.readString();
+            item.adress = parcel.readString();
+            return item;
+        }
+
+        @Override
+        public NewTaskListviewItem[] newArray(int i) {
+            return new NewTaskListviewItem[i];
+        }
+    };
 }
 

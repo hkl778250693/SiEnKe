@@ -8,6 +8,8 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,6 +29,7 @@ import android.widget.Toast;
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.NewTaskListviewAdapter;
 import com.example.administrator.myapplicationsienke.model.NewTaskListviewItem;
+import com.example.administrator.myapplicationsienke.model.TaskChoose;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,6 +44,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -68,7 +72,7 @@ public class NewTaskDetailActivity extends Activity {
     private AnimationDrawable animationDrawable;
     public int responseCode = 0;
     private NewTaskListviewAdapter newTaskListviewAdapter;
-
+    private ArrayList<NewTaskListviewItem> parclebleList =new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,9 +131,12 @@ public class NewTaskDetailActivity extends Activity {
                     createSecurityCasePopupwindow();
                     break;
                 case R.id.save:
+                    saveTaskInfo();//保存选中的任务编号信息
                     Toast.makeText(NewTaskDetailActivity.this,"用户信息已保存",Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(NewTaskDetailActivity.this, NewTaskActivity.class);
-                    startActivity(intent);
+                    Intent intent = new Intent();
+                    intent.putParcelableArrayListExtra("parclebleList",parclebleList);
+                    Log.i("NewTaskDetailActivity","parclebleList长度为："+parclebleList.size());
+                    setResult(Activity.RESULT_OK,intent);
                     finish();
                     break;
                 case R.id.search_btn:
@@ -192,6 +199,35 @@ public class NewTaskDetailActivity extends Activity {
         if (no_data.getVisibility() == View.GONE) {
             no_data.setVisibility(View.VISIBLE);
         }
+    }
+
+    //保存选中的任务编号信息
+    public void saveTaskInfo() {
+        HashMap<Integer, Boolean> state = newTaskListviewAdapter.getHashMap();
+        int count = newTaskListviewAdapter.getCount();
+        Log.i("count====>", "长度为：" + count);
+        for (int i = 0; i < count; i++) {
+            if (state.get(i) != null) {
+                NewTaskListviewItem item = newTaskListviewItemList.get((int) newTaskListviewAdapter.getItemId(i));
+                parclebleList.add(item);
+            }
+        }
+        newTaskListviewAdapter.notifyDataSetChanged();
+    }
+
+    //删除选中的任务编号信息
+    public void deleteChecked() {
+        HashMap<Integer, Boolean> isCheck_delete = newTaskListviewAdapter.getHashMap();
+        int count = newTaskListviewAdapter.getCount();
+        for (int i = 0; i < count; i++) {
+            int position = i - (count - newTaskListviewAdapter.getCount());
+            if (isCheck_delete.get(i) != null && isCheck_delete.get(i)) {
+                isCheck_delete.remove(i);
+                newTaskListviewAdapter.removeData(position);
+                Log.i("removeData====>", "删除的位置是：" + position);
+            }
+        }
+        newTaskListviewAdapter.notifyDataSetChanged();
     }
 
     //show弹出框
