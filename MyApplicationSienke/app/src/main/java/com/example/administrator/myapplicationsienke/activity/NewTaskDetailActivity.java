@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,6 +22,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.NewTaskListviewAdapter;
@@ -44,11 +47,12 @@ import java.util.List;
  * Created by Administrator on 2017/4/5.
  */
 public class NewTaskDetailActivity extends Activity {
+    private View view;
     private ImageView back;
     private ListView listView;
-    private TextView securityCheckCase;
+    private TextView securityCheckCase, save, no_data;
     private EditText setEsearchTextChanged;//搜索框
-    private Button  searchBtn;
+    private Button searchBtn;
     private PopupWindow popupWindow;
     private View securityCaseView;
     private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck;
@@ -58,6 +62,10 @@ public class NewTaskDetailActivity extends Activity {
     private String result; //网络请求结果
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private LayoutInflater layoutInflater;
+    private LinearLayout rootLinearlayout;
+    private ImageView frameAnimation;
+    private AnimationDrawable animationDrawable;
     public int responseCode = 0;
     private NewTaskListviewAdapter newTaskListviewAdapter;
 
@@ -67,16 +75,17 @@ public class NewTaskDetailActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_task_datail);
 
-        //开启支线程进行请求任务信息
+
+        /*//开启支线程进行请求任务信息
         new Thread() {
             @Override
             public void run() {
-                requireMyTask("getUserCheck.do","safetyPlan=11");
+                requireMyTask("getCostomer.do", "safetyPlan=");
                 super.run();
             }
-        }.start();
-        defaultSetting();//初始化设置
+        }.start();*/
         bindView();//绑定控件
+        defaultSetting();//初始化设置
         setOnClickListener();//点击事件
     }
 
@@ -87,12 +96,17 @@ public class NewTaskDetailActivity extends Activity {
         securityCheckCase = (TextView) findViewById(R.id.security_check_case);
         setEsearchTextChanged = (EditText) findViewById(R.id.etSearch);
         searchBtn = (Button) findViewById(R.id.search_btn);
+        save = (TextView) findViewById(R.id.save);
+        no_data = (TextView) findViewById(R.id.no_data);
+        rootLinearlayout = (LinearLayout)findViewById(R.id.root_linearlayout);
     }
 
     //点击事件
     private void setOnClickListener() {
         back.setOnClickListener(onClickListener);
         securityCheckCase.setOnClickListener(onClickListener);
+        save.setOnClickListener(onClickListener);
+        searchBtn.setOnClickListener(onClickListener);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -112,6 +126,60 @@ public class NewTaskDetailActivity extends Activity {
                 case R.id.security_check_case:
                     createSecurityCasePopupwindow();
                     break;
+                case R.id.save:
+                    Toast.makeText(NewTaskDetailActivity.this,"用户信息已保存",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(NewTaskDetailActivity.this, NewTaskActivity.class);
+                    startActivity(intent);
+                    finish();
+                    break;
+                case R.id.search_btn:
+                    if (securityCheckCase.getText().equals("姓名")) {
+                        showPopupwindow();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        //开启支线程进行请求任务信息
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                requireMyTask("getCostomer.do", "userName="+setEsearchTextChanged.getText().toString());
+                                super.run();
+                            }
+                        }.start();
+                    } else if (securityCheckCase.getText().equals("表编号")) {
+                        showPopupwindow();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        //开启支线程进行请求任务信息
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                requireMyTask("getCostomer.do", "meterNumber="+setEsearchTextChanged.getText().toString());
+                                super.run();
+                            }
+                        }.start();
+                    } else if (securityCheckCase.getText().equals("地址")) {
+                        showPopupwindow();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        //开启支线程进行请求任务信息
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                requireMyTask("getCostomer.do", "userAdress="+setEsearchTextChanged.getText().toString());
+                                super.run();
+                            }
+                        }.start();
+                    }
+                    break;
             }
         }
     };
@@ -120,6 +188,31 @@ public class NewTaskDetailActivity extends Activity {
     private void defaultSetting() {
         sharedPreferences = NewTaskDetailActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        securityCheckCase.setText("筛选");
+        if (no_data.getVisibility() == View.GONE) {
+            no_data.setVisibility(View.VISIBLE);
+        }
+    }
+
+    //show弹出框
+    public void showPopupwindow() {
+        layoutInflater = LayoutInflater.from(NewTaskDetailActivity.this);
+        view = layoutInflater.inflate(R.layout.popupwindow_query_loading, null);
+        popupWindow = new PopupWindow(view, 250, 250);
+        frameAnimation = (ImageView) view.findViewById(R.id.frame_animation);
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.loading_shape));
+        popupWindow.setAnimationStyle(R.style.dialog);
+        popupWindow.update();
+        popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
+        backgroundAlpha(0.8F);   //背景变暗
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                backgroundAlpha(1.0F);
+            }
+        });
+        //开始加载动画
+        startFrameAnimation();
     }
 
     //popupwindow
@@ -137,6 +230,9 @@ public class NewTaskDetailActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(notSecurityCheck.getText());
+                if (no_data.getVisibility() == View.VISIBLE) {
+                    no_data.setVisibility(View.GONE);
+                }
             }
         });
         passSecurityCheck.setOnClickListener(new View.OnClickListener() {
@@ -144,6 +240,9 @@ public class NewTaskDetailActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(passSecurityCheck.getText());
+                if (no_data.getVisibility() == View.VISIBLE) {
+                    no_data.setVisibility(View.GONE);
+                }
             }
         });
         notPassSecurityCheck.setOnClickListener(new View.OnClickListener() {
@@ -151,6 +250,9 @@ public class NewTaskDetailActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 securityCheckCase.setText(notPassSecurityCheck.getText());
+                if (no_data.getVisibility() == View.VISIBLE) {
+                    no_data.setVisibility(View.GONE);
+                }
             }
         });
         popupWindow.setFocusable(true);
@@ -173,6 +275,13 @@ public class NewTaskDetailActivity extends Activity {
         WindowManager.LayoutParams lp = getWindow().getAttributes();
         lp.alpha = bgAlpha; //0.0-1.0
         getWindow().setAttributes(lp);
+    }
+
+    //开始帧动画
+    public void startFrameAnimation() {
+        frameAnimation.setBackgroundResource(R.drawable.frame_animation_list);
+        animationDrawable = (AnimationDrawable) frameAnimation.getDrawable();
+        animationDrawable.start();
     }
 
 
@@ -200,7 +309,7 @@ public class NewTaskDetailActivity extends Activity {
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
                     if (!keyAndValue.equals("")) {
-                        url = new URL(httpUrl + "?" + keyAndValue );
+                        url = new URL(httpUrl + "?" + keyAndValue);
                         //没有参数传递
                     } else {
                         url = new URL(httpUrl);
@@ -269,28 +378,33 @@ public class NewTaskDetailActivity extends Activity {
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject object = jsonArray.getJSONObject(i);
                             NewTaskListviewItem item = new NewTaskListviewItem();
-                            item.setSecurityNumber(object.optInt("safetyPlan", 0) + "");
-                            item.setUserName(object.optString("userName", ""));
-                            item.setNumber(object.optString("meterNumber", ""));
-                            item.setPhoneNumber(object.optString("userPhone", ""));
-                            item.setSecurityType(object.optString("securityName", ""));
-                            item.setUserId(object.optString("oldUserId", ""));
-                            item.setAdress(object.optString("userAdress", ""));
+                            item.setUserName(object.optString("c_user_name", ""));
+                            item.setNumber(object.optString("c_meter_number", ""));
+                            item.setPhoneNumber(object.optString("c_user_phone", ""));
+                            item.setUserId(object.optString("c_old_user_id", ""));
+                            item.setAdress(object.optString("c_user_address", ""));
                             newTaskListviewItemList.add(item);
                         }
-                        if(newTaskListviewItemList.size() != 0){
+                        if (newTaskListviewItemList.size() != 0) {
                             Log.i("NewTaskDetailActivity", "传入的数据长度为：" + newTaskListviewItemList.size());
                             newTaskListviewAdapter = new NewTaskListviewAdapter(NewTaskDetailActivity.this, newTaskListviewItemList);
                             listView.setAdapter(newTaskListviewAdapter);
                         }
+                        popupWindow.dismiss();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    break;
+                case 2:
+                    popupWindow.dismiss();
+                    Toast.makeText(NewTaskDetailActivity.this, "没有相应的数据！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 3:
+                    popupWindow.dismiss();
+                    Toast.makeText(NewTaskDetailActivity.this, "网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
             }
             super.handleMessage(msg);
         }
     };
-
-
 }

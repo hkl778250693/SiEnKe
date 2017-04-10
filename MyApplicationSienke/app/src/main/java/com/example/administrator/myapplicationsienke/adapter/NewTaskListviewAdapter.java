@@ -50,11 +50,9 @@ public class NewTaskListviewAdapter extends BaseAdapter {
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = layoutInflater.inflate(R.layout.newtask_listview_item, null);
-            viewHolder.security_number = (TextView) convertView.findViewById(R.id.security_number);
             viewHolder.user_name = (TextView) convertView.findViewById(R.id.user_name);
             viewHolder.number = (TextView) convertView.findViewById(R.id.number);
             viewHolder.phone_number = (TextView) convertView.findViewById(R.id.phone_number);
-            viewHolder.security_type = (TextView) convertView.findViewById(R.id.security_type);
             viewHolder.user_id = (TextView) convertView.findViewById(R.id.user_id);
             viewHolder.address = (TextView) convertView.findViewById(R.id.address);
             convertView.setTag(viewHolder);
@@ -62,12 +60,10 @@ public class NewTaskListviewAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         NewTaskListviewItem newTaskListviewItem = newTaskListviewItemList.get(position);
-        viewHolder.security_number.setText(newTaskListviewItem.getSecurityNumber());
-        Log.i("security_number=====>", "security_number=" + newTaskListviewItem.getSecurityNumber());
+        Log.i("security_number=====>", "security_number=" + newTaskListviewItem.getUserName());
         viewHolder.user_name.setText(newTaskListviewItem.getUserName());
         viewHolder.number.setText(newTaskListviewItem.getNumber());
         viewHolder.phone_number.setText(newTaskListviewItem.getPhoneNumber());
-        viewHolder.security_type.setText(newTaskListviewItem.getSecurityType());
         viewHolder.user_id.setText(newTaskListviewItem.getUserId());
         viewHolder.address.setText(newTaskListviewItem.getAdress());
 
@@ -75,11 +71,9 @@ public class NewTaskListviewAdapter extends BaseAdapter {
     }
 
     class ViewHolder {
-        TextView security_number;  //安检编号
         TextView user_name;  //姓名
         TextView number;  //表编号
         TextView phone_number;  //电话号码
-        TextView security_type;   //安检类型
         TextView user_id;  //用户编号
         TextView address;   //地址
     }
