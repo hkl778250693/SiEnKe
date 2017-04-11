@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -37,6 +38,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -50,7 +52,8 @@ import java.util.List;
  * Created by Administrator on 2017/3/15.
  */
 public class NewTaskActivity extends Activity {
-    private TextView securityCheckCase, securityHiddenReason;//安检区域 安检类型
+    private TextView securityType;// 安检类型
+    private EditText taskName;//安检名称
     private TextView date;//开始日期选择器
     private TextView date1;//结束日期选择器
     private String ip, port;  //接口ip地址   端口
@@ -107,8 +110,8 @@ public class NewTaskActivity extends Activity {
     private void bindView() {
         newTaskBack = (ImageView) findViewById(R.id.newtask_back);
         newPlanAddBtn = (Button) findViewById(R.id.newplan_add_btn);
-        securityCheckCase = (TextView) findViewById(R.id.security_check_case);
-        securityHiddenReason = (TextView) findViewById(R.id.security_hidden_reason);
+        taskName = (EditText) findViewById(R.id.task_name);
+        securityType = (TextView) findViewById(R.id.security_type);
         date = (TextView) findViewById(R.id.data);
         date1 = (TextView) findViewById(R.id.data1);
         save_btn = (Button) findViewById(R.id.save_btn);
@@ -120,8 +123,8 @@ public class NewTaskActivity extends Activity {
     private void setViewClickListener() {
         newTaskBack.setOnClickListener(onClickListener);
         newPlanAddBtn.setOnClickListener(onClickListener);
-        securityCheckCase.setOnClickListener(onClickListener);
-        securityHiddenReason.setOnClickListener(onClickListener);
+        taskName.setOnClickListener(onClickListener);
+        securityType.setOnClickListener(onClickListener);
         date.setOnClickListener(onClickListener);
         date1.setOnClickListener(onClickListener);
         save_btn.setOnClickListener(onClickListener);
@@ -139,14 +142,17 @@ public class NewTaskActivity extends Activity {
                     startActivityForResult(intent1,100);
                     break;
                 case R.id.save_btn:
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            postMyTask();
+                        }
+                    }.start();
                     Toast.makeText(NewTaskActivity.this,"新增任务已保存",Toast.LENGTH_SHORT).show();
                     NewTaskActivity.this.finish();
                     break;
-                case R.id.security_check_case:
-                    createSecurityCasePopupwindow();
-                    break;
-                case R.id.security_hidden_reason:
-                    createSecurityHiddenReasonPopupwindow();
+                case R.id.security_type:
+                    createSecurityTypePopupwindow();
                     break;
                 case R.id.data:
                     Calendar cale1 = Calendar.getInstance();
@@ -226,28 +232,28 @@ public class NewTaskActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(notSecurityCheck.getText());
+                taskName.setText(notSecurityCheck.getText());
             }
         });
         passSecurityCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(passSecurityCheck.getText());
+                taskName.setText(passSecurityCheck.getText());
             }
         });
         notPassSecurityCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(notPassSecurityCheck.getText());
+                taskName.setText(notPassSecurityCheck.getText());
             }
         });
         overSecurityCheckTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(overSecurityCheckTime.getText());
+                taskName.setText(overSecurityCheckTime.getText());
             }
         });
         popupWindow.setFocusable(true);
@@ -256,7 +262,7 @@ public class NewTaskActivity extends Activity {
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(securityCheckCase, 600, 0);
+        popupWindow.showAsDropDown(taskName, 600, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -266,7 +272,7 @@ public class NewTaskActivity extends Activity {
     }
 
     //弹出安全隐患类型popupwindow
-    public void createSecurityHiddenReasonPopupwindow() {
+    public void createSecurityTypePopupwindow() {
         inflater = LayoutInflater.from(NewTaskActivity.this);
         securityHiddenreasonView = inflater.inflate(R.layout.popupwindow_security_type, null);
         popupWindow = new PopupWindow(securityHiddenreasonView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -282,42 +288,42 @@ public class NewTaskActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityHiddenReason.setText(indoorStandPipe.getText());
+                securityType.setText(indoorStandPipe.getText());
             }
         });
         indoorBranchPipe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityHiddenReason.setText(indoorBranchPipe.getText());
+                securityType.setText(indoorBranchPipe.getText());
             }
         });
         fuelGasMeter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityHiddenReason.setText(fuelGasMeter.getText());
+                securityType.setText(fuelGasMeter.getText());
             }
         });
         burningAppliances.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityHiddenReason.setText(burningAppliances.getText());
+                securityType.setText(burningAppliances.getText());
             }
         });
         gasFacilitiesRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityHiddenReason.setText(gasFacilitiesRoom.getText());
+                securityType.setText(gasFacilitiesRoom.getText());
             }
         });
         threeWayPipe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityHiddenReason.setText(threeWayPipe.getText());
+                securityType.setText(threeWayPipe.getText());
             }
         });
         popupWindow.setFocusable(true);
@@ -326,7 +332,7 @@ public class NewTaskActivity extends Activity {
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(securityHiddenReason, 365, 0);
+        popupWindow.showAsDropDown(securityType, 365, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -345,70 +351,76 @@ public class NewTaskActivity extends Activity {
     }
 
     //请求网络数据
-    private void requireMyTask(final String method, final String keyAndValue) {
+    private void postMyTask() {
         new Thread() {
             @Override
             public void run() {
                 try {
-                    URL url;
-                    HttpURLConnection httpURLConnection;
-                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
+                    //请求的地址
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                         //Log.i("sharedPreferences=ip=>",ip);
                     } else {
-                        ip = "88.88.88.66:";
+                        ip = "88.88.88.31:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
+                        //Log.i("sharedPreferences=ip=>",port);
                     } else {
-                        port = "8088";
+                        port = "8080";
                     }
-                    String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
-                    //有参数传递
-                    if (!keyAndValue.equals("")) {
-                        url = new URL(httpUrl + "?" + keyAndValue);
-                        //没有参数传递
-                    } else {
-                        url = new URL(httpUrl);
-                    }
-                    Log.i("url=============>", url + "");
-                    httpURLConnection = (HttpURLConnection) url.openConnection();
-                    httpURLConnection.setConnectTimeout(6000);
-                    httpURLConnection.setReadTimeout(6000);
-                    httpURLConnection.connect();
-                    //传回的数据解析成String
-                    Log.i("responseCode====>", httpURLConnection.getResponseCode() + "");
-                    if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
-                        InputStream inputStream = httpURLConnection.getInputStream();
-                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+                    String httpUrl = "http://" + ip + port + "/SMDemo/addSafePlan.do";
+                    Log.i("postMyTask_url====>", "" + httpUrl);
+                    // 根据地址创建URL对象
+                    URL url = new URL(httpUrl);
+                    // 根据URL对象打开链接
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                    // 发送POST请求必须设置允许输出
+                    urlConnection.setDoOutput(true);
+                    urlConnection.setDoInput(true);
+                    urlConnection.setUseCaches(false);//不使用缓存
+                    // 设置请求的方式
+                    urlConnection.setRequestMethod("POST");
+                    // 设置请求的超时时间
+                    urlConnection.setReadTimeout(8000);
+                    urlConnection.setConnectTimeout(8000);
+                    // 传递的数据
+                    String data = dataToJson();
+                    Log.i("postMyTask_data=>", "data=" + data);
+                    // 设置请求的头
+                    urlConnection.setRequestProperty("Content-Length", String.valueOf(data.getBytes().length));
+                    urlConnection.setRequestProperty("Content-Type", "applicaton/json;charset=UTF-8");
+                    //urlConnection.setRequestProperty("Origin", "http://"+ ip + port);
+                    //urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0");
+                    //获取输出流
+                    OutputStream os = urlConnection.getOutputStream();
+                    os.write(data.getBytes("UTF-8"));
+                    os.flush();
+                    os.close();
+                    Log.i("getResponseCode====>", "" + urlConnection.getResponseCode());
+                    if (urlConnection.getResponseCode() == 200) {
+                        InputStream inputStream = urlConnection.getInputStream();
+                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                         StringBuilder stringBuilder = new StringBuilder();
                         String str;
                         while ((str = bufferedReader.readLine()) != null) {
                             stringBuilder.append(str);
                         }
-                        result = stringBuilder.toString();
-                        Log.i("taskResult=====>", result);
+                        // 释放资源
+                        inputStream.close();
+                        // 返回字符串
+                        String result = stringBuilder.toString();
+                        Log.i("postMyTask_result====>", result);
                         JSONObject jsonObject = new JSONObject(result);
-                        if (!jsonObject.optString("total", "").equals("0")) {
+                        if (jsonObject.optInt("messg", 0) == 1) {
                             handler.sendEmptyMessage(1);
-                        } else {
-                            try {
-                                Thread.sleep(3000);
-                                handler.sendEmptyMessage(2);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                        }
+                        if (jsonObject.optInt("messg", 0) == 0) {
+                            handler.sendEmptyMessage(2);
                         }
                     } else {
-                        try {
-                            Thread.sleep(3000);
-                            handler.sendEmptyMessage(3);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        Log.i("login_state===>","登录失败");
                     }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -421,8 +433,38 @@ public class NewTaskActivity extends Activity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                super.run();
             }
         }.start();
+    }
+
+    //将数据转换成Json格式
+    public String dataToJson(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONObject object = new JSONObject();
+            object.put("c_safety_plan_name",taskName.getText().toString());      //安检任务名称
+            object.put("c_safety_plan_member","杜述洪");    //操作员
+            object.put("d_safety_start",date.getText().toString());       //开始时间
+            object.put("d_safety_end",date1.getText().toString());    //结束时间
+            object.put("n_company_id",Integer.parseInt(sharedPreferences.getString("company_id","")));       //公司id
+            JSONArray jsonArray = new JSONArray();
+            for(int i = 0;i<parclebleList.size();i++){
+                JSONObject object1 = new JSONObject();
+                object1.put("c_user_id",parclebleList.get(i).getUserId());
+                object1.put("n_data_state",1);
+                object1.put("n_safety_state",1);
+                object1.put("n_safety_date_type",0);
+                object1.put("c_safety_type",securityType.getText().toString());       //安检类型
+                jsonArray.put(i,object1);
+            }
+            jsonObject.put("safetyInspection",jsonArray);
+            jsonObject.put("safetyPlan",object);
+            Log.i("dataToJson==========>", "封装的json数据为："+jsonObject.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
     }
 
     //show弹出框
@@ -461,7 +503,6 @@ public class NewTaskActivity extends Activity {
                 case 1:
                     try {
                         Thread.sleep(1000);
-                        popupWindow.dismiss();
                         Toast.makeText(NewTaskActivity.this, "用户信息下载完成！", Toast.LENGTH_SHORT).show();
                         Intent intent1 = new Intent(NewTaskActivity.this, NewTaskDetailActivity.class);
                         startActivity(intent1);
@@ -470,11 +511,9 @@ public class NewTaskActivity extends Activity {
                     }
                     break;
                 case 2:
-                    popupWindow.dismiss();
                     Toast.makeText(NewTaskActivity.this, "没有用户信息下载！", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
-                    popupWindow.dismiss();
                     Toast.makeText(NewTaskActivity.this, "网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -485,13 +524,12 @@ public class NewTaskActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == RESULT_OK){
+        if(resultCode == RESULT_OK){
             if(requestCode == 100){
                 if (data != null ){
                     parclebleList = data.getParcelableArrayListExtra("parclebleList");
-                    Log.i("NewTaskActivity","接收到的parclebleList长度为："+parclebleList.size());
+                    Log.i("NewTaskActivity","接收到的parclebleList长度为："+parclebleList.get(0).getUserId());
                 }
-                Log.i("NewTaskActivity","default进来了："+parclebleList.size());
             }
         }
     }

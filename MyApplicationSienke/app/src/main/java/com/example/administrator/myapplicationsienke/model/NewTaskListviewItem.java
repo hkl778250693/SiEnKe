@@ -10,7 +10,7 @@ public class NewTaskListviewItem implements Parcelable {
     private String userName;             //姓名
     private String number;                   //表编号
     private String phoneNumber;             //电话号码
-    private String userId;                     //时间
+    private String userId;                 //用户编号
     private String adress;                //地址
 
     public String getUserName() {

@@ -119,34 +119,31 @@ public class UserDetailInfoActivity extends Activity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("createPopupwindow===>", "" + parent.getChildCount());
-                if (id == imageList.size()) {
-                    createPhotoPopupwindow();
-                    Log.i("createPopupwindow===>", "true");
+                // 如果单击时删除按钮处在显示状态，则隐藏它
+                if (adapter.getDeleteShow()) {
+                    adapter.setDeleteShow(false);
+                    adapter.notifyDataSetChanged();
                 } else {
-
+                    if (adapter.getCount() - 1 == position) {
+                        // 判断是否达到了可添加图片最大数
+                        if (imageList.size() != 6) {
+                            createPhotoPopupwindow();
+                        }
+                    }
                 }
             }
         });
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (isShowDelete) {
-                    isShowDelete = false;
-                } else {
-                    isShowDelete = true;
+                if (!(position == imageList.size())) {
+                    // 如果删除按钮已经显示了则不再设置
+                    if (!adapter.getDeleteShow()) {
+                        adapter.setDeleteShow(true);
+                        adapter.notifyDataSetChanged();
+                    }
                 }
-                Log.i("UserDetailInfoActivity", "id=" + id);
-                Log.i("UserDetailInfoActivity", "position=" + position);
-                if (position == imageList.size()) {
-                    Log.i("UserDetailInfoActivity", "imageList=" + imageList.size());
-                    view.findViewById(R.id.delete).setVisibility(View.GONE);
-                    view.findViewById(R.id.image).setBackgroundResource(R.mipmap.camera);
-                }
-                adapter.setIsShowDelete(isShowDelete);
-                adapter.setIndex(id);
-                parent.postInvalidate();
-                adapter.notifyDataSetChanged();
+                // 返回true，停止事件向下传播
                 return true;
             }
         });
@@ -624,7 +621,7 @@ public class UserDetailInfoActivity extends Activity {
             intent.putExtra("crop", "true");
             // aspectX aspectY 是宽高的比例
             intent.putExtra("aspectX", 1);
-            intent.putExtra("aspectY", 1.5);
+            intent.putExtra("aspectY", 1);
             // outputX outputY 是裁剪图片宽高
             intent.putExtra("outputX", 40);
             intent.putExtra("outputY", 40);

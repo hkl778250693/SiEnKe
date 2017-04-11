@@ -76,7 +76,7 @@
                         android:textSize="14sp" />
 
                     <EditText
-                        android:id="@+id/security_check_case"
+                        android:id="@+id/task_name"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="5dp"
@@ -110,7 +110,7 @@
                         android:textSize="14sp" />
 
                     <TextView
-                        android:id="@+id/security_hidden_reason"
+                        android:id="@+id/security_type"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="5dp"

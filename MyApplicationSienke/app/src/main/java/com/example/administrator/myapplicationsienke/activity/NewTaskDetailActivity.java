@@ -142,11 +142,6 @@ public class NewTaskDetailActivity extends Activity {
                 case R.id.search_btn:
                     if (securityCheckCase.getText().equals("姓名")) {
                         showPopupwindow();
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                         //开启支线程进行请求任务信息
                         new Thread() {
                             @Override
@@ -157,11 +152,6 @@ public class NewTaskDetailActivity extends Activity {
                         }.start();
                     } else if (securityCheckCase.getText().equals("表编号")) {
                         showPopupwindow();
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                         //开启支线程进行请求任务信息
                         new Thread() {
                             @Override
@@ -172,11 +162,6 @@ public class NewTaskDetailActivity extends Activity {
                         }.start();
                     } else if (securityCheckCase.getText().equals("地址")) {
                         showPopupwindow();
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                         //开启支线程进行请求任务信息
                         new Thread() {
                             @Override
@@ -208,6 +193,7 @@ public class NewTaskDetailActivity extends Activity {
         Log.i("count====>", "长度为：" + count);
         for (int i = 0; i < count; i++) {
             if (state.get(i) != null) {
+                Log.i("NewTaskDetailActivity","点击的位置是："+i);
                 NewTaskListviewItem item = newTaskListviewItemList.get((int) newTaskListviewAdapter.getItemId(i));
                 parclebleList.add(item);
             }
@@ -408,6 +394,7 @@ public class NewTaskDetailActivity extends Activity {
             switch (msg.what) {
                 case 1:
                     try {
+                        Thread.sleep(2000);
                         JSONObject jsonObject = new JSONObject(result);
                         JSONArray jsonArray = jsonObject.getJSONArray("rows");
                         Log.i("NewTaskDetailActivity", "jsonArray==" + jsonArray.length());
@@ -417,7 +404,7 @@ public class NewTaskDetailActivity extends Activity {
                             item.setUserName(object.optString("c_user_name", ""));
                             item.setNumber(object.optString("c_meter_number", ""));
                             item.setPhoneNumber(object.optString("c_user_phone", ""));
-                            item.setUserId(object.optString("c_old_user_id", ""));
+                            item.setUserId(object.optString("c_user_id", ""));
                             item.setAdress(object.optString("c_user_address", ""));
                             newTaskListviewItemList.add(item);
                         }
@@ -428,6 +415,8 @@ public class NewTaskDetailActivity extends Activity {
                         }
                         popupWindow.dismiss();
                     } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     break;

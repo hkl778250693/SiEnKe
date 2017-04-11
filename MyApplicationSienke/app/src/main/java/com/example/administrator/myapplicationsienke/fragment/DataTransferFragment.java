@@ -429,6 +429,7 @@ public class DataTransferFragment extends Fragment {
         values.put("userPhone", userObject.optString("userPhone", ""));
         values.put("securityType", userObject.optString("securityName", ""));
         values.put("oldUserId", userObject.optString("oldUserId", ""));
+        Log.i("data_down_load","下载的用户ID为："+userObject.optString("oldUserId", ""));
         values.put("newUserId", userObject.optString("userId", ""));
         values.put("userAddress", userObject.optString("userAdress", ""));
         values.put("taskId", userObject.optInt("safetyPlan", 0) + "");

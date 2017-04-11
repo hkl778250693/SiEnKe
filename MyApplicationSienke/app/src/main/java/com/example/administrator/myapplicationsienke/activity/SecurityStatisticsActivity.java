@@ -75,7 +75,7 @@ public class SecurityStatisticsActivity extends Activity {
             Log.i("StatisticsActivity===>", "完成率=" + result + "%");
             finishRate.setText(result);
         } else {
-            finishRate.setText("0");
+            finishRate.setText("0.0");
         }
         if (sharedPreferences.getInt("problem_number", 0) != 0) {
             Log.i("StatisticsActivity===>", "存在问题的户数=" + sharedPreferences.getInt("problem_number", 0) + "户");
