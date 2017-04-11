@@ -8,25 +8,18 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.PopupWindow;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,21 +27,15 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.SocketException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
-import java.security.KeyStore;
-import java.util.List;
-
-import javax.net.ssl.SSLSocketFactory;
 
 import static android.app.PendingIntent.getActivity;
 
 /**
  * Created by Administrator on 2017/3/14.
  */
-public class MobileSecurityActivity extends Activity {
+public class MobileSecurityLoginActivity extends Activity {
     Button logonBtn;
     Button cancel_btn;
     private EditText editMobileUser, editmobilePsw;
@@ -102,11 +89,11 @@ public class MobileSecurityActivity extends Activity {
             switch (v.getId()) {
                 case R.id.logon_btn:
                     if (editMobileUser.getText().toString().equals("") && editmobilePsw.getText().toString().equals("")) {
-                        Toast.makeText(MobileSecurityActivity.this, "用户名或密码不能为空", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MobileSecurityLoginActivity.this, "用户名或密码不能为空", Toast.LENGTH_LONG).show();
                     } else if (editMobileUser.getText().toString().equals("")) {
-                        Toast.makeText(MobileSecurityActivity.this, "请输入用户名", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MobileSecurityLoginActivity.this, "请输入用户名", Toast.LENGTH_LONG).show();
                     } else if (editmobilePsw.getText().toString().equals("")) {
-                        Toast.makeText(MobileSecurityActivity.this, "请输入密码", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MobileSecurityLoginActivity.this, "请输入密码", Toast.LENGTH_LONG).show();
                     }
                     if (!editMobileUser.getText().toString().equals("") && !editmobilePsw.getText().toString().equals("")) {
                         //开启子线程
@@ -134,13 +121,13 @@ public class MobileSecurityActivity extends Activity {
                             ip = sharedPreferences.getString("security_ip", "");
                             //Log.i("sharedPreferences=ip=>",ip);
                         } else {
-                            ip = "88.88.88.66:";
+                            ip = "88.88.88.31:";
                         }
                         if (!sharedPreferences.getString("security_port", "").equals("")) {
                             port = sharedPreferences.getString("security_port", "");
                             //Log.i("sharedPreferences=ip=>",port);
                         } else {
-                            port = "8088";
+                            port = "8080";
                         }
                         String httpUrl = "http://" + ip + port + "/SMDemo/login.do";
                         Log.i("httpUrl==========>", "" + httpUrl);
@@ -194,6 +181,8 @@ public class MobileSecurityActivity extends Activity {
                             Log.i("login_result=========>", result);
                             JSONObject jsonObject = new JSONObject(result);
                             if (jsonObject.optInt("messg", 0) == 1) {
+                                editor.putString("company_id",jsonObject.optInt("companyid")+"");
+                                editor.commit();
                                 handler.sendEmptyMessage(1);
                             }
                             if (jsonObject.optInt("messg", 0) == 0) {
@@ -225,16 +214,16 @@ public class MobileSecurityActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    Toast.makeText(MobileSecurityActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MobileSecurityActivity.this, SecurityChooseActivity.class);
+                    Toast.makeText(MobileSecurityLoginActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MobileSecurityLoginActivity.this, SecurityChooseActivity.class);
                     startActivity(intent);
                     finish();
                     break;
                 case 2:
-                    Toast.makeText(MobileSecurityActivity.this, "密码错误!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MobileSecurityLoginActivity.this, "密码错误!", Toast.LENGTH_LONG).show();
                     break;
                 case 3:
-                    Toast.makeText(MobileSecurityActivity.this, "网络请求异常!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MobileSecurityLoginActivity.this, "网络请求异常!", Toast.LENGTH_LONG).show();
                     break;
             }
             super.handleMessage(msg);
