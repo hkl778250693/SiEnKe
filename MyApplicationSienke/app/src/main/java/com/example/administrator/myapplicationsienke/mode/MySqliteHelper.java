@@ -26,13 +26,13 @@ public class MySqliteHelper extends SQLiteOpenHelper {
 
     //安全情况表
     final String CREATE_TABLE_SQL_SECURITY_CASE = "CREATE TABLE security_case " +
-            "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
-    //安全隐患表
+            "(id integer primary key AUTOINCREMENT,security_case varchar(200))";
+    //安全隐患类型表
     final String CREATE_TABLE_SQL_SECURITY_HIDDEEN_DANGER = "CREATE TABLE security_hidden_danger " +
-            "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
+            "(id integer primary key AUTOINCREMENT,security_type varchar(200))";
     //安全隐患原因表
     final String CREATE_TABLE_SQL_SECURITY_HIDDEEN_DENGER_REASON = "CREATE TABLE security_hidden_danger_reason " +
-            "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
+            "(id integer primary key AUTOINCREMENT,security_reason varchar(200))";
     //安全信息与照片关联表
     final String CREATE_TABLE_SQL_SECURITY_INFO_PHOTO = "CREATE TABLE security_info_photo " +
             "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
