@@ -57,6 +57,7 @@ public class DataTransferFragment extends Fragment {
     private SharedPreferences.Editor editor;
     private String ip, port;  //接口ip地址   端口
     public int responseCode = 0;
+    public int asyncResponseCode = 0;
     private LayoutInflater layoutInflater;
     private PopupWindow popupWindow;
     private ImageView frameAnimation;
@@ -66,6 +67,8 @@ public class DataTransferFragment extends Fragment {
     private SQLiteDatabase db;  //数据库
     private int totalCount = 0;  //总户数
     List<String> taskNumbList = new ArrayList<>();
+    int temp = 0;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -264,8 +267,8 @@ public class DataTransferFragment extends Fragment {
                 httpURLConnection.setReadTimeout(6000);
                 httpURLConnection.connect();
                 //传回的数据解析成String
-                Log.i("userResultCode=>", httpURLConnection.getResponseCode() + "");
-                if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
+                Log.i("asyncResponseCode=>", httpURLConnection.getResponseCode() + "");
+                if ((asyncResponseCode = httpURLConnection.getResponseCode()) == 200) {
                     InputStream inputStream = httpURLConnection.getInputStream();
                     InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -278,22 +281,14 @@ public class DataTransferFragment extends Fragment {
                     Log.i("userResult==========>", userResult);
                     JSONObject jsonObject = new JSONObject(userResult);
                     if (!jsonObject.optString("total", "").equals("0")) {
-                        handler.sendEmptyMessage(4);
+                        return userResult;
                     } else {
                         try {
                             Thread.sleep(3000);
-                            handler.sendEmptyMessage(2);
+                            handler.sendEmptyMessage(4);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                    }
-                    return userResult;
-                } else {
-                    try {
-                        Thread.sleep(3000);
-                        handler.sendEmptyMessage(3);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
                 }
             } catch (UnsupportedEncodingException e) {
@@ -302,7 +297,6 @@ public class DataTransferFragment extends Fragment {
                 e.printStackTrace();
             } catch (IOException e) {
                 Log.i("IOException==========>", "网络请求异常!");
-                handler.sendEmptyMessage(3);
                 e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -328,7 +322,6 @@ public class DataTransferFragment extends Fragment {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(getActivity(), "用户信息下载失败！", Toast.LENGTH_SHORT).show();
                 }
             }
             super.onPostExecute(s);
@@ -358,9 +351,9 @@ public class DataTransferFragment extends Fragment {
             url = httpUrl + taskNumbList.get(i);
             Log.i("startAsyncTask========>", url);
             myAsyncTask.execute(url);
+            temp++;
         }
     }
-
 
     Handler handler = new Handler() {
         @Override
@@ -383,8 +376,8 @@ public class DataTransferFragment extends Fragment {
                         Log.i("totalCount==========>", "总户数="+totalCount);
                         Toast.makeText(getActivity(), "任务下载完成，用户信息正在下载，请稍等...", Toast.LENGTH_SHORT).show();
                         startAsyncTask();//开启异步任务获取所有任务编号的用户数据
-                        popupWindow.dismiss();
                         Toast.makeText(getActivity(), "用户信息下载完成！", Toast.LENGTH_SHORT).show();
+                        popupWindow.dismiss();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
@@ -398,6 +391,10 @@ public class DataTransferFragment extends Fragment {
                 case 3:
                     popupWindow.dismiss();
                     Toast.makeText(getActivity(), "网络请求超时！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 4:
+                    popupWindow.dismiss();
+                    Toast.makeText(getActivity(), "没有相应的用户数据！", Toast.LENGTH_SHORT).show();
                     break;
             }
             super.handleMessage(msg);
