@@ -107,9 +107,6 @@ public class UserListActivity extends Activity {
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
         filter = (TextView) findViewById(R.id.filter);
-        tiaoZhuan = (ImageView) findViewById(R.id.tiaozhuan);
-        backBtn = (Button) findViewById(R.id.back_btn);
-        nextBtn = (Button) findViewById(R.id.next_btn);
         noData = (TextView) findViewById(R.id.no_data);
         searchBtn = (Button) findViewById(R.id.search_btn);
         etSearch = (EditText) findViewById(R.id.etSearch);
@@ -190,8 +187,6 @@ public class UserListActivity extends Activity {
                     break;
                 case R.id.filter:
                     createSecurityCasePopupwindow();
-                    break;
-                case R.id.tiaozhuan:
                     break;
                 case R.id.edit_delete:
                     etSearch.setText("");

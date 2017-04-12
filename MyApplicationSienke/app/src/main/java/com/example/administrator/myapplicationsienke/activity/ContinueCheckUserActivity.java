@@ -104,9 +104,6 @@ public class ContinueCheckUserActivity extends Activity {
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
         filter = (TextView) findViewById(R.id.filter);
-        tiaoZhuan = (ImageView) findViewById(R.id.tiaozhuan);
-        backBtn = (Button) findViewById(R.id.back_btn);
-        nextBtn = (Button) findViewById(R.id.next_btn);
         noData = (TextView) findViewById(R.id.no_data);
         setEsearchTextChanged = (EditText) findViewById(R.id.etSearch);
         searchBtn = (Button) findViewById(R.id.search_btn);
@@ -156,8 +153,6 @@ public class ContinueCheckUserActivity extends Activity {
                     break;
                 case R.id.security_check_case:
                     createSecurityCasePopupwindow();
-                    break;
-                case R.id.tiaozhuan:
                     break;
             }
         }

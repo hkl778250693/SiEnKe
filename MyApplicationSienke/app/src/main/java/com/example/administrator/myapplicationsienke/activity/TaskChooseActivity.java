@@ -43,6 +43,7 @@ public class TaskChooseActivity extends Activity {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private Cursor cursor;
+    private int taskTotalUserNumber=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,12 +132,16 @@ public class TaskChooseActivity extends Activity {
         for (int i = 0; i < count; i++) {
             if (state.get(i) != null) {
                 TaskChoose taskChoose = taskChooseList.get((int) adapter.getItemId(i));
+                taskTotalUserNumber += Integer.parseInt(taskChoose.getTotalUserNumber());
                 map.put("taskId" + i, taskChoose.getTaskNumber());
                 Log.i("taskId=========>", "这次被勾选第" + i + "个，任务编号为：" + taskChoose.getTaskNumber());
                 integers.add(i);
                 Log.i("integers====>", "长度为：" + integers.size());
             }
         }
+        editor.putInt("taskTotalUserNumber",taskTotalUserNumber);
+        Log.i("taskTotalUserNumber=>", "任务总户数为：" + taskTotalUserNumber);
+        editor.commit();
         adapter.notifyDataSetChanged();
     }
 
