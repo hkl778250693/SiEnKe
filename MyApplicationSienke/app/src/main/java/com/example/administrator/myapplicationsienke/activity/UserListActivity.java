@@ -43,11 +43,7 @@ import java.util.List;
 public class UserListActivity extends Activity {
     private ImageView back,editDelete;
     private ListView listView;
-    private TextView filter, noData;
-    private LayoutInflater inflater;  //转换器
-    private View securityCaseView;
-    private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck;
-    private PopupWindow popupWindow;
+    private TextView noData,name;
     private List<UserListviewItem> userListviewItemList = new ArrayList<>();
     private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
     private int task_total_numb = 0;
@@ -103,8 +99,8 @@ public class UserListActivity extends Activity {
     //绑定控件ID
     private void bindView() {
         back = (ImageView) findViewById(R.id.back);
+        name = (TextView) findViewById(R.id.name);
         listView = (ListView) findViewById(R.id.listview);
-        filter = (TextView) findViewById(R.id.filter);
         noData = (TextView) findViewById(R.id.no_data);
         etSearch = (EditText) findViewById(R.id.etSearch);
         editDelete = (ImageView) findViewById(R.id.edit_delete);
@@ -120,8 +116,8 @@ public class UserListActivity extends Activity {
 
     //点击事件
     private void setOnClickListener() {
+        name.setText("用户列表");
         back.setOnClickListener(onClickListener);
-        filter.setOnClickListener(onClickListener);
         editDelete.setOnClickListener(onClickListener);
         listView.setTextFilterEnabled(true);  // 开启过滤功能
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -181,9 +177,6 @@ public class UserListActivity extends Activity {
                     }
                     UserListActivity.this.finish();
                     break;
-                case R.id.filter:
-                    createSecurityCasePopupwindow();
-                    break;
                 case R.id.edit_delete:
                     etSearch.setText("");
                     editDelete.setVisibility(View.GONE);
@@ -219,60 +212,6 @@ public class UserListActivity extends Activity {
             task_total_numb = sharedPreferences.getInt("task_total_numb", 0);
         }
     }
-
-    //popupwindow
-    public void createSecurityCasePopupwindow() {
-        inflater = LayoutInflater.from(UserListActivity.this);
-        securityCaseView = inflater.inflate(R.layout.popupwindow_userlist_choose, null);
-        popupWindow = new PopupWindow(securityCaseView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        //绑定控件ID
-        notSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.not_security_check);
-        passSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.pass_security_check);
-        notPassSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.not_pass_security_check);
-        //设置点击事件
-        notSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                filter.setText(notSecurityCheck.getText());
-            }
-        });
-        passSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                filter.setText(passSecurityCheck.getText());
-            }
-        });
-        notPassSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                filter.setText(notPassSecurityCheck.getText());
-            }
-        });
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
-        popupWindow.setAnimationStyle(R.style.Popupwindow);
-        backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(filter, 200, 0);
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                backgroundAlpha(1.0F);
-            }
-        });
-    }
-
-    //设置背景透明度
-    public void backgroundAlpha(float bgAlpha) {
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.alpha = bgAlpha; //0.0-1.0
-        getWindow().setAttributes(lp);
-    }
-
 
     /**
      * 查询方法参数详解

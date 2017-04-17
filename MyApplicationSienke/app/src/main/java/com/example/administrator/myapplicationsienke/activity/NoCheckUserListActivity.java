@@ -10,9 +10,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,14 +35,16 @@ import java.util.List;
  * Created by Administrator on 2017/3/15.
  */
 public class NoCheckUserListActivity extends Activity {
-    private ImageView securityNoCheckBack;
+    private ImageView back,editDelete;
     private ListView listView;
+    private TextView name;
     private List<UserListviewItem> noCheckUserItemList = new ArrayList<>();
     private SQLiteDatabase db;  //数据库
     private MySqliteHelper helper; //数据库帮助类
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private Cursor cursor;
+    private EditText etSearch;//搜索框
     private TextView noData;
     private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
     private int task_total_numb = 0;
@@ -50,7 +56,7 @@ public class NoCheckUserListActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_security_choose_nocheck_listview);
+        setContentView(R.layout.activity_userlist);
 
         defaultSetting();//初始化设置
         getTaskParams(); //获取任务编号参数
@@ -74,9 +80,12 @@ public class NoCheckUserListActivity extends Activity {
 
     //绑定控件ID
     private void bindView() {
-        securityNoCheckBack = (ImageView) findViewById(R.id.security_nocheck_back);
+        back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
         noData = (TextView) findViewById(R.id.no_data);
+        name = (TextView) findViewById(R.id.name);
+        etSearch = (EditText) findViewById(R.id.etSearch);
+        editDelete = (ImageView) findViewById(R.id.edit_delete);
     }
 
     //初始化设置
@@ -89,7 +98,9 @@ public class NoCheckUserListActivity extends Activity {
 
     //点击事件
     private void setViewClickListener(){
-        securityNoCheckBack.setOnClickListener(onClickListener);
+        name.setText("未检用户");
+        back.setOnClickListener(onClickListener);
+        editDelete.setOnClickListener(onClickListener);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -100,6 +111,42 @@ public class NoCheckUserListActivity extends Activity {
                 startActivityForResult(intent,position);
             }
         });
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.i("UserListActivity", "onTextChanged进来了" );
+                if(TextUtils.isEmpty(s.toString().trim())){
+                    listView.clearTextFilter();    //搜索文本为空时，清除ListView的过滤
+                    if(noCheckUserAdapter != null){
+                        noCheckUserAdapter.getFilter().filter("");
+                    }
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            handler.sendEmptyMessage(0);
+                        }
+                    }.start();
+                    if (editDelete.getVisibility() == View.VISIBLE) {
+                        editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
+                    }
+                }else {
+                    noCheckUserAdapter.getFilter().filter(s);
+                    if (editDelete.getVisibility() == View.GONE) {
+                        editDelete.setVisibility(View.VISIBLE);  //反之则显示
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.i("UserListActivity_after", "afterTextChanged进来了" );
+            }
+        });
     }
 
 
@@ -107,7 +154,7 @@ public class NoCheckUserListActivity extends Activity {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.security_nocheck_back:
+                case R.id.back:
                     for (int i = 0; i < task_total_numb; i++) {
                         getContinueCheckPosition(stringList.get(i));//读取下载到本地的任务数据
                         if(!sharedPreferences.getString("continuePosition","").equals("")){
@@ -115,6 +162,11 @@ public class NoCheckUserListActivity extends Activity {
                         }
                     }
                     NoCheckUserListActivity.this.finish();
+                    break;
+                case R.id.edit_delete:
+                    etSearch.setText("");
+                    editDelete.setVisibility(View.GONE);
+                    noCheckUserAdapter.getFilter().filter("");
                     break;
             }
         }

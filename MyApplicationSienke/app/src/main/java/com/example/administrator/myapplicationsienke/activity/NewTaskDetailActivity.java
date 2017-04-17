@@ -72,7 +72,7 @@ public class NewTaskDetailActivity extends Activity {
     private AnimationDrawable animationDrawable;
     public int responseCode = 0;
     private NewTaskListviewAdapter newTaskListviewAdapter;
-    private ArrayList<NewTaskListviewItem> parclebleList =new ArrayList<>();
+    private ArrayList<NewTaskListviewItem> parclebleList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +93,7 @@ public class NewTaskDetailActivity extends Activity {
         searchBtn = (TextView) findViewById(R.id.search_btn);
         save = (TextView) findViewById(R.id.save);
         no_data = (TextView) findViewById(R.id.no_data);
-        rootLinearlayout = (LinearLayout)findViewById(R.id.root_linearlayout);
+        rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
     }
 
     //点击事件
@@ -122,21 +122,21 @@ public class NewTaskDetailActivity extends Activity {
                     createSecurityCasePopupwindow();
                     break;
                 case R.id.save:
-                    if(newTaskListviewItemList.size() != 0){
+                    if (newTaskListviewItemList.size() != 0) {
                         saveTaskInfo();//保存选中的任务编号信息
-                        Toast.makeText(NewTaskDetailActivity.this,"添加用户成功！",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(NewTaskDetailActivity.this, "添加用户成功！", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent();
-                        intent.putParcelableArrayListExtra("parclebleList",parclebleList);
-                        Log.i("NewTaskDetailActivity","parclebleList长度为："+parclebleList.size());
-                        setResult(Activity.RESULT_OK,intent);
+                        intent.putParcelableArrayListExtra("parclebleList", parclebleList);
+                        Log.i("NewTaskDetailActivity", "parclebleList长度为：" + parclebleList.size());
+                        setResult(Activity.RESULT_OK, intent);
                         finish();
-                    }else {
-                        Toast.makeText(NewTaskDetailActivity.this,"没有选中用户哦！",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(NewTaskDetailActivity.this, "没有选中用户哦！", Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case R.id.search_btn:
-                    if(filter.getText().equals("筛选")){
-                        Toast.makeText(NewTaskDetailActivity.this,"请选择筛选条件哦！",Toast.LENGTH_SHORT).show();
+                    if (filter.getText().equals("筛选")) {
+                        Toast.makeText(NewTaskDetailActivity.this, "请选择筛选条件哦！", Toast.LENGTH_SHORT).show();
                     }
                     if (filter.getText().equals("姓名")) {
                         showPopupwindow();
@@ -144,7 +144,7 @@ public class NewTaskDetailActivity extends Activity {
                         new Thread() {
                             @Override
                             public void run() {
-                                requireMyTask("getCostomer.do", "userName="+setEsearchTextChanged.getText().toString());
+                                requireMyTask("getCostomer.do", "userName=" + setEsearchTextChanged.getText().toString());
                                 super.run();
                             }
                         }.start();
@@ -154,7 +154,7 @@ public class NewTaskDetailActivity extends Activity {
                         new Thread() {
                             @Override
                             public void run() {
-                                requireMyTask("getCostomer.do", "meterNumber="+setEsearchTextChanged.getText().toString());
+                                requireMyTask("getCostomer.do", "meterNumber=" + setEsearchTextChanged.getText().toString());
                                 super.run();
                             }
                         }.start();
@@ -164,7 +164,7 @@ public class NewTaskDetailActivity extends Activity {
                         new Thread() {
                             @Override
                             public void run() {
-                                requireMyTask("getCostomer.do", "userAdress="+setEsearchTextChanged.getText().toString());
+                                requireMyTask("getCostomer.do", "userAdress=" + setEsearchTextChanged.getText().toString());
                                 super.run();
                             }
                         }.start();
@@ -191,7 +191,7 @@ public class NewTaskDetailActivity extends Activity {
         Log.i("count====>", "长度为：" + count);
         for (int i = 0; i < count; i++) {
             if (state.get(i) != null) {
-                Log.i("NewTaskDetailActivity","点击的位置是："+i);
+                Log.i("NewTaskDetailActivity", "点击的位置是：" + i);
                 NewTaskListviewItem item = newTaskListviewItemList.get((int) newTaskListviewAdapter.getItemId(i));
                 parclebleList.add(item);
             }
