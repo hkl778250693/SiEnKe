@@ -483,7 +483,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="备        注："
+                    android:text="照        片："
                     android:layout_marginRight="5dp"
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
