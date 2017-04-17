@@ -15,7 +15,8 @@
             android:layout_height="wrap_content"
             android:text="查询"
             android:textSize="14sp"
-            android:drawableLeft="@mipmap/back1"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/back_selector"
             android:drawablePadding="3dp"
             android:textColor="@android:color/white"
             android:padding="16dp"/>

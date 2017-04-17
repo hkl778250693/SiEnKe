@@ -1,8 +1,12 @@
 package com.example.administrator.myapplicationsienke.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.provider.Contacts;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,10 +33,15 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
     private List<UserListviewItem> backList;  //备用数据源
     private LayoutInflater layoutInflater;
     private MyFilter myFilter;
+    public static String searchContent;
 
     public UserListviewAdapter(Context context, List<UserListviewItem> userListviewList) {
         this.context = context;
         this.userListviewList = userListviewList;
+        //backList是暂存原来所用的数据，当筛选内容为空时，显示所有数据，并且必须 new 一个对象，
+        //而不能backList = userListviewList;,这样的话当arrayList改变时copyList也就改变了
+       /* backList = new ArrayList<>();
+        backList.addAll(userListviewList);*/
         backList = userListviewList;
         if (context != null) {
             layoutInflater = LayoutInflater.from(context);
@@ -41,12 +50,20 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
 
     @Override
     public int getCount() {
-        return userListviewList.size();
+        if (userListviewList == null) {
+            return 0;
+        } else {
+            return userListviewList.size();
+        }
     }
 
     @Override
     public Object getItem(int position) {
-        return userListviewList.get(position);
+        if (userListviewList == null) {
+            return null;
+        } else {
+            return userListviewList.get(position);
+        }
     }
 
     @Override
@@ -74,7 +91,6 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
         }
         UserListviewItem userListviewItem = userListviewList.get(position);
         viewHolder.security_number.setText(userListviewItem.getSecurityNumber());
-        Log.i("security_number=====>", "security_number=" + userListviewItem.getSecurityNumber());
         viewHolder.user_name.setText(userListviewItem.getUserName());
         viewHolder.number.setText(userListviewItem.getNumber());
         if (!userListviewItem.getPhoneNumber().equals("null")) {
@@ -91,6 +107,44 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
         viewHolder.address.setText(userListviewItem.getAdress());
         viewHolder.if_edit.setImageResource(userListviewItem.getIfEdit());
 
+        if (userListviewList != null) {
+            if (searchContent != null) {
+                String phoneNumber = userListviewItem.getPhoneNumber();
+                String name = userListviewItem.getUserName();
+                String address = userListviewItem.getAdress();
+                String meter_number = userListviewItem.getNumber();
+                SpannableStringBuilder style = null;
+                if (phoneNumber.contains(searchContent)) {
+                    style = new SpannableStringBuilder(phoneNumber);
+                    style.setSpan(new ForegroundColorSpan(Color.parseColor("#4EA0DC")),
+                            phoneNumber.indexOf(searchContent),
+                            phoneNumber.indexOf(searchContent) + searchContent.length(),
+                            Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+                    viewHolder.phone_number.setText(style);
+                } else if (name.contains(searchContent)) {
+                    style = new SpannableStringBuilder(name);
+                    style.setSpan(new ForegroundColorSpan(Color.parseColor("#4EA0DC")),
+                            name.indexOf(searchContent),
+                            name.indexOf(searchContent) + searchContent.length(),
+                            Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+                    viewHolder.user_name.setText(style);
+                }else if (address.contains(searchContent)) {
+                    style = new SpannableStringBuilder(address);
+                    style.setSpan(new ForegroundColorSpan(Color.parseColor("#4EA0DC")),
+                            address.indexOf(searchContent),
+                            address.indexOf(searchContent) + searchContent.length(),
+                            Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+                    viewHolder.address.setText(style);
+                }else if (meter_number.contains(searchContent)) {
+                    style = new SpannableStringBuilder(meter_number);
+                    style.setSpan(new ForegroundColorSpan(Color.parseColor("#4EA0DC")),
+                            meter_number.indexOf(searchContent),
+                            meter_number.indexOf(searchContent) + searchContent.length(),
+                            Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+                    viewHolder.number.setText(style);
+                }
+            }
+        }
         return convertView;
     }
 
@@ -117,12 +171,14 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
     class MyFilter extends Filter {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
+            searchContent = constraint.toString();
             FilterResults results = new FilterResults();
-            List<UserListviewItem> list;
-            if (constraint == null|| constraint.length() == 0) {  //当过滤的关键字为空的时候，则显示所有的数据
+            List<UserListviewItem> list;  //筛选后的数据集合
+            if (constraint.length() == 0) {  //当过滤的关键字为空的时候，则显示所有的数据
                 list = backList;
             } else {    //否则把符合条件的数据对象添加到集合中
                 list = new ArrayList<>();
+                list.clear();
                 for (UserListviewItem item : backList) {
                     if (item.getPhoneNumber().contains(constraint) || item.getUserName().contains(constraint) || item.getNumber().contains(constraint) || item.getAdress().contains(constraint)) {
                         list.add(item);
@@ -141,7 +197,7 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
             if (results.count > 0) {
                 notifyDataSetChanged();  //通知数据发生了改变
                 Log.i("publishResults", "publishResults进来了！");
-            }else {
+            } else {
                 notifyDataSetInvalidated();  //通知数据失效
             }
         }

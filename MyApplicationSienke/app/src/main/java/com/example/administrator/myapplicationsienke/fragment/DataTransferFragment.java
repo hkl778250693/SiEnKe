@@ -67,7 +67,6 @@ public class DataTransferFragment extends Fragment {
     private SQLiteDatabase db;  //数据库
     private int totalCount = 0;  //总户数
     List<String> taskNumbList = new ArrayList<>();
-    int temp = 0;
 
     @Nullable
     @Override
@@ -134,7 +133,7 @@ public class DataTransferFragment extends Fragment {
     public void showPopupwindow() {
         layoutInflater = LayoutInflater.from(getActivity());
         view = layoutInflater.inflate(R.layout.popupwindow_query_loading, null);
-        popupWindow = new PopupWindow(view, 250, 250);
+        popupWindow = new PopupWindow(view, 350, 350);
         frameAnimation = (ImageView) view.findViewById(R.id.frame_animation);
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.loading_shape));
         popupWindow.setAnimationStyle(R.style.dialog);
@@ -178,13 +177,13 @@ public class DataTransferFragment extends Fragment {
                         ip = sharedPreferences.getString("security_ip", "");
                         //Log.i("sharedPreferences=ip=>",ip);
                     } else {
-                        ip = "88.88.88.31:";
+                        ip = "88.88.88.66:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                         //Log.i("sharedPreferences=ip=>",ip);
                     } else {
-                        port = "8080";
+                        port = "8088";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
@@ -258,8 +257,9 @@ public class DataTransferFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... params) {    //所有的耗时操作都在此时进行，不能进行UI操作
+            URL url = null;
             try {
-                URL url = new URL(params[0]);
+                url= new URL(params[0]);
                 Log.i("doInBackground===>","url="+url);
                 HttpURLConnection httpURLConnection;
                 httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -281,14 +281,18 @@ public class DataTransferFragment extends Fragment {
                     Log.i("userResult==========>", userResult);
                     JSONObject jsonObject = new JSONObject(userResult);
                     if (!jsonObject.optString("total", "").equals("0")) {
+                        if(url.toString().contains(taskNumbList.get(taskNumbList.size()-1))){
+                            handler.sendEmptyMessage(5);
+                        }
                         return userResult;
                     } else {
-                        try {
-                            Thread.sleep(3000);
+                        if(url.toString().contains(taskNumbList.get(taskNumbList.size()-1))){
                             handler.sendEmptyMessage(4);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
                         }
+                    }
+                }else {
+                    if(url.toString().contains(taskNumbList.get(taskNumbList.size()-1))){
+                        handler.sendEmptyMessage(6);
                     }
                 }
             } catch (UnsupportedEncodingException e) {
@@ -297,6 +301,9 @@ public class DataTransferFragment extends Fragment {
                 e.printStackTrace();
             } catch (IOException e) {
                 Log.i("IOException==========>", "网络请求异常!");
+                if(url.toString().contains(taskNumbList.get(taskNumbList.size()-1))){
+                    handler.sendEmptyMessage(3);
+                }
                 e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -318,7 +325,7 @@ public class DataTransferFragment extends Fragment {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         userObject = jsonArray.getJSONObject(i);
                         Log.i("onPostExecute========>", "更新UI！");
-                        insertUserInfo();
+                        insertUserDataBase();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -335,13 +342,13 @@ public class DataTransferFragment extends Fragment {
             ip = sharedPreferences.getString("security_ip", "");
             Log.i("sharedPreferences=ip=>",ip);
         }else {
-            ip = "88.88.88.31:";
+            ip = "88.88.88.66:";
         }
         if (!sharedPreferences.getString("security_port", "").equals("")) {
             port = sharedPreferences.getString("security_port", "");
             Log.i("sharedPreferences=ip=>",port);
         } else {
-            port = "8080";
+            port = "8088";
         }
         String httpUrl = "http://" + ip + port + "/SMDemo/" + "getUserCheck.do?"+"safetyPlan=";
         String url;
@@ -351,7 +358,6 @@ public class DataTransferFragment extends Fragment {
             url = httpUrl + taskNumbList.get(i);
             Log.i("startAsyncTask========>", url);
             myAsyncTask.execute(url);
-            temp++;
         }
     }
 
@@ -366,7 +372,7 @@ public class DataTransferFragment extends Fragment {
                         Log.i("jsonArray==========>", "jsonArray=="+jsonArray.length());
                         for (int i = 0; i < jsonArray.length(); i++) {
                             taskObject = jsonArray.getJSONObject(i);
-                            insertTaskData();
+                            insertTaskDataBase();
                             taskNumbList.add(taskObject.optInt("safetyplanId",0)+"");
                         }
                         Log.i("taskNumbList====>", "一共有"+taskNumbList.size()+"个任务");
@@ -376,8 +382,6 @@ public class DataTransferFragment extends Fragment {
                         Log.i("totalCount==========>", "总户数="+totalCount);
                         Toast.makeText(getActivity(), "任务下载完成，用户信息正在下载，请稍等...", Toast.LENGTH_SHORT).show();
                         startAsyncTask();//开启异步任务获取所有任务编号的用户数据
-                        Toast.makeText(getActivity(), "用户信息下载完成！", Toast.LENGTH_SHORT).show();
-                        popupWindow.dismiss();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
@@ -390,11 +394,19 @@ public class DataTransferFragment extends Fragment {
                     break;
                 case 3:
                     popupWindow.dismiss();
-                    Toast.makeText(getActivity(), "网络请求超时！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "任务信息网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
                 case 4:
                     popupWindow.dismiss();
                     Toast.makeText(getActivity(), "没有相应的用户数据！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 5:
+                    popupWindow.dismiss();
+                    Toast.makeText(getActivity(), "用户信息下载完成！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 6:
+                    popupWindow.dismiss();
+                    Toast.makeText(getActivity(), "用户信息请求网络超时！", Toast.LENGTH_SHORT).show();
                     break;
             }
             super.handleMessage(msg);
@@ -402,7 +414,7 @@ public class DataTransferFragment extends Fragment {
     };
 
     //将服务器下载的任务数据存到本地数据库任务表
-    private void insertTaskData() {
+    private void insertTaskDataBase() {
         ContentValues values = new ContentValues();
         values.put("taskName", taskObject.optString("safetyPlanName", ""));
         values.put("taskId", taskObject.optInt("safetyplanId", 0) + "");
@@ -418,7 +430,7 @@ public class DataTransferFragment extends Fragment {
     }
 
     //将服务器下载的用户信息数据存到本地数据库用户表
-    private void insertUserInfo() {
+    private void insertUserDataBase() {
         ContentValues values = new ContentValues();
         values.put("securityNumber", userObject.optString("safetyInspectionId", ""));
         values.put("userName", userObject.optString("userName", ""));

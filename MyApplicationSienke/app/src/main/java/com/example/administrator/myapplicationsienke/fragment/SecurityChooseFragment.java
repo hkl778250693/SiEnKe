@@ -3,6 +3,7 @@ package com.example.administrator.myapplicationsienke.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.activity.ContinueCheckUserActivity;
@@ -20,7 +22,9 @@ import com.example.administrator.myapplicationsienke.activity.SecurityStatistics
 import com.example.administrator.myapplicationsienke.activity.TaskChooseActivity;
 import com.example.administrator.myapplicationsienke.activity.UserListActivity;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
+import com.example.administrator.myapplicationsienke.mode.Tools;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -58,21 +62,7 @@ public class SecurityChooseFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (intent != null) {
             Log.i("SecurityChooseFragment=", "intent不为空");
-            params = intent.getExtras();
-            if (params != null) {
-                Log.i("SecurityChooseFragment=", "bundle不为空");
-                task_total_numb = params.getInt("task_total_numb", 0);
-                Log.i("SecurityChooseFragment=", "task_total_numb=" + task_total_numb);
-                stringList = params.getStringArrayList("taskId");
-                if (task_total_numb != 0) {
-                    for (int i = 0; i < task_total_numb; i++) {
-                        stringSet.add(stringList.get(i));
-                    }
-                }
-                editor.putInt("task_total_numb", task_total_numb);
-                editor.putStringSet("stringSet", stringSet);
-                editor.commit();
-            }
+
         }
     }
 
@@ -119,12 +109,20 @@ public class SecurityChooseFragment extends Fragment {
                     startActivity(intent2);
                     break;
                 case R.id.new_task:
-                    Intent intent3 = new Intent(getActivity(), NewTaskActivity.class);
-                    startActivity(intent3);
+                    if(Tools.NetIsAvilable(getActivity())){
+                        Intent intent3 = new Intent(getActivity(), NewTaskActivity.class);
+                        startActivity(intent3);
+                    }else {
+                        Toast.makeText(getActivity(), "网络未连接，请打开网络！", Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case R.id.security_statistics:
-                    Intent intent4 = new Intent(getActivity(), SecurityStatisticsActivity.class);
-                    startActivity(intent4);
+                    /*Intent intent4 = new Intent(getActivity(), SecurityStatisticsActivity.class);
+                    startActivity(intent4);*/
+
+                    Uri uri = Uri.parse("http://88.88.88.231:8080/yewu");
+                    Intent intent6 = new Intent(Intent.ACTION_VIEW,uri);
+                    startActivity(intent6);
                     break;
                 case R.id.task_choose:
                     Intent intent5 = new Intent(getActivity(), TaskChooseActivity.class);

@@ -2,6 +2,7 @@ package com.example.administrator.myapplicationsienke.activity;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -54,14 +55,13 @@ import java.util.List;
 public class NewTaskActivity extends Activity {
     private TextView securityType;// 安检类型
     private EditText taskName;//安检名称
-    private TextView date;//开始日期选择器
-    private TextView date1;//结束日期选择器
+    private TextView startTime;//开始日期选择器
+    private TextView endTime;//结束日期选择器
     private String ip, port;  //接口ip地址   端口
     private String result; //网络请求结果
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private SQLiteDatabase db;  //数据库
-    List<String> taskNumbList = new ArrayList<>();
     public int responseCode = 0;
     private int year;
     private int month;
@@ -82,7 +82,10 @@ public class NewTaskActivity extends Activity {
     private ImageView frameAnimation;
     private AnimationDrawable animationDrawable;
     private LinearLayout rootLinearlayout;
-    private ArrayList<NewTaskListviewItem> parclebleList =new ArrayList<>();
+    private ArrayList<NewTaskListviewItem> parclebleList = new ArrayList<>();
+    private String resultTaskId;   //新增任务点保存时从服务器返回的任务编号
+    private String userResult; //网络请求结果
+    private  JSONObject object;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,11 +115,10 @@ public class NewTaskActivity extends Activity {
         newPlanAddBtn = (Button) findViewById(R.id.newplan_add_btn);
         taskName = (EditText) findViewById(R.id.task_name);
         securityType = (TextView) findViewById(R.id.security_type);
-        date = (TextView) findViewById(R.id.data);
-        date1 = (TextView) findViewById(R.id.data1);
+        startTime = (TextView) findViewById(R.id.data);
+        endTime = (TextView) findViewById(R.id.data1);
         save_btn = (Button) findViewById(R.id.save_btn);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
-
     }
 
     //点击事件
@@ -125,8 +127,8 @@ public class NewTaskActivity extends Activity {
         newPlanAddBtn.setOnClickListener(onClickListener);
         taskName.setOnClickListener(onClickListener);
         securityType.setOnClickListener(onClickListener);
-        date.setOnClickListener(onClickListener);
-        date1.setOnClickListener(onClickListener);
+        startTime.setOnClickListener(onClickListener);
+        endTime.setOnClickListener(onClickListener);
         save_btn.setOnClickListener(onClickListener);
     }
 
@@ -139,17 +141,19 @@ public class NewTaskActivity extends Activity {
                     break;
                 case R.id.newplan_add_btn:
                     Intent intent1 = new Intent(NewTaskActivity.this, NewTaskDetailActivity.class);
-                    startActivityForResult(intent1,100);
+                    startActivityForResult(intent1, 100);
                     break;
                 case R.id.save_btn:
-                    new Thread(){
-                        @Override
-                        public void run() {
-                            postMyTask();
-                        }
-                    }.start();
-                    Toast.makeText(NewTaskActivity.this,"新增任务已保存",Toast.LENGTH_SHORT).show();
-                    NewTaskActivity.this.finish();
+                    if (parclebleList.size() != 0) {
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                postMyTask();
+                            }
+                        }.start();
+                    } else {
+                        Toast.makeText(NewTaskActivity.this, "请添加用户数据哦！", Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case R.id.security_type:
                     createSecurityTypePopupwindow();
@@ -159,7 +163,7 @@ public class NewTaskActivity extends Activity {
                     year = cale1.get(Calendar.YEAR);
                     month = cale1.get(Calendar.MONTH);
                     day = cale1.get(Calendar.DAY_OF_MONTH);
-                    date.setText(year + "-" + (month + 1) + "-" + day);
+                    startTime.setText(year + "-" + (month + 1) + "-" + day);
                     //开始时间选择器
                     new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
@@ -172,7 +176,7 @@ public class NewTaskActivity extends Activity {
                         }
 
                         private void updateDate() {
-                            date.setText(year + "-" + (month + 1) + "-" + day);
+                            startTime.setText(year + "-" + (month + 1) + "-" + day);
                         }
                     }
                             , cale1.get(Calendar.YEAR)
@@ -184,7 +188,7 @@ public class NewTaskActivity extends Activity {
                     year1 = cale2.get(Calendar.YEAR);
                     month1 = cale2.get(Calendar.MONTH);
                     day1 = cale2.get(Calendar.DAY_OF_MONTH);
-                    date1.setText(year + "-" + (month + 1) + "-" + day);
+                    endTime.setText(year + "-" + (month + 1) + "-" + day);
                     //结束时间选择器
                     new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
@@ -197,7 +201,7 @@ public class NewTaskActivity extends Activity {
                         }
 
                         private void updateDate() {
-                            date1.setText(year + "-" + (month + 1) + "-" + day);
+                            endTime.setText(year + "-" + (month + 1) + "-" + day);
                         }
                     }
                             , cale2.get(Calendar.YEAR)
@@ -359,13 +363,11 @@ public class NewTaskActivity extends Activity {
                     //请求的地址
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         ip = "88.88.88.66:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",port);
                     } else {
                         port = "8088";
                     }
@@ -398,7 +400,7 @@ public class NewTaskActivity extends Activity {
                     os.flush();
                     os.close();
                     Log.i("getResponseCode====>", "" + urlConnection.getResponseCode());
-                    if (urlConnection.getResponseCode() == 200) {
+                    if ((responseCode = urlConnection.getResponseCode()) == 200) {
                         InputStream inputStream = urlConnection.getInputStream();
                         InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -410,17 +412,16 @@ public class NewTaskActivity extends Activity {
                         // 释放资源
                         inputStream.close();
                         // 返回字符串
-                        String result = stringBuilder.toString();
+                        result = stringBuilder.toString();
                         Log.i("postMyTask_result====>", result);
                         JSONObject jsonObject = new JSONObject(result);
-                        if (jsonObject.optInt("messg", 0) == 1) {
+                        if (jsonObject.optString("message", "").equals("保存成功！")) {
                             handler.sendEmptyMessage(1);
-                        }
-                        if (jsonObject.optInt("messg", 0) == 0) {
+                        } else {
                             handler.sendEmptyMessage(2);
                         }
                     } else {
-                        Log.i("login_state===>","登录失败");
+                        handler.sendEmptyMessage(3);
                     }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -428,7 +429,7 @@ public class NewTaskActivity extends Activity {
                     e.printStackTrace();
                 } catch (IOException e) {
                     Log.i("IOException==========>", "网络请求异常!");
-                    handler.sendEmptyMessage(3);
+                    handler.sendEmptyMessage(2);
                     e.printStackTrace();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -439,32 +440,135 @@ public class NewTaskActivity extends Activity {
     }
 
     //将数据转换成Json格式
-    public String dataToJson(){
+    public String dataToJson() {
         JSONObject jsonObject = new JSONObject();
         try {
             JSONObject object = new JSONObject();
-            object.put("c_safety_plan_name",taskName.getText().toString());      //安检任务名称
-            object.put("c_safety_plan_member","杜述洪");    //操作员
-            object.put("d_safety_start",date.getText().toString());       //开始时间
-            object.put("d_safety_end",date1.getText().toString());    //结束时间
-            object.put("n_company_id",Integer.parseInt(sharedPreferences.getString("company_id","")));       //公司id
+            object.put("c_safety_plan_name", taskName.getText().toString());      //安检任务名称
+            object.put("c_safety_plan_member", "杜述洪");    //操作员
+            object.put("d_safety_start", startTime.getText().toString());       //开始时间
+            object.put("d_safety_end", endTime.getText().toString());    //结束时间
+            object.put("n_company_id", Integer.parseInt(sharedPreferences.getString("company_id", "")));       //公司id
             JSONArray jsonArray = new JSONArray();
-            for(int i = 0;i<parclebleList.size();i++){
+            for (int i = 0; i < parclebleList.size(); i++) {
                 JSONObject object1 = new JSONObject();
-                object1.put("c_user_id",parclebleList.get(i).getUserId());
-                object1.put("n_data_state",1);
-                object1.put("n_safety_state",1);
-                object1.put("n_safety_date_type",0);
-                object1.put("c_safety_type",securityType.getText().toString());       //安检类型
-                jsonArray.put(i,object1);
+                object1.put("c_user_id", parclebleList.get(i).getUserId());
+                object1.put("n_data_state", 1);
+                object1.put("n_safety_state", 1);
+                object1.put("n_safety_date_type", 0);
+                object1.put("c_safety_type", 2 + "");       //安检类型
+                jsonArray.put(i, object1);
             }
-            jsonObject.put("safetyInspection",jsonArray);
-            jsonObject.put("safetyPlan",object);
-            Log.i("dataToJson==========>", "封装的json数据为："+jsonObject.toString());
+            jsonObject.put("safetyInspection", jsonArray);
+            jsonObject.put("safetyPlan", object);
+            Log.i("dataToJson==========>", "封装的json数据为：" + jsonObject.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return jsonObject.toString();
+    }
+
+    //将新增的任务数据存到本地数据库任务表
+    private void insertTaskDataBase() {
+        ContentValues values = new ContentValues();
+        values.put("taskName", taskName.getText().toString());
+        values.put("taskId", resultTaskId);
+        values.put("securityType", securityType.getText().toString());
+        values.put("totalCount", parclebleList.size());
+        values.put("endTime", endTime.getText().toString());
+        db.insert("Task", null, values);
+    }
+
+    //将添加的用户信息数据存到本地数据库用户表
+    private void insertUserDataBase(String securityId) {
+        ContentValues values = new ContentValues();
+        for (int i = 0; i < parclebleList.size(); i++) {
+            values.put("securityNumber", securityId);
+            values.put("userName", parclebleList.get(i).getUserName());
+            values.put("meterNumber", parclebleList.get(i).getNumber());
+            values.put("userPhone", parclebleList.get(i).getPhoneNumber());
+            values.put("securityType", securityType.getText().toString());
+            values.put("oldUserId", object.optString("oldUserId", ""));
+            values.put("newUserId", parclebleList.get(i).getUserId());
+            values.put("userAddress", parclebleList.get(i).getAdress());
+            values.put("taskId", resultTaskId);
+            values.put("ifChecked", "false");
+            db.insert("User", null, values);
+        }
+    }
+
+    //根据数据库返回回来的任务编号去查询相应用户的安检编号
+    private void requireSecurityId(final String method, final String keyAndValue) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    URL url;
+                    HttpURLConnection httpURLConnection;
+                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
+                    if (!sharedPreferences.getString("security_ip", "").equals("")) {
+                        ip = sharedPreferences.getString("security_ip", "");
+                    } else {
+                        ip = "88.88.88.66:";
+                    }
+                    if (!sharedPreferences.getString("security_port", "").equals("")) {
+                        port = sharedPreferences.getString("security_port", "");
+                    } else {
+                        port = "8088";
+                    }
+                    String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
+                    //有参数传递
+                    if (!keyAndValue.equals("")) {
+                        url = new URL(httpUrl + "?" + keyAndValue);
+                        //没有参数传递
+                    } else {
+                        url = new URL(httpUrl);
+                    }
+                    Log.i("url=============>", url + "");
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setConnectTimeout(6000);
+                    httpURLConnection.setReadTimeout(6000);
+                    httpURLConnection.connect();
+                    //传回的数据解析成String
+                    Log.i("responseCode====>", httpURLConnection.getResponseCode() + "");
+                    if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
+                        InputStream inputStream = httpURLConnection.getInputStream();
+                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String str;
+                        while ((str = bufferedReader.readLine()) != null) {
+                            stringBuilder.append(str);
+                        }
+                        userResult = stringBuilder.toString();
+                        Log.i("taskResult=====>", userResult);
+                        JSONObject jsonObject = new JSONObject(userResult);
+                        if (!jsonObject.optString("total", "").equals("0")) {
+                            handler.sendEmptyMessage(4);
+                        } else {
+                            handler.sendEmptyMessage(5);
+                        }
+                    } else {
+                        try {
+                            Thread.sleep(3000);
+                            handler.sendEmptyMessage(6);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    Log.i("IOException==========>", "网络请求异常!");
+                    handler.sendEmptyMessage(6);
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     //show弹出框
@@ -503,18 +607,41 @@ public class NewTaskActivity extends Activity {
                 case 1:
                     try {
                         Thread.sleep(1000);
-                        Toast.makeText(NewTaskActivity.this, "用户信息下载完成！", Toast.LENGTH_SHORT).show();
-                        Intent intent1 = new Intent(NewTaskActivity.this, NewTaskDetailActivity.class);
-                        startActivity(intent1);
+                        Toast.makeText(NewTaskActivity.this, "任务新增成功！", Toast.LENGTH_SHORT).show();
+                        JSONObject taskObject = new JSONObject(result);
+                        resultTaskId = taskObject.optInt("safetyPlanId", 0) + "";
+                        requireSecurityId("getUserCheck.do","safetyPlan="+resultTaskId);
+                        insertTaskDataBase();  //将新增的任务数据存到本地数据库任务表
+                        NewTaskActivity.this.finish();
                     } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
                 case 2:
-                    Toast.makeText(NewTaskActivity.this, "没有用户信息下载！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(NewTaskActivity.this, "任务新增失败！", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
-                    Toast.makeText(NewTaskActivity.this, "网络请求超时！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(NewTaskActivity.this, "网络错误！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 4:
+                    try {
+                        JSONObject userObject = new JSONObject(userResult);
+                        JSONArray array = userObject.getJSONArray("rows");
+                        for (int i = 0; i < array.length(); i++) {
+                            object = array.getJSONObject(i);
+                            insertUserDataBase(object.optInt("safetyInspectionId",0)+"");  //将添加的用户信息数据存到本地数据库用户表
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 5:
+                    Toast.makeText(NewTaskActivity.this, "任务编号请求数据为空！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 6:
+                    Toast.makeText(NewTaskActivity.this, "任务编号请求数据错误！", Toast.LENGTH_SHORT).show();
                     break;
             }
             super.handleMessage(msg);
@@ -524,11 +651,10 @@ public class NewTaskActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK){
-            if(requestCode == 100){
-                if (data != null ){
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 100) {
+                if (data != null) {
                     parclebleList = data.getParcelableArrayListExtra("parclebleList");
-                    Log.i("NewTaskActivity","接收到的parclebleList长度为："+parclebleList.get(0).getUserId());
                 }
             }
         }
