@@ -53,7 +53,7 @@ public class UserListActivity extends Activity {
     private int task_total_numb = 0;
     private SQLiteDatabase db;  //数据库
     private MySqliteHelper helper; //数据库帮助类
-    private int currentPosition;  //点击listview  当前item的位置
+    private int currentPosition,continueposition;  //点击listview  当前item的位置
     private UserListviewAdapter userListviewAdapter;
     private UserListviewItem item;
     private SharedPreferences sharedPreferences;
@@ -130,9 +130,9 @@ public class UserListActivity extends Activity {
                 item = userListviewItemList.get((int) parent.getAdapter().getItemId(position));
                 currentPosition = position;
                 Intent intent = new Intent(UserListActivity.this, UserDetailInfoActivity.class);
-                intent.putExtra("position", position);
+                intent.putExtra("position", currentPosition);
                 intent.putExtra("security_id",item.getSecurityNumber());
-                startActivityForResult(intent, position);
+                startActivityForResult(intent, currentPosition);
             }
         });
         etSearch.addTextChangedListener(new TextWatcher() {
@@ -175,7 +175,7 @@ public class UserListActivity extends Activity {
                 case R.id.back:
                     for (int i = 0; i < task_total_numb; i++) {
                         getContinueCheckPosition(stringList.get(i)); //获取继续安检的item位置
-                        if (!sharedPreferences.getString("continuePosition", "").equals("")) {
+                        if (sharedPreferences.getString("continuePosition", "").equals(continueposition)) {
                             break;
                         }
                     }
@@ -363,6 +363,7 @@ public class UserListActivity extends Activity {
                 Log.i("ContinueCheckPosition", "安检状态为 = " + cursor.getString(10));
                 Log.i("ContinueCheckPosition", "安检状态为false,此时的item位置为：" + cursor.getPosition());
                 Log.i("ContinueCheckPosition", "安检状态为false,此时的item的用户名为：" + cursor.getColumnName(2));
+                continueposition = cursor.getPosition();
                 editor.putString("continuePosition", cursor.getPosition() + "");
                 editor.commit();
                 break;
