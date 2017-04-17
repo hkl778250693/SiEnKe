@@ -3,7 +3,6 @@ package com.example.administrator.myapplicationsienke.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +10,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.example.administrator.myapplicationsienke.R;
-import com.example.administrator.myapplicationsienke.mode.PhotoBitmapUtil;
 import com.example.administrator.myapplicationsienke.model.GridviewImage;
-import com.example.administrator.myapplicationsienke.model.QueryListviewItem;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,23 +23,21 @@ import java.util.List;
  */
 public class GridviewImageAdapter extends BaseAdapter {
     private Context context;
-    private List<GridviewImage> gridviewImageList;
+    private ArrayList<String> gridviewImageList;
     private LayoutInflater layoutInflater;
+    private File file;
+    private Bitmap addBitmap;
     /**
      * 判断是否显示清除按钮 true=显示
      */
     private boolean showDelete = false;
-    /**
-     * 加号按钮
-     */
-    public Bitmap addBitmap;
 
-    public GridviewImageAdapter(Context context, List<GridviewImage> gridviewImageList) {
+    public GridviewImageAdapter(Context context, ArrayList<String> gridviewImageList) {
         this.context = context;
         this.gridviewImageList = gridviewImageList;
         if (context != null) {
             layoutInflater = LayoutInflater.from(context);
-            addBitmap = BitmapFactory.decodeResource(context.getResources(),R.mipmap.camera);
+            addBitmap = BitmapFactory.decodeResource(context.getResources(),R.mipmap.camera_true);
         }
     }
 
@@ -80,11 +78,16 @@ public class GridviewImageAdapter extends BaseAdapter {
             }else {
                 viewHolder.delete.setVisibility(View.GONE);
             }
-            viewHolder.imageView.setImageBitmap(gridviewImageList.get(position).getImage());
+            file = new File(gridviewImageList.get(position));
+            Glide.with(context).load(file).into(viewHolder.imageView);
+            Log.i("GridviewImageAdapter","此时的照片路径为："+gridviewImageList.get(position));
         }else {
-            if(gridviewImageList.size() != 6){
+            if(gridviewImageList.size() != 9){
                 viewHolder.delete.setVisibility(View.GONE);
-                viewHolder.imageView.setImageBitmap(addBitmap);
+                Glide.with(context).load(R.mipmap.camera).into(viewHolder.imageView);
+            }else {
+                viewHolder.delete.setVisibility(View.GONE);
+                Glide.with(context).load(R.mipmap.forbidden_camera).into(viewHolder.imageView);
             }
         }
 
@@ -93,6 +96,7 @@ public class GridviewImageAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 gridviewImageList.remove(position);
+                file.delete();
                 notifyDataSetChanged();
             }
         });

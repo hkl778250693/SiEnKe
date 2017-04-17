@@ -36,13 +36,16 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.GridviewImageAdapter;
+import com.example.administrator.myapplicationsienke.mode.MyPhotoUtils;
 import com.example.administrator.myapplicationsienke.mode.Tools;
 import com.example.administrator.myapplicationsienke.model.GridviewImage;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -54,7 +57,7 @@ public class UserDetailInfoActivity extends Activity {
     private LinearLayout rootLinearlayout;  //添加图片
     private RelativeLayout hiddenTypeRoot, hiddenReasonRoot;
     private TextView securityCheckCase, securityHiddenType, securityHiddenReason;  //安全情况,安全隐患类型，安全隐患原因
-    private Button saveBtn, takePhoto, photoAlbum, cancel;  //保存、拍照、相册、取消
+    private Button saveBtn, takePhoto, cancel;  //保存、拍照、相册、取消
     private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck, overSecurityCheckTime, nobodyHere, refuseSecurityCheck;
     private RadioButton commonSecurityCheck, yearPlan, recheck, passGasSecurityCheck;
     private RadioButton indoorStandPipe, indoorBranchPipe, fuelGasMeter, burningAppliances, gasFacilitiesRoom, threeWayPipe;
@@ -62,23 +65,24 @@ public class UserDetailInfoActivity extends Activity {
     private LayoutInflater inflater;  //转换器
     private View popupwindowView, securityCaseView, securityHiddenTypeView, securityHiddenreasonView, saveView;
     private PopupWindow popupWindow;
-    private Bitmap bitmap;
     int sdkVersion = Build.VERSION.SDK_INT;  //当前SDK版本
-    private String SD_CARD_TEMP_DIR;
-    protected static Uri tempUri, albumUri, photoUri;
-    protected static final int TAKE_PHOTO = 100;//选择本地照片
-    protected static final int PHOTO_ALBUM = 200;//拍照
+    private int TYPE_FILE_IMAGE = 1;
+    private int TYPE_FILE_CROP_IMAGE = 2;
+    protected static Uri tempUri,cropPhotoUri;
+    protected static final int TAKE_PHOTO = 100;//拍照
     protected static final int CROP_SMALL_PICTURE = 300;  //裁剪成小图片
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private String result, path, uid;
+    private String securityId;
     private List<GridviewImage> imageList = new ArrayList<>();
-    private Bitmap addImageBitmap;  //添加照片
-    private GridviewImage image;
     private GridviewImageAdapter adapter;
-    private boolean isShowDelete;
     private List<Bitmap> bitmaps = new ArrayList<>();
-
+    private String cropPhotoPath;  //裁剪的图片路径
+    private String originalPhotoPath;  //未裁剪图片路径
+    private ArrayList<String>  cropPathLists = new ArrayList<>();  //裁剪的图片路径集合
+    private ArrayList<String>  cropPathLists_back = new ArrayList<>();  //大图页面返回的图片路径集合
+    private ArrayList<String>  originalPathLists = new ArrayList<>();  //原始的图片路径集合
+    private int currentPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,12 +117,13 @@ public class UserDetailInfoActivity extends Activity {
         securityHiddenReason.setOnClickListener(onClickListener);
         saveBtn.setOnClickListener(onClickListener);
 
-        adapter = new GridviewImageAdapter(UserDetailInfoActivity.this, imageList);
+        adapter = new GridviewImageAdapter(UserDetailInfoActivity.this,cropPathLists);
         gridView.setSelector(new ColorDrawable(Color.TRANSPARENT));
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                currentPosition = position;
                 // 如果单击时删除按钮处在显示状态，则隐藏它
                 if (adapter.getDeleteShow()) {
                     adapter.setDeleteShow(false);
@@ -126,17 +131,24 @@ public class UserDetailInfoActivity extends Activity {
                 } else {
                     if (adapter.getCount() - 1 == position) {
                         // 判断是否达到了可添加图片最大数
-                        if (imageList.size() != 6) {
+                        if (cropPathLists.size() != 9) {
                             createPhotoPopupwindow();
                         }
                     }
+                }
+                if(!adapter.getDeleteShow() && adapter.getCount() - 1 != position){
+                    Intent intent = new Intent(UserDetailInfoActivity.this,MyPhotoGalleryActivity.class);
+                    intent.putExtra("currentPosition",currentPosition);
+                    intent.putStringArrayListExtra("cropPathLists",cropPathLists);
+                    Log.i("UserDetailInfoActivity", "点击图片跳转进来到预览详情页面的图片数量为："+cropPathLists.size());
+                    startActivityForResult(intent,500);
                 }
             }
         });
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!(position == imageList.size())) {
+                if (!(position == cropPathLists.size())) {
                     // 如果删除按钮已经显示了则不再设置
                     if (!adapter.getDeleteShow()) {
                         adapter.setDeleteShow(true);
@@ -188,7 +200,7 @@ public class UserDetailInfoActivity extends Activity {
 
         //获取上一个页面传过来的用户ID
         Intent intent = getIntent();
-        uid = intent.getStringExtra("user_id");
+        securityId = intent.getStringExtra("security_id");
     }
 
     //弹出拍照popupwindow
@@ -248,7 +260,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 if (bitmaps.size() != 0) {
-                    saveImage(bitmaps);
+                    //saveImage(bitmaps);
                 }
                 Intent intent = new Intent();
                 setResult(Activity.RESULT_OK, intent);
@@ -497,77 +509,46 @@ public class UserDetailInfoActivity extends Activity {
     public void openCamera() {
         Intent openCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // 指定照片保存路径（SD卡），image.jpg为一个临时文件，每次拍照后这个图片都会被替换
-        SD_CARD_TEMP_DIR = Environment.getExternalStorageDirectory() + "image.jpg";
-        tempUri = Uri.fromFile(new File(SD_CARD_TEMP_DIR));
+        MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_IMAGE,securityId);
+        tempUri = photoUtils.getOutFileUri(TYPE_FILE_IMAGE);
+        originalPhotoPath = tempUri.getPath();
+        originalPathLists.add(originalPhotoPath);
         openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);
+        Log.i("openCamera===>", "保存的地址为" + tempUri);
         startActivityForResult(openCameraIntent, TAKE_PHOTO);
     }
 
-    /*//调用本地相册
-    public void openAlnum(){
-        Intent openAlbumIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        openAlbumIntent.setType("image*//*");
-        startActivityForResult(openAlbumIntent,PHOTO_ALBUM);
-    }*/
-
     //页面回调方法
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.i("onActivityResult===>", "" + true);
         Log.i("onActivityResult===>", "" + requestCode);
         if (resultCode == RESULT_OK) {   //如果返回码是可用的
-            Log.i("RESULT_OK===>", "" + true);
             switch (requestCode) {
                 case TAKE_PHOTO:
-                    Log.i("TAKE_PHOTO===>", "" + true);
                     startCropPhoto(tempUri);
-                    break;
-                case PHOTO_ALBUM:
-                    Log.i("PHOTO_ALBUM===>", "" + true);
-                    if (Tools.hasSdcard()) {
-                        //startCropPhoto(albumUri);
-                        if (data != null) {
-                            albumUri = data.getData();
-                            if (sdkVersion >= 19) {      //android 5.0以上直接返回的是图片的路径
-                                Log.i("sdkVersion===>", "" + sdkVersion);
-                                path = albumUri.getPath();
-                                Log.i("sdkVersion=path=>", "" + path);
-                                //path = getPath_above19(this,imgUri);    //或者直接使用path = imgUri.getPath();
-                            } else {
-                                path = getFilePath_below19(albumUri);
-                            }
-                            ContentResolver cr = this.getContentResolver();
-                            try {
-                                bitmap = MediaStore.Images.Media.getBitmap(cr, albumUri);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            Log.i("sdkVersion=bitmap=>", "" + bitmap);
-                            //photoOne.setImageBitmap(bitmap);
-                            //saveImage(data);//保存图片
-                        }
-                    } else {
-                        Toast.makeText(UserDetailInfoActivity.this, "未找到存储卡，无法存储照片！", Toast.LENGTH_LONG).show();
+                    Log.i("TAKE_PHOTO=====>", "没有数据返回！");
+                    if(data != null){
+                        Log.i("TAKE_PHOTO=====>", "有数据返回！");
                     }
                     break;
                 case CROP_SMALL_PICTURE:
                     if (data != null) {
-                        Bundle bundle = data.getExtras();
-                        bitmap = (Bitmap) bundle.get("data");
-                        bitmaps.add(bitmap);
-                        Log.i("CROP_SMALL_photoUri=>", "" + bitmap);
-                        image = new GridviewImage();
-                        image.setImage(bitmap);
-                        Log.i("CROP_SMALL_photoUri=>", "" + image);
-                        imageList.add(image);
-                        Log.i("CROP_SMALL_photoUri=>", "" + imageList.size());
+                        cropPathLists.add(cropPhotoPath);
+
                         handler.sendEmptyMessage(1);
                     }
                     break;
+                case 500:
+                    if(data != null){
+                        cropPathLists_back = data.getStringArrayListExtra("cropPathLists_back");
+                        handler.sendEmptyMessage(2);
+                    }
+                    break;
             }
+        }else if(resultCode == RESULT_CANCELED){
+            Toast.makeText(UserDetailInfoActivity.this, "您取消了拍照哦", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -575,10 +556,18 @@ public class UserDetailInfoActivity extends Activity {
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == 1) {
-                adapter = new GridviewImageAdapter(UserDetailInfoActivity.this, imageList);
-                gridView.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
+            switch (msg.what){
+                case 1:
+                    adapter = new GridviewImageAdapter(UserDetailInfoActivity.this, cropPathLists);
+                    gridView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                    break;
+                case 2:
+                    adapter = new GridviewImageAdapter(UserDetailInfoActivity.this, cropPathLists_back);
+                    cropPathLists = cropPathLists_back;
+                    gridView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                    break;
             }
             super.handleMessage(msg);
         }
@@ -589,9 +578,7 @@ public class UserDetailInfoActivity extends Activity {
      *
      * @param uri
      */
-
-
-    private String getFilePath_below19(Uri uri) {
+    /*private String getFilePath_below19(Uri uri) {
         //这里开始的第二部分，获取图片的路径：低版本的是没问题的，但是sdk>19会获取不到
         String[] proj = {MediaStore.Images.Media.DATA};
         //好像是android多媒体数据库的封装接口，具体的看Android文档
@@ -605,7 +592,7 @@ public class UserDetailInfoActivity extends Activity {
         String path = cursor.getString(column_index);
         Log.i("path:", path);
         return path;
-    }
+    }*/
 
     /**
      * 裁剪图片方法实现
@@ -614,18 +601,25 @@ public class UserDetailInfoActivity extends Activity {
      */
     protected void startCropPhoto(Uri uri) {
         if (uri != null) {
-            tempUri = uri;
             Intent intent = new Intent("com.android.camera.action.CROP");
             intent.setDataAndType(uri, "image/*");
             // 设置裁剪
             intent.putExtra("crop", "true");
             // aspectX aspectY 是宽高的比例
             intent.putExtra("aspectX", 1);
-            intent.putExtra("aspectY", 1);
+            intent.putExtra("aspectY", 1.3);
             // outputX outputY 是裁剪图片宽高
-            intent.putExtra("outputX", 40);
-            intent.putExtra("outputY", 40);
-            intent.putExtra("return-data", true);
+            intent.putExtra("outputX", 500);
+            intent.putExtra("outputY", 650);
+            intent.putExtra("return-data", false);
+            // 当图片的宽高不足时，会出现黑边，去除黑边
+            intent.putExtra("scale", true);
+            intent.putExtra("scaleUpIfNeeded", true);
+            MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_CROP_IMAGE,securityId);
+            cropPhotoUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);
+            Log.i("startCropPhoto", "图片裁剪的uri = " + cropPhotoUri);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, cropPhotoUri);
+            cropPhotoPath = cropPhotoUri.getPath();
             startActivityForResult(intent, CROP_SMALL_PICTURE);
         }
     }
@@ -637,10 +631,8 @@ public class UserDetailInfoActivity extends Activity {
      * @return
      */
     private Bitmap decodeSampleBitmap(String path) {
-        //photoOne是将要呈现图片的ImageView控件
         //int targetW = photoOne.getWidth();
         //int targetH = photoOne.getHeight();
-
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, options);
@@ -668,11 +660,11 @@ public class UserDetailInfoActivity extends Activity {
                 Bitmap photo = bitmaps.get(i);
                 if (Tools.hasSdcard()) {
                     Log.i("UserDetailInfoActivity", "有SD卡");
-                    filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Sienke/files/img/" + uid + "_" + i + ".jpg";
+                    filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Sienke/files/img/" + securityId + "_" + i + ".jpg";
                     file = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
                 } else {
                     Log.i("UserDetailInfoActivity", "没有SD卡");
-                    filePath = "data/data/" + UserDetailInfoActivity.this.getPackageName() + "/Sienke/files/img/" + uid + "_" + i + ".jpg";
+                    filePath = "data/data/" + UserDetailInfoActivity.this.getPackageName() + "/Sienke/files/img/" + securityId + "_" + i + ".jpg";
                     file = new File("data/data/" + UserDetailInfoActivity.this.getPackageName());
                 }
                 if (!file.exists()) {
