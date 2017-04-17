@@ -48,6 +48,20 @@
         android:paddingRight="10dp"
         android:paddingTop="5dp">
 
+        <TextView
+            android:id="@+id/filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/check_hidden_danger_down_shape"
+            android:drawablePadding="15dp"
+            android:drawableRight="@mipmap/down"
+            android:layout_marginRight="10dp"
+            android:padding="7dp"
+            android:text="姓名"
+            android:textColor="@color/text_gray"
+            android:textSize="14sp" />
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -74,24 +88,11 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/check_hidden_danger_down_shape"
-            android:drawablePadding="15dp"
-            android:drawableRight="@mipmap/down"
-            android:padding="7dp"
-            android:text="姓名"
-            android:textColor="@color/text_gray"
-            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/search_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
             android:background="@drawable/search_bg_selector"
             android:drawableLeft="@drawable/search_picture_selector"
             android:drawablePadding="2dp"

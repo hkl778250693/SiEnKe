@@ -70,7 +70,7 @@ public class NewTaskActivity extends Activity {
     private int month1;
     private int day1;
     private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck, overSecurityCheckTime;
-    private RadioButton indoorStandPipe, indoorBranchPipe, fuelGasMeter, burningAppliances, gasFacilitiesRoom, threeWayPipe;
+    private RadioButton commonSecurityCheck, yearPlan, reCheck, passGasSecurityCheck;
     private LayoutInflater inflater;  //转换器
     private View securityCaseView, securityHiddenreasonView;
     private PopupWindow popupWindow;
@@ -85,7 +85,7 @@ public class NewTaskActivity extends Activity {
     private ArrayList<NewTaskListviewItem> parclebleList = new ArrayList<>();
     private String resultTaskId;   //新增任务点保存时从服务器返回的任务编号
     private String userResult; //网络请求结果
-    private  JSONObject object;
+    private JSONObject object;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -221,113 +221,43 @@ public class NewTaskActivity extends Activity {
     }
 
 
-    //弹出安检区域popupwindow
-    public void createSecurityCasePopupwindow() {
-        inflater = LayoutInflater.from(NewTaskActivity.this);
-        securityCaseView = inflater.inflate(R.layout.popupwidow_security_area, null);
-        popupWindow = new PopupWindow(securityCaseView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        //绑定控件ID
-        notSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.not_security_check);
-        passSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.pass_security_check);
-        notPassSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.not_pass_security_check);
-        overSecurityCheckTime = (RadioButton) securityCaseView.findViewById(R.id.over_security_check_time);
-        //设置点击事件
-        notSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                taskName.setText(notSecurityCheck.getText());
-            }
-        });
-        passSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                taskName.setText(passSecurityCheck.getText());
-            }
-        });
-        notPassSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                taskName.setText(notPassSecurityCheck.getText());
-            }
-        });
-        overSecurityCheckTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                taskName.setText(overSecurityCheckTime.getText());
-            }
-        });
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
-        popupWindow.setAnimationStyle(R.style.Popupwindow);
-        backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(taskName, 600, 0);
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                backgroundAlpha(1.0F);
-            }
-        });
-    }
-
     //弹出安全隐患类型popupwindow
     public void createSecurityTypePopupwindow() {
         inflater = LayoutInflater.from(NewTaskActivity.this);
         securityHiddenreasonView = inflater.inflate(R.layout.popupwindow_security_type, null);
         popupWindow = new PopupWindow(securityHiddenreasonView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
-        indoorStandPipe = (RadioButton) securityHiddenreasonView.findViewById(R.id.indoor_stand_pipe);
-        indoorBranchPipe = (RadioButton) securityHiddenreasonView.findViewById(R.id.indoor_branch_pipe);
-        fuelGasMeter = (RadioButton) securityHiddenreasonView.findViewById(R.id.fuel_gas_meter);
-        burningAppliances = (RadioButton) securityHiddenreasonView.findViewById(R.id.burning_appliances);
-        gasFacilitiesRoom = (RadioButton) securityHiddenreasonView.findViewById(R.id.gas_facilities_room);
-        threeWayPipe = (RadioButton) securityHiddenreasonView.findViewById(R.id.three_way_pipe);
+        commonSecurityCheck = (RadioButton) securityHiddenreasonView.findViewById(R.id.common_security_check);
+        yearPlan = (RadioButton) securityHiddenreasonView.findViewById(R.id.year_plan);
+        reCheck = (RadioButton) securityHiddenreasonView.findViewById(R.id.recheck);
+        passGasSecurityCheck = (RadioButton) securityHiddenreasonView.findViewById(R.id.pass_gas_security_check);
         //设置点击事件
-        indoorStandPipe.setOnClickListener(new View.OnClickListener() {
+        commonSecurityCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityType.setText(indoorStandPipe.getText());
+                securityType.setText(commonSecurityCheck.getText());
             }
         });
-        indoorBranchPipe.setOnClickListener(new View.OnClickListener() {
+        yearPlan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityType.setText(indoorBranchPipe.getText());
+                securityType.setText(yearPlan.getText());
             }
         });
-        fuelGasMeter.setOnClickListener(new View.OnClickListener() {
+        reCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityType.setText(fuelGasMeter.getText());
+                securityType.setText(reCheck.getText());
             }
         });
-        burningAppliances.setOnClickListener(new View.OnClickListener() {
+        passGasSecurityCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityType.setText(burningAppliances.getText());
-            }
-        });
-        gasFacilitiesRoom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityType.setText(gasFacilitiesRoom.getText());
-            }
-        });
-        threeWayPipe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityType.setText(threeWayPipe.getText());
+                securityType.setText(passGasSecurityCheck.getText());
             }
         });
         popupWindow.setFocusable(true);
@@ -336,7 +266,7 @@ public class NewTaskActivity extends Activity {
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(securityType, 365, 0);
+        popupWindow.showAsDropDown(securityType, 500, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -610,7 +540,7 @@ public class NewTaskActivity extends Activity {
                         Toast.makeText(NewTaskActivity.this, "任务新增成功！", Toast.LENGTH_SHORT).show();
                         JSONObject taskObject = new JSONObject(result);
                         resultTaskId = taskObject.optInt("safetyPlanId", 0) + "";
-                        requireSecurityId("getUserCheck.do","safetyPlan="+resultTaskId);
+                        requireSecurityId("getUserCheck.do", "safetyPlan=" + resultTaskId);
                         insertTaskDataBase();  //将新增的任务数据存到本地数据库任务表
                         NewTaskActivity.this.finish();
                     } catch (InterruptedException e) {
@@ -631,7 +561,7 @@ public class NewTaskActivity extends Activity {
                         JSONArray array = userObject.getJSONArray("rows");
                         for (int i = 0; i < array.length(); i++) {
                             object = array.getJSONObject(i);
-                            insertUserDataBase(object.optInt("safetyInspectionId",0)+"");  //将添加的用户信息数据存到本地数据库用户表
+                            insertUserDataBase(object.optInt("safetyInspectionId", 0) + "");  //将添加的用户信息数据存到本地数据库用户表
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
