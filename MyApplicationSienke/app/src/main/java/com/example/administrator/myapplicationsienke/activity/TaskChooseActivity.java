@@ -113,13 +113,17 @@ public class TaskChooseActivity extends Activity {
                         finish();
                     } else {
                         saveTaskInfo(); //保存选中的任务编号信息
-                        saveCheckStateInfo();//保存选中状态，将信息写入preference保存以备下一次读取使用
-                        Toast.makeText(TaskChooseActivity.this, "保存成功！您可以到用户列表查看哦~", Toast.LENGTH_SHORT).show();
-                        intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
-                        transferParams(); //传递任务编号参数到主页面
-                        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                        startActivity(intent);
-                        finish();
+                        if(taskTotalUserNumber != 0){
+                            saveCheckStateInfo();//保存选中状态，将信息写入preference保存以备下一次读取使用
+                            Toast.makeText(TaskChooseActivity.this, "保存成功！您可以到用户列表查看哦~", Toast.LENGTH_SHORT).show();
+                            intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
+                            transferParams(); //传递任务编号参数到主页面
+                            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                            startActivity(intent);
+                            finish();
+                        }else {
+                            Toast.makeText(TaskChooseActivity.this, "您还没有选择任务哦~", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     break;
             }
