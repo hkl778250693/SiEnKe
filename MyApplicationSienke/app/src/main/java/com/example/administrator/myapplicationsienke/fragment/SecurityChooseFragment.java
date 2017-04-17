@@ -117,12 +117,11 @@ public class SecurityChooseFragment extends Fragment {
                     }
                     break;
                 case R.id.security_statistics:
-                    /*Intent intent4 = new Intent(getActivity(), SecurityStatisticsActivity.class);
-                    startActivity(intent4);*/
-
-                    Uri uri = Uri.parse("http://88.88.88.231:8080/yewu");
+                    Intent intent4 = new Intent(getActivity(), SecurityStatisticsActivity.class);
+                    startActivity(intent4);
+                    /*Uri uri = Uri.parse("http://88.88.88.231:8080/yewu");
                     Intent intent6 = new Intent(Intent.ACTION_VIEW,uri);
-                    startActivity(intent6);
+                    startActivity(intent6);*/
                     break;
                 case R.id.task_choose:
                     Intent intent5 = new Intent(getActivity(), TaskChooseActivity.class);

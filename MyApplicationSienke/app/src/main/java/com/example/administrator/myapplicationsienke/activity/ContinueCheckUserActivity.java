@@ -77,6 +77,7 @@ public class ContinueCheckUserActivity extends Activity {
                         getUserData(stringList.get(i));//读取继续安检用户数据
                     }
                     handler.sendEmptyMessage(1);
+                    handler.sendEmptyMessage(0);
                 }else {
                     handler.sendEmptyMessage(2);
                 }
@@ -107,7 +108,6 @@ public class ContinueCheckUserActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
-        Log.i("ContinueCheckActivity", "defaultSetting进来了");
         helper = new MySqliteHelper(ContinueCheckUserActivity.this, 1);
         db = helper.getWritableDatabase();
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
@@ -120,10 +120,22 @@ public class ContinueCheckUserActivity extends Activity {
         back.setOnClickListener(onClickListener);
         filter.setOnClickListener(onClickListener);
         editDelete.setOnClickListener(onClickListener);
-        if(!continuePosition.equals("")){
+        /*if(!continuePosition.equals("")){
             listView.setSelection(Integer.parseInt(continuePosition));  //让listview显示上次安检的位置
             Log.i("Continue_setSelection", "列表显示当前的位置是：" + continuePosition);
-        }
+        }*/
+        new Thread(){
+            @Override
+            public void run() {
+                /*for (int i = 0; i < task_total_numb; i++) {
+                    getContinueCheckPosition(stringList.get(i)); //获取继续安检的item位置
+                    if (!sharedPreferences.getString("continuePosition", "").equals("")) {
+                        break;
+                    }
+                }*/
+
+            }
+        }.start();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -131,7 +143,7 @@ public class ContinueCheckUserActivity extends Activity {
                 currentPosition = position;
                 Intent intent = new Intent(ContinueCheckUserActivity.this, UserDetailInfoActivity.class);
                 intent.putExtra("position",position);
-                startActivityForResult(intent,position);
+                startActivityForResult(intent,currentPosition);
             }
         });
 
@@ -205,7 +217,7 @@ public class ContinueCheckUserActivity extends Activity {
             switch (msg.what){
                 case 0:
                     if(!sharedPreferences.getString("continuePosition","").equals("")){
-                        listView.setSelection(Integer.parseInt(sharedPreferences.getString("continuePosition","")));  //让listview显示上次安检的位置
+                        listView.setSelection(Integer.parseInt(continuePosition));  //让listview显示上次安检的位置
                         Log.i("Continue_edit_delete", "列表显示当前的位置是：" + continuePosition);
                     }
                     break;

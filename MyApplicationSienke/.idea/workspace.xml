@@ -73,7 +73,8 @@
     </layouts>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_LOG_LEVEL" value="ERROR" />
+    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="Continue_edit_delete" />
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="INFO" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="BookmarkManager">
@@ -169,9 +170,60 @@
           <provider editor-type-id="android-designer">
             <state />
           </provider>
+<<<<<<< HEAD
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="-7.4827585">
               <caret line="108" column="0" selection-start-line="108" selection-start-column="0" selection-end-line="108" selection-end-column="0" />
+=======
+        </entry>
+      </file>
+      <file leaf-file-name="SecurityChooseFragment.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/SecurityChooseFragment.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="131" column="6" selection-start-line="131" selection-start-column="6" selection-end-line="132" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ContinueCheckUserActivity.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/ContinueCheckUserActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.4125">
+              <caret line="220" column="51" selection-start-line="220" selection-start-column="31" selection-end-line="220" selection-end-column="51" />
+              <folding>
+                <element signature="e#2602#3108#0" expanded="true" />
+                <element signature="e#3107#3108#0" expanded="true" />
+                <element signature="e#4643#5042#0" expanded="true" />
+                <element signature="e#5041#5042#0" expanded="true" />
+                <element signature="e#5092#5636#0" expanded="true" />
+                <element signature="e#5635#5636#0" expanded="true" />
+                <element signature="e#7853#8049#0" expanded="true" />
+                <element signature="e#8048#8049#0" expanded="true" />
+                <element signature="e#8140#9240#0" expanded="true" />
+                <element signature="e#9239#9240#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UserListActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/UserListActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="177" column="28" selection-start-line="177" selection-start-column="28" selection-end-line="177" selection-end-column="28" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SecurityChooseActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/SecurityChooseActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="233" column="60" selection-start-line="233" selection-start-column="60" selection-end-line="233" selection-end-column="60" />
+>>>>>>> 55c2f0646228908058bfa9b19d8af07bdefd27fd
               <folding />
             </state>
           </provider>
@@ -1582,7 +1634,11 @@
     </option>
     <option name="modificationStamps">
       <map>
+<<<<<<< HEAD
         <entry key="$PROJECT_DIR$" value="4474455086442" />
+=======
+        <entry key="$PROJECT_DIR$" value="4471353630484" />
+>>>>>>> 55c2f0646228908058bfa9b19d8af07bdefd27fd
       </map>
     </option>
     <option name="projectBuildClasspath">
@@ -1875,12 +1931,10 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/SecurityChooseActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/adapter/UserListviewAdapter.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/NoCheckUserListActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/ContinueCheckUserActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/mode/MyGridview.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_user_detail_info.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/gridview_image_item.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/drawable/camera_selector.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/UserListActivity.java" />
         <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/gallery_photo_item.xml" />
@@ -1910,7 +1964,12 @@
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_cost_detail.xml" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/SecurityChooseFragment.java" />
+<<<<<<< HEAD
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_new_task_datail.xml" />
+=======
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/UserListActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/ContinueCheckUserActivity.java" />
+>>>>>>> 55c2f0646228908058bfa9b19d8af07bdefd27fd
       </list>
     </option>
   </component>
@@ -2607,8 +2666,12 @@
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+<<<<<<< HEAD
       <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.011142061" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32879657" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+=======
+      <window_info id="Android Monitor" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.29108635" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+>>>>>>> 55c2f0646228908058bfa9b19d8af07bdefd27fd
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21309192" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -2679,6 +2742,17 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+<<<<<<< HEAD
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/mode/PhotoBitmapUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.20503597">
+          <caret line="27" column="13" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+>>>>>>> 55c2f0646228908058bfa9b19d8af07bdefd27fd
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/adapter/NoCheckUserAdapter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.59498954">
@@ -2748,10 +2822,17 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/SecurityChooseActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="180" column="52" selection-start-line="180" selection-start-column="52" selection-end-line="180" selection-end-column="52" />
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/UserDetailInfoActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="558" column="30" selection-start-line="558" selection-start-column="30" selection-end-line="558" selection-end-column="30" />
+>>>>>>> 55c2f0646228908058bfa9b19d8af07bdefd27fd
           <folding />
         </state>
       </provider>
@@ -3100,11 +3181,16 @@
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/fragment/SecurityChooseFragment.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
+<<<<<<< HEAD
           <caret line="99" column="0" selection-start-line="99" selection-start-column="0" selection-end-line="100" selection-end-column="0" />
+=======
+          <caret line="131" column="6" selection-start-line="131" selection-start-column="6" selection-end-line="132" selection-end-column="0" />
+>>>>>>> 55c2f0646228908058bfa9b19d8af07bdefd27fd
           <folding />
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_userlist.xml">
       <provider editor-type-id="android-designer">
         <state />
@@ -3139,10 +3225,17 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="79" column="45" selection-start-line="79" selection-start-column="45" selection-end-line="79" selection-end-column="45" />
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/NoCheckUserListActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-2.0979166">
+          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
+>>>>>>> 55c2f0646228908058bfa9b19d8af07bdefd27fd
           <folding />
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_new_task_datail.xml">
       <provider editor-type-id="android-designer">
         <state />
@@ -3175,7 +3268,40 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.35829663">
           <caret line="311" column="104" selection-start-line="311" selection-start-column="104" selection-end-line="311" selection-end-column="104" />
+=======
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/SecurityChooseActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="233" column="60" selection-start-line="233" selection-start-column="60" selection-end-line="233" selection-end-column="60" />
+>>>>>>> 55c2f0646228908058bfa9b19d8af07bdefd27fd
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/UserListActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="177" column="28" selection-start-line="177" selection-start-column="28" selection-end-line="177" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/administrator/myapplicationsienke/activity/ContinueCheckUserActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4125">
+          <caret line="220" column="51" selection-start-line="220" selection-start-column="31" selection-end-line="220" selection-end-column="51" />
+          <folding>
+            <element signature="e#2602#3108#0" expanded="true" />
+            <element signature="e#3107#3108#0" expanded="true" />
+            <element signature="e#4643#5042#0" expanded="true" />
+            <element signature="e#5041#5042#0" expanded="true" />
+            <element signature="e#5092#5636#0" expanded="true" />
+            <element signature="e#5635#5636#0" expanded="true" />
+            <element signature="e#7853#8049#0" expanded="true" />
+            <element signature="e#8048#8049#0" expanded="true" />
+            <element signature="e#8140#9240#0" expanded="true" />
+            <element signature="e#9239#9240#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
