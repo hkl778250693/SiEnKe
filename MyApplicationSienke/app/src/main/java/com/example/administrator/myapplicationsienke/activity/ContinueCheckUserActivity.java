@@ -43,12 +43,8 @@ import java.util.List;
 public class ContinueCheckUserActivity extends Activity {
     private ImageView back,editDelete;
     private ListView listView;
-    private TextView filter, noData;
+    private TextView noData,name;
     private EditText etSearch;//搜索框
-    private LayoutInflater inflater;  //转换器
-    private View securityCaseView;
-    private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck;
-    private PopupWindow popupWindow;
     private List<UserListviewItem> userListviewItemList = new ArrayList<>();
     private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
     private int task_total_numb = 0;
@@ -99,8 +95,8 @@ public class ContinueCheckUserActivity extends Activity {
     //绑定控件ID
     private void bindView() {
         back = (ImageView) findViewById(R.id.back);
+        name = (TextView) findViewById(R.id.name);
         listView = (ListView) findViewById(R.id.listview);
-        filter = (TextView) findViewById(R.id.filter);
         noData = (TextView) findViewById(R.id.no_data);
         etSearch = (EditText) findViewById(R.id.etSearch);
         editDelete = (ImageView) findViewById(R.id.edit_delete);
@@ -108,6 +104,7 @@ public class ContinueCheckUserActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
+        name.setText("继续安检");
         helper = new MySqliteHelper(ContinueCheckUserActivity.this, 1);
         db = helper.getWritableDatabase();
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
@@ -118,24 +115,7 @@ public class ContinueCheckUserActivity extends Activity {
     //点击事件
     private void setOnClickListener() {
         back.setOnClickListener(onClickListener);
-        filter.setOnClickListener(onClickListener);
         editDelete.setOnClickListener(onClickListener);
-        /*if(!continuePosition.equals("")){
-            listView.setSelection(Integer.parseInt(continuePosition));  //让listview显示上次安检的位置
-            Log.i("Continue_setSelection", "列表显示当前的位置是：" + continuePosition);
-        }*/
-        new Thread(){
-            @Override
-            public void run() {
-                /*for (int i = 0; i < task_total_numb; i++) {
-                    getContinueCheckPosition(stringList.get(i)); //获取继续安检的item位置
-                    if (!sharedPreferences.getString("continuePosition", "").equals("")) {
-                        break;
-                    }
-                }*/
-
-            }
-        }.start();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -192,9 +172,6 @@ public class ContinueCheckUserActivity extends Activity {
             switch (v.getId()) {
                 case R.id.back:
                     ContinueCheckUserActivity.this.finish();
-                    break;
-                case R.id.security_check_case:
-                    createSecurityCasePopupwindow();
                     break;
                 case R.id.edit_delete:
                     etSearch.setText("");
@@ -270,59 +247,6 @@ public class ContinueCheckUserActivity extends Activity {
             }
         }
         cursor.close(); //游标关闭
-    }
-
-    //popupwindow
-    public void createSecurityCasePopupwindow() {
-        inflater = LayoutInflater.from(ContinueCheckUserActivity.this);
-        securityCaseView = inflater.inflate(R.layout.popupwindow_userlist_choose, null);
-        popupWindow = new PopupWindow(securityCaseView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        //绑定控件ID
-        notSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.not_security_check);
-        passSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.pass_security_check);
-        notPassSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.not_pass_security_check);
-        //设置点击事件
-        notSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                filter.setText(notSecurityCheck.getText());
-            }
-        });
-        passSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                filter.setText(passSecurityCheck.getText());
-            }
-        });
-        notPassSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                filter.setText(notPassSecurityCheck.getText());
-            }
-        });
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
-        popupWindow.setAnimationStyle(R.style.Popupwindow);
-        backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(filter, 200, 0);
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                backgroundAlpha(1.0F);
-            }
-        });
-    }
-
-    //设置背景透明度
-    public void backgroundAlpha(float bgAlpha) {
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.alpha = bgAlpha; //0.0-1.0
-        getWindow().setAttributes(lp);
     }
 
     /**
