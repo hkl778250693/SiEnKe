@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.NoCheckUserAdapter;
+import com.example.administrator.myapplicationsienke.adapter.UserListviewAdapter;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
@@ -57,18 +60,12 @@ public class NoCheckUserListActivity extends Activity {
             @Override
             public void run() {
                 if(task_total_numb != 0){
-                    if (noData.getVisibility() == View.VISIBLE) {
-                        noData.setVisibility(View.GONE);
-                    }
                     for (int i = 0; i < task_total_numb; i++) {
                         getUserInfo(stringList.get(i));//读取未检任务数据
-                        Log.i("NoCheckUserListActivity", "查询的任务编号是：" + stringList.get(i));
                     }
+                    handler.sendEmptyMessage(0);
                 }else {
-                    if (noData.getVisibility() == View.GONE) {
-                        Log.i("NoCheckUserListActivity", "显示没有用户数据照片！");
-                        noData.setVisibility(View.VISIBLE);
-                    }
+                    handler.sendEmptyMessage(1);
                 }
                 super.run();
             }
@@ -93,8 +90,6 @@ public class NoCheckUserListActivity extends Activity {
     //点击事件
     private void setViewClickListener(){
         securityNoCheckBack.setOnClickListener(onClickListener);
-        noCheckUserAdapter = new NoCheckUserAdapter(NoCheckUserListActivity.this, noCheckUserItemList);
-        listView.setAdapter(noCheckUserAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -125,6 +120,27 @@ public class NoCheckUserListActivity extends Activity {
         }
     };
 
+
+    Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 0:
+                    noCheckUserAdapter = new NoCheckUserAdapter(NoCheckUserListActivity.this, noCheckUserItemList);
+                    noCheckUserAdapter.notifyDataSetChanged();
+                    listView.setAdapter(noCheckUserAdapter);
+                    break;
+                case 1:
+                    if (noData.getVisibility() == View.GONE) {
+                        Log.i("ContinueCheckActivity", "显示没有用户数据照片！");
+                        noData.setVisibility(View.VISIBLE);
+                    }
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+    };
+
     //获取任务编号参数
     public void getTaskParams() {
         if (sharedPreferences.getStringSet("stringSet",null) != null && sharedPreferences.getInt("task_total_numb",0) != 0) {
@@ -140,7 +156,15 @@ public class NoCheckUserListActivity extends Activity {
     public void getUserInfo(String taskId) {
         Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});
         //如果游标为空，则显示没有数据图片
-        Log.i("NoCheckUserListActivity", "一共有"+cursor.getCount()+"个用户");
+        if (cursor.getCount() == 0) {
+            if (noData.getVisibility() == View.GONE) {
+                noData.setVisibility(View.VISIBLE);
+            }
+            return;
+        }
+        if (noData.getVisibility() == View.VISIBLE) {
+            noData.setVisibility(View.GONE);
+        }
         while (cursor.moveToNext()) {
             if(cursor.getString(10).equals("false")){
                 UserListviewItem item = new UserListviewItem();
@@ -164,10 +188,10 @@ public class NoCheckUserListActivity extends Activity {
     public void getContinueCheckPosition(String taskId) {
         Log.i("ContinueCheckPosition", "获取继续安检位置进来了！");
         Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
-        //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
         if(cursor.getCount() == 0){
             return;
         }
+        //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
         while (cursor.moveToNext()) {
             Log.i("ContinueCheckPosition", "游标进来了");
             Log.i("ContinueCheckPosition", "安检状态为 = "+cursor.getString(10));
@@ -200,8 +224,6 @@ public class NoCheckUserListActivity extends Activity {
                 item.setIfEdit(R.mipmap.userlist_gray);
                 noCheckUserItemList.remove(currentPosition);
                 noCheckUserAdapter.notifyDataSetChanged();
-                editor.putInt("checkedNumber",sharedPreferences.getInt("checkedNumber",0)+1);
-                editor.commit();
                 Log.i("UserList=ActivityResult", "页面回调进来了");
             }
         }

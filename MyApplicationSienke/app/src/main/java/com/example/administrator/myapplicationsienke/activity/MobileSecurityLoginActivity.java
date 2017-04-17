@@ -220,7 +220,7 @@ public class MobileSecurityLoginActivity extends Activity {
                     finish();
                     break;
                 case 2:
-                    Toast.makeText(MobileSecurityLoginActivity.this, "密码错误!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MobileSecurityLoginActivity.this, "账号或密码错误!", Toast.LENGTH_LONG).show();
                     break;
                 case 3:
                     Toast.makeText(MobileSecurityLoginActivity.this, "网络请求异常!", Toast.LENGTH_LONG).show();

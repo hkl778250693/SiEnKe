@@ -54,9 +54,9 @@ public class NewTaskDetailActivity extends Activity {
     private View view;
     private ImageView back;
     private ListView listView;
-    private TextView securityCheckCase, save, no_data;
+    private TextView filter, save, no_data;
     private EditText setEsearchTextChanged;//搜索框
-    private Button searchBtn;
+    private TextView searchBtn;
     private PopupWindow popupWindow;
     private View securityCaseView;
     private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck;
@@ -79,15 +79,6 @@ public class NewTaskDetailActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_task_datail);
 
-
-        /*//开启支线程进行请求任务信息
-        new Thread() {
-            @Override
-            public void run() {
-                requireMyTask("getCostomer.do", "safetyPlan=");
-                super.run();
-            }
-        }.start();*/
         bindView();//绑定控件
         defaultSetting();//初始化设置
         setOnClickListener();//点击事件
@@ -97,9 +88,9 @@ public class NewTaskDetailActivity extends Activity {
     private void bindView() {
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
-        securityCheckCase = (TextView) findViewById(R.id.security_check_case);
+        filter = (TextView) findViewById(R.id.filter);
         setEsearchTextChanged = (EditText) findViewById(R.id.etSearch);
-        searchBtn = (Button) findViewById(R.id.search_btn);
+        searchBtn = (TextView) findViewById(R.id.search_btn);
         save = (TextView) findViewById(R.id.save);
         no_data = (TextView) findViewById(R.id.no_data);
         rootLinearlayout = (LinearLayout)findViewById(R.id.root_linearlayout);
@@ -108,7 +99,7 @@ public class NewTaskDetailActivity extends Activity {
     //点击事件
     private void setOnClickListener() {
         back.setOnClickListener(onClickListener);
-        securityCheckCase.setOnClickListener(onClickListener);
+        filter.setOnClickListener(onClickListener);
         save.setOnClickListener(onClickListener);
         searchBtn.setOnClickListener(onClickListener);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -127,20 +118,27 @@ public class NewTaskDetailActivity extends Activity {
                 case R.id.back:
                     NewTaskDetailActivity.this.finish();
                     break;
-                case R.id.security_check_case:
+                case R.id.filter:
                     createSecurityCasePopupwindow();
                     break;
                 case R.id.save:
-                    saveTaskInfo();//保存选中的任务编号信息
-                    Toast.makeText(NewTaskDetailActivity.this,"用户信息已保存",Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent();
-                    intent.putParcelableArrayListExtra("parclebleList",parclebleList);
-                    Log.i("NewTaskDetailActivity","parclebleList长度为："+parclebleList.size());
-                    setResult(Activity.RESULT_OK,intent);
-                    finish();
+                    if(newTaskListviewItemList.size() != 0){
+                        saveTaskInfo();//保存选中的任务编号信息
+                        Toast.makeText(NewTaskDetailActivity.this,"添加用户成功！",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent();
+                        intent.putParcelableArrayListExtra("parclebleList",parclebleList);
+                        Log.i("NewTaskDetailActivity","parclebleList长度为："+parclebleList.size());
+                        setResult(Activity.RESULT_OK,intent);
+                        finish();
+                    }else {
+                        Toast.makeText(NewTaskDetailActivity.this,"没有选中用户哦！",Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case R.id.search_btn:
-                    if (securityCheckCase.getText().equals("姓名")) {
+                    if(filter.getText().equals("筛选")){
+                        Toast.makeText(NewTaskDetailActivity.this,"请选择筛选条件哦！",Toast.LENGTH_SHORT).show();
+                    }
+                    if (filter.getText().equals("姓名")) {
                         showPopupwindow();
                         //开启支线程进行请求任务信息
                         new Thread() {
@@ -150,7 +148,7 @@ public class NewTaskDetailActivity extends Activity {
                                 super.run();
                             }
                         }.start();
-                    } else if (securityCheckCase.getText().equals("表编号")) {
+                    } else if (filter.getText().equals("表编号")) {
                         showPopupwindow();
                         //开启支线程进行请求任务信息
                         new Thread() {
@@ -160,7 +158,7 @@ public class NewTaskDetailActivity extends Activity {
                                 super.run();
                             }
                         }.start();
-                    } else if (securityCheckCase.getText().equals("地址")) {
+                    } else if (filter.getText().equals("地址")) {
                         showPopupwindow();
                         //开启支线程进行请求任务信息
                         new Thread() {
@@ -180,7 +178,7 @@ public class NewTaskDetailActivity extends Activity {
     private void defaultSetting() {
         sharedPreferences = NewTaskDetailActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        securityCheckCase.setText("筛选");
+        filter.setText("筛选");
         if (no_data.getVisibility() == View.GONE) {
             no_data.setVisibility(View.VISIBLE);
         }
@@ -220,7 +218,7 @@ public class NewTaskDetailActivity extends Activity {
     public void showPopupwindow() {
         layoutInflater = LayoutInflater.from(NewTaskDetailActivity.this);
         view = layoutInflater.inflate(R.layout.popupwindow_query_loading, null);
-        popupWindow = new PopupWindow(view, 250, 250);
+        popupWindow = new PopupWindow(view, 350, 350);
         frameAnimation = (ImageView) view.findViewById(R.id.frame_animation);
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.loading_shape));
         popupWindow.setAnimationStyle(R.style.dialog);
@@ -251,7 +249,7 @@ public class NewTaskDetailActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(notSecurityCheck.getText());
+                filter.setText(notSecurityCheck.getText());
                 if (no_data.getVisibility() == View.VISIBLE) {
                     no_data.setVisibility(View.GONE);
                 }
@@ -261,7 +259,7 @@ public class NewTaskDetailActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(passSecurityCheck.getText());
+                filter.setText(passSecurityCheck.getText());
                 if (no_data.getVisibility() == View.VISIBLE) {
                     no_data.setVisibility(View.GONE);
                 }
@@ -271,7 +269,7 @@ public class NewTaskDetailActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(notPassSecurityCheck.getText());
+                filter.setText(notPassSecurityCheck.getText());
                 if (no_data.getVisibility() == View.VISIBLE) {
                     no_data.setVisibility(View.GONE);
                 }
@@ -283,7 +281,7 @@ public class NewTaskDetailActivity extends Activity {
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(securityCheckCase, 200, 0);
+        popupWindow.showAsDropDown(filter, 200, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {

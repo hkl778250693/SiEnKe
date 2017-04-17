@@ -27,13 +27,15 @@ import com.example.administrator.myapplicationsienke.fragment.DataTransferFragme
 import com.example.administrator.myapplicationsienke.fragment.SecurityChooseFragment;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Administrator on 2017/3/14.
  */
 public class SecurityChooseActivity extends FragmentActivity {
-    private Button file, settings, quite; //文件管理 系统设置 退出应用
+    private RadioButton file, settings, quite; //文件管理 系统设置 退出应用
     private LayoutInflater inflater; //转换器
     private View popupwindowView;
     private PopupWindow popupWindow;
@@ -46,7 +48,10 @@ public class SecurityChooseActivity extends FragmentActivity {
     private long exitTime = 0;//退出程序
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-
+    private Bundle params;
+    private Set<String> stringSet = new HashSet<>();//保存字符串参数
+    private int task_total_numb;
+    private ArrayList<String> stringList = new ArrayList<>();//得到的字符串集合
 
     //强制竖屏
     @Override
@@ -132,9 +137,9 @@ public class SecurityChooseActivity extends FragmentActivity {
         popupwindowView = inflater.inflate(R.layout.popup_window_security, null);
         popupWindow = new PopupWindow(popupwindowView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
-        file = (Button) popupwindowView.findViewById(R.id.file);//文件管理
-        settings = (Button) popupwindowView.findViewById(R.id.settings);//系统设置
-        quite = (Button) popupwindowView.findViewById(R.id.quite);//安全退出
+        file = (RadioButton) popupwindowView.findViewById(R.id.file);//文件管理
+        settings = (RadioButton) popupwindowView.findViewById(R.id.settings);//系统设置
+        quite = (RadioButton) popupwindowView.findViewById(R.id.quite);//安全退出
         //设置点击事件
         file.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,7 +177,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.check_hidden_danger_down_shape));
         popupWindow.setAnimationStyle(R.style.mypopwindow_anim_style);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(security_check_go, 0, 0);
@@ -198,8 +203,38 @@ public class SecurityChooseActivity extends FragmentActivity {
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         editor.putInt("problem_number",sharedPreferences.getInt("problem_number",0));
-        editor.putInt("checkedNumber",sharedPreferences.getInt("checkedNumber",0));
         editor.commit();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if(intent != null){
+            setIntent(intent);
+            int number = getIntent().getIntExtra("down",0);
+            Log.i("onNewIntent", "onNewIntent进来了！返回的结果="+number);
+            if( number == 1){     //获取任务选择页面传过来的参数，如果参数为 1 ，则让viewpager显示数据传输fragment
+                viewPager.setCurrentItem(1);
+                dataTransferRbt.setChecked(true);
+            }
+            params = getIntent().getExtras();
+            if (params != null) {
+                Log.i("SecurityChooseFragment=", "bundle不为空");
+                task_total_numb = params.getInt("task_total_numb", 0);
+                Log.i("SecurityChooseFragment=", "task_total_numb=" + task_total_numb);
+                stringList = params.getStringArrayList("taskId");
+                if (task_total_numb != 0) {
+                    stringSet.clear();
+                    for (int i = 0; i < task_total_numb; i++) {
+                        stringSet.add(stringList.get(i));
+                        Log.i("onNewIntent====>", "得到的参数为：" +stringList.get(i));
+                    }
+                }
+                editor.putInt("task_total_numb", task_total_numb);
+                editor.putStringSet("stringSet", stringSet);
+                editor.commit();
+            }
+        }
     }
 
     //设置viewPager
@@ -218,21 +253,6 @@ public class SecurityChooseActivity extends FragmentActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        fragmentList.get(0).onActivityResult(requestCode,resultCode, data);
-        if(resultCode == RESULT_OK){
-            Log.i("SecurityChooseActivity=", "返回码="+resultCode);
-            Log.i("SecurityChooseActivity=", "请求码="+requestCode);
-            if(requestCode == 100){  //获取任务选择页面传过来的参数，如果参数为 1 ，则让viewpager显示数据传输fragment
-                if(data != null){
-                    int number = data.getIntExtra("down",0);
-                    Log.i("SecurityChooseActivity=", "返回的结果="+number);
-                    if(number == 1){
-                        dataTransferRbt.setChecked(true);
-                        viewPager.setCurrentItem(1);
-                    }
-                }
-            }
-        }
     }
 
     /**

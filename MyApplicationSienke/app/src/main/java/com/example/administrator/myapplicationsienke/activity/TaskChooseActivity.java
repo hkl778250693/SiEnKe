@@ -43,7 +43,7 @@ public class TaskChooseActivity extends Activity {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private Cursor cursor;
-    private int taskTotalUserNumber=0;
+    private int taskTotalUserNumber = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,18 +104,20 @@ public class TaskChooseActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.save:
-                    if(cursor.getCount() == 0){
-                        Intent intent = new Intent();
-                        intent.putExtra("down",1);  //传递一个 1 的参数到主页面，让他替换fragment
-                        setResult(Activity.RESULT_OK,intent);
+                    if (cursor.getCount() == 0) {
+                        Intent intent1 = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
+                        intent1.putExtra("down", 1);  //传递一个 1 的参数到主页面，让他替换fragment
+                        Log.i("TaskChooseActivity==>", "传递参数成功！");
+                        intent1.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        startActivity(intent1);
                         finish();
-                    }else {
+                    } else {
                         saveTaskInfo(); //保存选中的任务编号信息
-                        //deleteChecked();//删除选中的任务编号信息
                         saveCheckStateInfo();//保存选中状态，将信息写入preference保存以备下一次读取使用
                         Toast.makeText(TaskChooseActivity.this, "保存成功！您可以到用户列表查看哦~", Toast.LENGTH_SHORT).show();
                         intent = new Intent(TaskChooseActivity.this, SecurityChooseActivity.class);
                         transferParams(); //传递任务编号参数到主页面
+                        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                         startActivity(intent);
                         finish();
                     }
@@ -139,7 +141,7 @@ public class TaskChooseActivity extends Activity {
                 Log.i("integers====>", "长度为：" + integers.size());
             }
         }
-        editor.putInt("taskTotalUserNumber",taskTotalUserNumber);
+        editor.putInt("taskTotalUserNumber", taskTotalUserNumber);
         Log.i("taskTotalUserNumber=>", "任务总户数为：" + taskTotalUserNumber);
         editor.commit();
         adapter.notifyDataSetChanged();
@@ -182,7 +184,6 @@ public class TaskChooseActivity extends Activity {
         for (int j = 0; j < integers.size(); j++) {
             stringList.add(map.get("taskId" + integers.get(j)).toString());
             Log.i("bundle.putString====>", "传递的参数为：" + map.get("taskId" + integers.get(j)).toString());
-            Log.i("bundle.putString====>", "传递的参数为：" + map.get("taskId=" + integers.get(j)));
         }
         bundle.putStringArrayList("taskId", stringList);
         bundle.putInt("task_total_numb", integers.size());
@@ -231,7 +232,7 @@ public class TaskChooseActivity extends Activity {
             if (noData.getVisibility() == View.GONE) {
                 noData.setVisibility(View.VISIBLE);
             }
-            new Thread(){
+            new Thread() {
                 @Override
                 public void run() {
                     try {
@@ -245,22 +246,6 @@ public class TaskChooseActivity extends Activity {
             }.start();
             return;
         }
-        /*if (!cursor.isFirst()) {  //是否在第一行
-            cursor.moveToFirst();  //将游标移动到第一行
-        } else {
-            if (noData.getVisibility() == View.VISIBLE) {
-                noData.setVisibility(View.GONE);
-            }
-            while (cursor.moveToNext()) {
-                TaskChoose taskChoose = new TaskChoose();
-                taskChoose.setTaskName(cursor.getString(1));
-                taskChoose.setTaskNumber(cursor.getString(2));
-                taskChoose.setCheckType(cursor.getString(3));
-                taskChoose.setTotalUserNumber(cursor.getString(4));
-                taskChoose.setEndTime(cursor.getString(5));
-                taskChooseList.add(taskChoose);
-            }
-        }*/
         save.setText("保存");
         if (noData.getVisibility() == View.VISIBLE) {
             noData.setVisibility(View.GONE);
@@ -274,19 +259,14 @@ public class TaskChooseActivity extends Activity {
             taskChoose.setEndTime(cursor.getString(5));
             taskChooseList.add(taskChoose);
         }
-        /*int columnNumb = cursor.getColumnCount();
-          for (int i=0;i < columnNumb;i++){  //循环读取每列的数据
-                    String columnName = cursor.getColumnName(i);  //获得每列的列名
-                    String taskName = cursor.getString(i);  //获取每列对应的值
-                }*/
         //cursor游标操作完成以后,一定要关闭
         cursor.close();
     }
 
-    Handler handler = new Handler(){
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what == 0){
+            if (msg.what == 0) {
                 Toast.makeText(TaskChooseActivity.this, "您还没有任务哦，快去下载吧！~", Toast.LENGTH_SHORT).show();
             }
             super.handleMessage(msg);

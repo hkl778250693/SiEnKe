@@ -40,7 +40,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:scrollbars="none"
         android:fillViewport="true">
 
@@ -368,11 +368,11 @@
                     android:background="@drawable/linearlayout_shape"
                     android:hint="请输入表编号"
                     android:textColor="@color/text_gray"
-                    android:textSize="14sp"
-                    android:paddingTop="7dp"
-                    android:paddingBottom="7dp"
+                    android:textSize="12sp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
                     android:paddingLeft="8dp"
-                    android:paddingRight="5dp"/>
+                    android:paddingRight="8dp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -397,11 +397,11 @@
                     android:background="@drawable/linearlayout_shape"
                     android:hint="备注信息"
                     android:textColor="@color/text_gray"
-                    android:textSize="14sp"
-                    android:paddingTop="7dp"
-                    android:paddingBottom="7dp"
+                    android:textSize="12sp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
                     android:paddingLeft="8dp"
-                    android:paddingRight="5dp"/>
+                    android:paddingRight="8dp"/>
             </LinearLayout>
 
             <RelativeLayout
@@ -477,38 +477,43 @@
                 android:orientation="horizontal"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:paddingTop="16dp">
+                android:paddingTop="16dp"
+                android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="备        注："
+                    android:layout_marginRight="5dp"
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="(最多可保存9张图片)"
+                    android:layout_marginRight="5dp"
+                    android:textColor="@color/text_gray"
+                    android:textSize="12sp" />
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="140dp"
-                    android:layout_marginLeft="5dp"
-                    android:background="@drawable/check_hidden_danger_down_shape"
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/check_hidden_danger_down_shape"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center_horizontal">
+                <com.example.administrator.myapplicationsienke.mode.MyGridview
+                    android:id="@+id/gridview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:stretchMode="columnWidth"
                     android:gravity="center"
-                    android:orientation="horizontal"
-                    android:padding="10dp">
-                    
-                    <GridView
-                        android:id="@+id/gridview"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:stretchMode="columnWidth"
-                        android:gravity="center"
-                        android:numColumns="3"
-                        android:columnWidth="60dp"
-                        android:horizontalSpacing="3dp"
-                        android:verticalSpacing="5dp"
-                        android:scrollbars="none"/>
-
-                </LinearLayout>
+                    android:numColumns="5"
+                    android:verticalSpacing="5dp"/>
             </LinearLayout>
 
             <Button
@@ -520,7 +525,7 @@
                 android:layout_marginLeft="11dp"
                 android:layout_marginRight="11dp"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/button_selector"
+                android:background="@drawable/user_detail_save_btn_selector"
                 android:text="保 存"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />

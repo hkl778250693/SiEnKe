@@ -41,10 +41,9 @@ import java.util.List;
  * Created by Administrator on 2017/3/16.
  */
 public class UserListActivity extends Activity {
-    private ImageView back, tiaoZhuan, editDelete;
+    private ImageView back,editDelete;
     private ListView listView;
     private TextView filter, noData;
-    private Button backBtn, nextBtn, searchBtn;
     private LayoutInflater inflater;  //转换器
     private View securityCaseView;
     private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck;
@@ -73,16 +72,15 @@ public class UserListActivity extends Activity {
             @Override
             public void run() {
                 if (task_total_numb != 0) {
-                    if (noData.getVisibility() == View.VISIBLE) {
-                        noData.setVisibility(View.GONE);
-                    }
                     for (int i = 0; i < task_total_numb; i++) {
+                        Log.i("UserListActivity----", "查询的任务编号条数为：" + task_total_numb+stringList);
                         getUserData(stringList.get(i));//读取所有安检用户数据
-                        Log.i("UserListActivity", "查询的任务编号是：" + stringList.get(i));
+                        Log.i("UserListActivity----", "查询的任务编号是：" + stringList.get(i));
                     }
+                    handler.sendEmptyMessage(0);
                 } else {
                     if (noData.getVisibility() == View.GONE) {
-                        Log.i("UserListActivity", "显示没有用户数据照片！");
+                        Log.i("UserListActivity_noData", "显示没有用户数据照片！");
                         noData.setVisibility(View.VISIBLE);
                     }
                 }
@@ -108,7 +106,6 @@ public class UserListActivity extends Activity {
         listView = (ListView) findViewById(R.id.listview);
         filter = (TextView) findViewById(R.id.filter);
         noData = (TextView) findViewById(R.id.no_data);
-        searchBtn = (Button) findViewById(R.id.search_btn);
         etSearch = (EditText) findViewById(R.id.etSearch);
         editDelete = (ImageView) findViewById(R.id.edit_delete);
     }
@@ -124,13 +121,8 @@ public class UserListActivity extends Activity {
     //点击事件
     private void setOnClickListener() {
         back.setOnClickListener(onClickListener);
-        tiaoZhuan.setOnClickListener(onClickListener);
-        backBtn.setOnClickListener(onClickListener);
-        nextBtn.setOnClickListener(onClickListener);
         filter.setOnClickListener(onClickListener);
         editDelete.setOnClickListener(onClickListener);
-        userListviewAdapter = new UserListviewAdapter(UserListActivity.this, userListviewItemList);
-        listView.setAdapter(userListviewAdapter);
         listView.setTextFilterEnabled(true);  // 开启过滤功能
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -139,7 +131,7 @@ public class UserListActivity extends Activity {
                 currentPosition = position;
                 Intent intent = new Intent(UserListActivity.this, UserDetailInfoActivity.class);
                 intent.putExtra("position", position);
-                intent.putExtra("user_id",item.getUserId());
+                intent.putExtra("security_id",item.getSecurityNumber());
                 startActivityForResult(intent, position);
             }
         });
@@ -154,11 +146,15 @@ public class UserListActivity extends Activity {
                 Log.i("UserListActivity", "onTextChanged进来了" );
                 if(TextUtils.isEmpty(s.toString().trim())){
                     listView.clearTextFilter();    //搜索文本为空时，清除ListView的过滤
+                    if(userListviewAdapter != null){
+                        userListviewAdapter.getFilter().filter("");
+                    }
                     if (editDelete.getVisibility() == View.VISIBLE) {
                         editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
                     }
                 }else {
-                    listView.setFilterText(s.toString().trim());  //设置过滤关键字
+                    userListviewAdapter.getFilter().filter(s);
+                    //listView.setFilterText(s.toString().trim());  //设置过滤关键字
                     if (editDelete.getVisibility() == View.GONE) {
                         editDelete.setVisibility(View.VISIBLE);  //反之则显示
                     }
@@ -191,11 +187,7 @@ public class UserListActivity extends Activity {
                 case R.id.edit_delete:
                     etSearch.setText("");
                     editDelete.setVisibility(View.GONE);
-                    for (int i = 0; i < task_total_numb; i++) {
-                        getUserData(stringList.get(i));//读取所有安检用户数据
-                        Log.i("UserListActivity", "查询的任务编号是：" + stringList.get(i));
-                    }
-                    handler.sendEmptyMessage(1);
+                    userListviewAdapter.getFilter().filter("");
                     break;
             }
         }
@@ -206,9 +198,9 @@ public class UserListActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 0:
-                    break;
-                case 1:
+                    userListviewAdapter = new UserListviewAdapter(UserListActivity.this, userListviewItemList);
                     userListviewAdapter.notifyDataSetChanged();
+                    listView.setAdapter(userListviewAdapter);
                     break;
             }
             super.handleMessage(msg);
@@ -222,6 +214,7 @@ public class UserListActivity extends Activity {
             Iterator iterator = sharedPreferences.getStringSet("stringSet", null).iterator();
             while (iterator.hasNext()) {
                 stringList.add(iterator.next().toString());
+                Log.i("UserListActivity====>", "得到的参数为：" +stringList);
             }
             task_total_numb = sharedPreferences.getInt("task_total_numb", 0);
         }
@@ -323,6 +316,7 @@ public class UserListActivity extends Activity {
         //如果游标为空，则显示没有数据图片
         if (cursor.getCount() == 0) {
             if (noData.getVisibility() == View.GONE) {
+                Log.i("UserList_getUserData", "显示没有用户数据照片！");
                 noData.setVisibility(View.VISIBLE);
             }
             return;
@@ -393,8 +387,6 @@ public class UserListActivity extends Activity {
                 updateUserCheckedState(); //更新本地数据库用户表安检状态
                 item.setIfEdit(R.mipmap.userlist_gray);
                 userListviewAdapter.notifyDataSetChanged();
-                editor.putInt("checkedNumber", sharedPreferences.getInt("checkedNumber", 0) + 1);
-                editor.commit();
                 Log.i("UserList=ActivityResult", "页面回调进来了");
             }
         }
