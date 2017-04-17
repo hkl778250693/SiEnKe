@@ -203,7 +203,7 @@ public class ContinueCheckUserActivity extends Activity {
                     new Thread(){
                         @Override
                         public void run() {
-                            handler.sendEmptyMessage(0);
+                            handler.sendEmptyMessage(3);
                         }
                     }.start();
                     break;
@@ -218,7 +218,7 @@ public class ContinueCheckUserActivity extends Activity {
                 case 0:
                     if(!sharedPreferences.getString("continuePosition","").equals("")){
                         listView.setSelection(Integer.parseInt(continuePosition));  //让listview显示上次安检的位置
-                        Log.i("Continue_edit_delete", "列表显示当前的位置是：" + continuePosition);
+                        Log.i("ContinueCheckActivity", "列表显示当前的位置是：" + continuePosition);
                     }
                     break;
                 case 1:
@@ -230,6 +230,12 @@ public class ContinueCheckUserActivity extends Activity {
                     if (noData.getVisibility() == View.GONE) {
                         Log.i("ContinueCheckActivity", "显示没有用户数据照片！");
                         noData.setVisibility(View.VISIBLE);
+                    }
+                    break;
+                case 3:
+                    if(!sharedPreferences.getString("continuePosition","").equals("")){
+                        listView.setSelection(Integer.parseInt(sharedPreferences.getString("continuePosition","")));  //让listview显示上次安检的位置
+                        Log.i("Continue_edit_delete", "列表显示当前的位置是：" + sharedPreferences.getString("continuePosition",""));
                     }
                     break;
             }
