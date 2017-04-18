@@ -135,7 +135,9 @@ public class NoCheckUserListActivity extends Activity {
                         editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
                     }
                 }else {
-                    noCheckUserAdapter.getFilter().filter(s);
+                    if(noCheckUserAdapter != null){
+                        noCheckUserAdapter.getFilter().filter(s);
+                    }
                     if (editDelete.getVisibility() == View.GONE) {
                         editDelete.setVisibility(View.VISIBLE);  //反之则显示
                     }
@@ -166,7 +168,9 @@ public class NoCheckUserListActivity extends Activity {
                 case R.id.edit_delete:
                     etSearch.setText("");
                     editDelete.setVisibility(View.GONE);
-                    noCheckUserAdapter.getFilter().filter("");
+                    if(noCheckUserAdapter != null){
+                        noCheckUserAdapter.getFilter().filter("");
+                    }
                     break;
             }
         }

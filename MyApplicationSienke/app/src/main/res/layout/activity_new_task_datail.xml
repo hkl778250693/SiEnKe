@@ -54,10 +54,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:background="@drawable/check_hidden_danger_down_shape"
-            android:drawablePadding="15dp"
+            android:drawablePadding="5dp"
             android:drawableRight="@mipmap/down"
             android:layout_marginRight="10dp"
-            android:padding="7dp"
+            android:padding="6dp"
             android:text="姓名"
             android:textColor="@color/text_gray"
             android:textSize="14sp" />

@@ -18,9 +18,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,9 +52,10 @@ import java.util.List;
  * Created by Administrator on 2017/3/16 0016.
  */
 public class DataTransferFragment extends Fragment {
-    private View view;
-    private TextView upload, download;
-    private LinearLayout rootLinearlayout;
+    private View view,popupwindowView;
+    private TextView upload, download, progressName, progressPercent;
+    private LinearLayout rootLinearlayout,linearlayoutDown;
+    private Button finishBtn;
     private String taskResult, userResult; //网络请求结果
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -60,13 +64,17 @@ public class DataTransferFragment extends Fragment {
     public int asyncResponseCode = 0;
     private LayoutInflater layoutInflater;
     private PopupWindow popupWindow;
-    private ImageView frameAnimation;
     private AnimationDrawable animationDrawable;
-    private List<DownloadListvieItem> downloadListvieItemList = new ArrayList<>();
     private JSONObject taskObject, userObject;
     private SQLiteDatabase db;  //数据库
     private int totalCount = 0;  //总户数
-    List<String> taskNumbList = new ArrayList<>();
+    private List<String> taskNumbList = new ArrayList<>();
+    private ProgressBar downloadProgress;  //下载进度条
+    private int currentProgress = 0;
+    private int currentPercent = 0;
+    private int userProgress = 0;
+    private JSONArray jsonArray;
+
 
     @Nullable
     @Override
@@ -101,18 +109,11 @@ public class DataTransferFragment extends Fragment {
                     startActivity(intent);
                     break;
                 case R.id.download:
-                    showPopupwindow();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
                     //开启支线程进行请求任务信息
                     new Thread() {
                         @Override
                         public void run() {
-                            requireMyTask("SafeCheckPlan.do","safePlanMember=");
+                            requireMyTask("SafeCheckPlan.do", "safePlanMember=");
                             super.run();
                         }
                     }.start();
@@ -132,12 +133,23 @@ public class DataTransferFragment extends Fragment {
     //show弹出框
     public void showPopupwindow() {
         layoutInflater = LayoutInflater.from(getActivity());
-        view = layoutInflater.inflate(R.layout.popupwindow_query_loading, null);
-        popupWindow = new PopupWindow(view, 350, 350);
-        frameAnimation = (ImageView) view.findViewById(R.id.frame_animation);
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.loading_shape));
-        popupWindow.setAnimationStyle(R.style.dialog);
-        popupWindow.update();
+        popupwindowView = layoutInflater.inflate(R.layout.popupwindow_download_progressbar, null);
+        popupWindow = new PopupWindow(popupwindowView, 500, LinearLayout.LayoutParams.WRAP_CONTENT);
+        linearlayoutDown = (LinearLayout) popupwindowView.findViewById(R.id.linearlayout_down);
+        finishBtn = (Button) popupwindowView.findViewById(R.id.finish_btn);
+        downloadProgress = (ProgressBar) popupwindowView.findViewById(R.id.download_progress);
+        progressName = (TextView) popupwindowView.findViewById(R.id.progress_name);
+        progressPercent = (TextView) popupwindowView.findViewById(R.id.progress_percent);
+        downloadProgress.setMax(10*jsonArray.length());
+        progressName.setText("任务正在下载，请稍后...");
+        finishBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                downloadProgress.setProgress(0);
+                popupWindow.dismiss();
+            }
+        });
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.business_check_shape));
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
@@ -146,8 +158,6 @@ public class DataTransferFragment extends Fragment {
                 backgroundAlpha(1.0F);
             }
         });
-        //开始加载动画
-        startFrameAnimation();
     }
 
     //设置背景透明度
@@ -155,13 +165,6 @@ public class DataTransferFragment extends Fragment {
         WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
         lp.alpha = bgAlpha; //0.0-1.0
         getActivity().getWindow().setAttributes(lp);
-    }
-
-    //开始帧动画
-    public void startFrameAnimation() {
-        frameAnimation.setBackgroundResource(R.drawable.frame_animation_list);
-        animationDrawable = (AnimationDrawable) frameAnimation.getDrawable();
-        animationDrawable.start();
     }
 
     //请求网络数据
@@ -188,20 +191,24 @@ public class DataTransferFragment extends Fragment {
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
                     if (!keyAndValue.equals("")) {
-                        url = new URL(httpUrl + "?" + keyAndValue + URLEncoder.encode("杜述洪","UTF-8"));
+                        url = new URL(httpUrl + "?" + keyAndValue + URLEncoder.encode("杜述洪", "UTF-8"));
                         //没有参数传递
                     } else {
                         url = new URL(httpUrl);
                     }
                     Log.i("url=============>", url + "");
                     httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setRequestMethod("GET");
+                    httpURLConnection.setRequestProperty("Accept-Encoding", "identity");
+                    httpURLConnection.setRequestProperty("Content-Type", "applicaton/json;charset=UTF-8");
                     httpURLConnection.setConnectTimeout(6000);
                     httpURLConnection.setReadTimeout(6000);
                     httpURLConnection.connect();
                     //传回的数据解析成String
-                    Log.i("responseCode====>", httpURLConnection.getResponseCode() + "");
                     if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
                         InputStream inputStream = httpURLConnection.getInputStream();
+                        Log.i("start_inputStream==>", "" + inputStream);
+                        Log.i("mid_inputStream==>", "" + inputStream);
                         InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                         StringBuilder stringBuilder = new StringBuilder();
@@ -209,8 +216,9 @@ public class DataTransferFragment extends Fragment {
                         while ((str = bufferedReader.readLine()) != null) {
                             stringBuilder.append(str);
                         }
+                        Log.i("end_inputStream==>", "" + inputStream);
                         taskResult = stringBuilder.toString();
-                        Log.i("taskResult=====>",taskResult);
+                        Log.i("taskResult=====>", taskResult);
                         JSONObject jsonObject = new JSONObject(taskResult);
                         if (!jsonObject.optString("total", "").equals("0")) {
                             handler.sendEmptyMessage(1);
@@ -246,12 +254,12 @@ public class DataTransferFragment extends Fragment {
     }
 
     //自定义异步任务
-                                     //启动任务的参数，进度参数，结果参数
-    public class MyAsyncTask extends AsyncTask<String,Integer,String>{
+    //启动任务的参数，进度参数，结果参数
+    public class MyAsyncTask extends AsyncTask<String, Integer, String> {
         @Override
         protected void onPreExecute() {
             //在execute(Params... params)被调用后立即执行，一般用来在执行后台任务前对UI做一些标记。
-            Log.i("onPreExecute===>","onPreExecute进来了！");
+            Log.i("onPreExecute===>", "onPreExecute进来了！");
             super.onPreExecute();
         }
 
@@ -259,8 +267,8 @@ public class DataTransferFragment extends Fragment {
         protected String doInBackground(String... params) {    //所有的耗时操作都在此时进行，不能进行UI操作
             URL url = null;
             try {
-                url= new URL(params[0]);
-                Log.i("doInBackground===>","url="+url);
+                url = new URL(params[0]);
+                Log.i("doInBackground===>", "url=" + url);
                 HttpURLConnection httpURLConnection;
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setConnectTimeout(6000);
@@ -281,17 +289,17 @@ public class DataTransferFragment extends Fragment {
                     Log.i("userResult==========>", userResult);
                     JSONObject jsonObject = new JSONObject(userResult);
                     if (!jsonObject.optString("total", "").equals("0")) {
-                        if(url.toString().contains(taskNumbList.get(taskNumbList.size()-1))){
+                        if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
                             handler.sendEmptyMessage(5);
                         }
                         return userResult;
                     } else {
-                        if(url.toString().contains(taskNumbList.get(taskNumbList.size()-1))){
+                        if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
                             handler.sendEmptyMessage(4);
                         }
                     }
-                }else {
-                    if(url.toString().contains(taskNumbList.get(taskNumbList.size()-1))){
+                } else {
+                    if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
                         handler.sendEmptyMessage(6);
                     }
                 }
@@ -301,7 +309,7 @@ public class DataTransferFragment extends Fragment {
                 e.printStackTrace();
             } catch (IOException e) {
                 Log.i("IOException==========>", "网络请求异常!");
-                if(url.toString().contains(taskNumbList.get(taskNumbList.size()-1))){
+                if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
                     handler.sendEmptyMessage(3);
                 }
                 e.printStackTrace();
@@ -314,11 +322,15 @@ public class DataTransferFragment extends Fragment {
         @Override
         protected void onProgressUpdate(Integer... values) {   //更新类似于进度条的控件的进度效果
             super.onProgressUpdate(values);
+            if(isCancelled()){
+                return;
+            }
+            downloadProgress.setProgress(values[0]);
         }
 
         @Override
         protected void onPostExecute(String s) {  //执行UI操作
-            if(s != null){
+            if (s != null) {
                 try {
                     JSONObject jsonObject = new JSONObject(s);
                     JSONArray jsonArray = jsonObject.getJSONArray("rows");
@@ -336,29 +348,73 @@ public class DataTransferFragment extends Fragment {
     }
 
     //开始异步任务
-    public void startAsyncTask(){
+    public void startAsyncTask() {
         Log.i("startAsyncTask========>", "异步任务进来了！");
         if (!sharedPreferences.getString("security_ip", "").equals("")) {
             ip = sharedPreferences.getString("security_ip", "");
-            Log.i("sharedPreferences=ip=>",ip);
-        }else {
+            Log.i("sharedPreferences=ip=>", ip);
+        } else {
             ip = "88.88.88.66:";
         }
         if (!sharedPreferences.getString("security_port", "").equals("")) {
             port = sharedPreferences.getString("security_port", "");
-            Log.i("sharedPreferences=ip=>",port);
+            Log.i("sharedPreferences=ip=>", port);
         } else {
             port = "8088";
         }
-        String httpUrl = "http://" + ip + port + "/SMDemo/" + "getUserCheck.do?"+"safetyPlan=";
-        String url;
-        Log.i("startAsyncTask========>", "任务编号个数为："+taskNumbList.size());
-        for(int i = 0;i<taskNumbList.size();i++){
-            MyAsyncTask myAsyncTask = new MyAsyncTask();
-            url = httpUrl + taskNumbList.get(i);
-            Log.i("startAsyncTask========>", url);
-            myAsyncTask.execute(url);
-        }
+        new Thread(){
+            @Override
+            public void run() {
+                String url;
+                String httpUrl = "http://" + ip + port + "/SMDemo/" + "getUserCheck.do?" + "safetyPlan=";
+                Log.i("startAsyncTask========>", "任务编号个数为：" + taskNumbList.size());
+                for (int i = 0; i < taskNumbList.size(); i++) {
+                    MyAsyncTask myAsyncTask = new MyAsyncTask();
+                    url = httpUrl + taskNumbList.get(i);
+                    Log.i("startAsyncTask========>", url);
+                    myAsyncTask.execute(url);
+                    try {
+                        Thread.sleep(500);
+                        userProgress += 10*taskNumbList.size() / taskNumbList.size();
+                        currentPercent = (1000*(i+1)) / (10*taskNumbList.size());
+                        Message msg = new Message();
+                        msg.what = 9;
+                        msg.arg1 = userProgress;
+                        msg.arg2 = currentPercent;
+                        handler.sendMessage(msg);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                handler.sendEmptyMessage(10);
+            }
+        }.start();
+    }
+
+    public void setProgress(){
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    for(int i = 0;i<jsonArray.length();i++){
+                        Thread.sleep(200);
+                        currentProgress += 10*jsonArray.length() / jsonArray.length();
+                        currentPercent = (1000*(i+1)) / (10*jsonArray.length());
+                        Message msg = new Message();
+                        msg.what = 7;
+                        msg.arg1 = currentProgress;
+                        msg.arg2 = currentPercent;
+                        handler.sendMessage(msg);
+                        Log.i("down_progress=>", " 更新进度条"+currentProgress);
+                        Log.i("down_progress=>", " 下载进度: "+currentPercent);
+                    }
+                    handler.sendEmptyMessage(8);
+                    startAsyncTask();//开启异步任务获取所有任务编号的用户数据
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     Handler handler = new Handler() {
@@ -368,23 +424,20 @@ public class DataTransferFragment extends Fragment {
                 case 1:
                     try {
                         JSONObject jsonObject = new JSONObject(taskResult);
-                        JSONArray jsonArray = jsonObject.getJSONArray("rows");
-                        Log.i("jsonArray==========>", "jsonArray=="+jsonArray.length());
+                        jsonArray = jsonObject.getJSONArray("rows");
+                        showPopupwindow();
+                        Log.i("jsonArray==========>", "jsonArray==" + jsonArray.length());
                         for (int i = 0; i < jsonArray.length(); i++) {
                             taskObject = jsonArray.getJSONObject(i);
                             insertTaskDataBase();
-                            taskNumbList.add(taskObject.optInt("safetyplanId",0)+"");
+                            taskNumbList.add(taskObject.optInt("safetyplanId", 0) + "");
                         }
-                        Log.i("taskNumbList====>", "一共有"+taskNumbList.size()+"个任务");
-                        Thread.sleep(1000);
-                        editor.putInt("totalCount",totalCount);
+                        Log.i("taskNumbList====>", "一共有" + taskNumbList.size() + "个任务");
+                        editor.putInt("totalCount", totalCount);
                         editor.commit();
-                        Log.i("totalCount==========>", "总户数="+totalCount);
-                        Toast.makeText(getActivity(), "任务下载完成，用户信息正在下载，请稍等...", Toast.LENGTH_SHORT).show();
-                        startAsyncTask();//开启异步任务获取所有任务编号的用户数据
+                        Log.i("totalCount==========>", "总户数=" + totalCount);
+                        setProgress();
                     } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     break;
@@ -401,12 +454,38 @@ public class DataTransferFragment extends Fragment {
                     Toast.makeText(getActivity(), "没有相应的用户数据！", Toast.LENGTH_SHORT).show();
                     break;
                 case 5:
-                    popupWindow.dismiss();
-                    Toast.makeText(getActivity(), "用户信息下载完成！", Toast.LENGTH_SHORT).show();
+                    /*progressName.setText("数据下载完成！");
+                    linearlayoutDown.setVisibility(View.GONE);
+                    finishBtn.setVisibility(View.VISIBLE);
+                    userProgress = 0;
+                    currentPercent = 0;*/
                     break;
                 case 6:
                     popupWindow.dismiss();
                     Toast.makeText(getActivity(), "用户信息请求网络超时！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 7:
+                    progressPercent.setText(String.valueOf(msg.arg2));
+                    downloadProgress.setProgress(msg.arg1);
+                    Log.i("down_progress=>", " 任务进度为：" + downloadProgress.getProgress());
+                    break;
+                case 8:
+                    downloadProgress.setProgress(0);
+                    progressName.setText("用户信息正在下载，请稍等...");
+                    progressPercent.setText("0");
+                    currentProgress = 0;
+                    currentPercent = 0;
+                    break;
+                case 9:
+                    progressPercent.setText(String.valueOf(msg.arg2));
+                    downloadProgress.setProgress(msg.arg1);
+                    break;
+                case 10:
+                    progressName.setText("数据下载完成！");
+                    linearlayoutDown.setVisibility(View.GONE);
+                    finishBtn.setVisibility(View.VISIBLE);
+                    userProgress = 0;
+                    currentPercent = 0;
                     break;
             }
             super.handleMessage(msg);
@@ -425,8 +504,8 @@ public class DataTransferFragment extends Fragment {
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
-        db.insert("Task",null,values);
-        Log.i("db==========>","task_db!"+db);
+        db.insert("Task", null, values);
+        Log.i("db==========>", "task_db!" + db);
     }
 
     //将服务器下载的用户信息数据存到本地数据库用户表
@@ -438,7 +517,7 @@ public class DataTransferFragment extends Fragment {
         values.put("userPhone", userObject.optString("userPhone", ""));
         values.put("securityType", userObject.optString("securityName", ""));
         values.put("oldUserId", userObject.optString("oldUserId", ""));
-        Log.i("data_down_load","下载的用户ID为："+userObject.optString("oldUserId", ""));
+        Log.i("data_down_load", "下载的用户ID为：" + userObject.optString("oldUserId", ""));
         values.put("newUserId", userObject.optString("userId", ""));
         values.put("userAddress", userObject.optString("userAdress", ""));
         values.put("taskId", userObject.optInt("safetyPlan", 0) + "");
