@@ -69,10 +69,9 @@ public class NewTaskActivity extends Activity {
     private int year1;
     private int month1;
     private int day1;
-    private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck, overSecurityCheckTime;
     private RadioButton commonSecurityCheck, yearPlan, reCheck, passGasSecurityCheck;
     private LayoutInflater inflater;  //转换器
-    private View securityCaseView, securityHiddenreasonView;
+    private View  securityHiddenreasonView;
     private PopupWindow popupWindow;
     private ImageView newTaskBack;
     private Button newPlanAddBtn;
