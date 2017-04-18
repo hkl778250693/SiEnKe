@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/progress_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="任务下载中，请稍后..."
+        android:textColor="@color/text_gray" />
+
+    <ProgressBar
+        android:id="@+id/download_progress"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:layout_marginTop="10dp"
+        android:max="100"
+        android:progressDrawable="@drawable/progressbar_layer_list" />
+
+    <LinearLayout
+        android:id="@+id/linearlayout_down"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="下载进度为：" />
+
+        <TextView
+            android:id="@+id/progress_percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/theme_colors" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="%"
+            android:textColor="@color/theme_colors" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/finish_btn"
+        android:layout_width="60dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/user_detail_save_btn_selector"
+        android:text="确定"
+        android:visibility="gone"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@android:color/white"
+        android:textSize="12sp" />
+
+</LinearLayout>

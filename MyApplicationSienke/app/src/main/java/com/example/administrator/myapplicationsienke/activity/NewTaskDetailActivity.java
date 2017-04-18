@@ -139,15 +139,19 @@ public class NewTaskDetailActivity extends Activity {
                         Toast.makeText(NewTaskDetailActivity.this, "请选择筛选条件哦！", Toast.LENGTH_SHORT).show();
                     }
                     if (filter.getText().equals("姓名")) {
-                        showPopupwindow();
-                        //开启支线程进行请求任务信息
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                requireMyTask("getCostomer.do", "userName=" + setEsearchTextChanged.getText().toString());
-                                super.run();
-                            }
-                        }.start();
+                        if(setEsearchTextChanged.getText().length() >= 2){
+                            showPopupwindow();
+                            //开启支线程进行请求任务信息
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    requireMyTask("getCostomer.do", "userName=" + setEsearchTextChanged.getText().toString());
+                                    super.run();
+                                }
+                            }.start();
+                        }else {
+                            Toast.makeText(NewTaskDetailActivity.this, "请至少输入两个字哦！", Toast.LENGTH_SHORT).show();
+                        }
                     } else if (filter.getText().equals("表编号")) {
                         showPopupwindow();
                         //开启支线程进行请求任务信息

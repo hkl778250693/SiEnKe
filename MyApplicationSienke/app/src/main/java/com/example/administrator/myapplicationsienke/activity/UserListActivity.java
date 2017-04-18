@@ -149,7 +149,9 @@ public class UserListActivity extends Activity {
                         editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
                     }
                 }else {
-                    userListviewAdapter.getFilter().filter(s);
+                    if(userListviewAdapter != null){
+                        userListviewAdapter.getFilter().filter(s);
+                    }
                     //listView.setFilterText(s.toString().trim());  //设置过滤关键字
                     if (editDelete.getVisibility() == View.GONE) {
                         editDelete.setVisibility(View.VISIBLE);  //反之则显示
@@ -180,7 +182,9 @@ public class UserListActivity extends Activity {
                 case R.id.edit_delete:
                     etSearch.setText("");
                     editDelete.setVisibility(View.GONE);
-                    userListviewAdapter.getFilter().filter("");
+                    if(userListviewAdapter != null){
+                        userListviewAdapter.getFilter().filter("");
+                    }
                     break;
             }
         }
