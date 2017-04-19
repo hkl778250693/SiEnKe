@@ -71,6 +71,7 @@ public class DataTransferFragment extends Fragment {
     private List<String> taskNumbList = new ArrayList<>();
     private ProgressBar downloadProgress;  //下载进度条
     private int currentProgress = 0;
+    private int currentUserPercent = 0;
     private int currentPercent = 0;
     private int userProgress = 0;
     private JSONArray jsonArray;
@@ -368,6 +369,7 @@ public class DataTransferFragment extends Fragment {
                 String url;
                 String httpUrl = "http://" + ip + port + "/SMDemo/" + "getUserCheck.do?" + "safetyPlan=";
                 Log.i("startAsyncTask========>", "任务编号个数为：" + taskNumbList.size());
+                currentUserPercent = 0;
                 for (int i = 0; i < taskNumbList.size(); i++) {
                     MyAsyncTask myAsyncTask = new MyAsyncTask();
                     url = httpUrl + taskNumbList.get(i);
@@ -376,11 +378,14 @@ public class DataTransferFragment extends Fragment {
                     try {
                         Thread.sleep(500);
                         userProgress += 10*taskNumbList.size() / taskNumbList.size();
-                        currentPercent = (1000*(i+1)) / (10*taskNumbList.size());
+                        currentUserPercent = (1000*(i+1)) / (10*taskNumbList.size());
                         Message msg = new Message();
                         msg.what = 9;
                         msg.arg1 = userProgress;
-                        msg.arg2 = currentPercent;
+                        msg.arg2 = currentUserPercent;
+                        Log.i("down_user_progress=>", " 循环次数为"+taskNumbList.size());
+                        Log.i("down_user_progress=>", " 更新进度条"+userProgress);
+                        Log.i("down_user_progress=>", " 下载进度: "+currentUserPercent);
                         handler.sendMessage(msg);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -405,8 +410,8 @@ public class DataTransferFragment extends Fragment {
                         msg.arg1 = currentProgress;
                         msg.arg2 = currentPercent;
                         handler.sendMessage(msg);
-                        Log.i("down_progress=>", " 更新进度条"+currentProgress);
-                        Log.i("down_progress=>", " 下载进度: "+currentPercent);
+                        Log.i("down_task_progress=>", " 更新进度条"+currentProgress);
+                        Log.i("down_task_progress=>", " 下载进度: "+currentPercent);
                     }
                     handler.sendEmptyMessage(8);
                     startAsyncTask();//开启异步任务获取所有任务编号的用户数据
@@ -426,6 +431,7 @@ public class DataTransferFragment extends Fragment {
                         JSONObject jsonObject = new JSONObject(taskResult);
                         jsonArray = jsonObject.getJSONArray("rows");
                         showPopupwindow();
+                        taskNumbList.clear();
                         Log.i("jsonArray==========>", "jsonArray==" + jsonArray.length());
                         for (int i = 0; i < jsonArray.length(); i++) {
                             taskObject = jsonArray.getJSONObject(i);
@@ -454,11 +460,7 @@ public class DataTransferFragment extends Fragment {
                     Toast.makeText(getActivity(), "没有相应的用户数据！", Toast.LENGTH_SHORT).show();
                     break;
                 case 5:
-                    /*progressName.setText("数据下载完成！");
-                    linearlayoutDown.setVisibility(View.GONE);
-                    finishBtn.setVisibility(View.VISIBLE);
-                    userProgress = 0;
-                    currentPercent = 0;*/
+
                     break;
                 case 6:
                     popupWindow.dismiss();
@@ -485,7 +487,7 @@ public class DataTransferFragment extends Fragment {
                     linearlayoutDown.setVisibility(View.GONE);
                     finishBtn.setVisibility(View.VISIBLE);
                     userProgress = 0;
-                    currentPercent = 0;
+                    currentUserPercent = 0;
                     break;
             }
             super.handleMessage(msg);

@@ -96,6 +96,7 @@ public class TaskChooseActivity extends Activity {
     private void setViewClickListener() {
         save.setOnClickListener(onClickListener);
         adapter = new TaskChooseAdapter(TaskChooseActivity.this, taskChooseList);
+        adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
     }
 
@@ -148,7 +149,6 @@ public class TaskChooseActivity extends Activity {
         editor.putInt("taskTotalUserNumber", taskTotalUserNumber);
         Log.i("taskTotalUserNumber=>", "任务总户数为：" + taskTotalUserNumber);
         editor.commit();
-        adapter.notifyDataSetChanged();
     }
 
     //保存选中状态，将信息写入preference保存以备下一次读取使用
@@ -270,8 +270,15 @@ public class TaskChooseActivity extends Activity {
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == 0) {
-                Toast.makeText(TaskChooseActivity.this, "您还没有任务哦，快去下载吧！~", Toast.LENGTH_SHORT).show();
+            switch (msg.what){
+                case 0:
+                    Toast.makeText(TaskChooseActivity.this, "您还没有任务哦，快去下载吧！~", Toast.LENGTH_SHORT).show();
+                    break;
+                case 1:
+                    adapter = new TaskChooseAdapter(TaskChooseActivity.this, taskChooseList);
+                    //adapter.notifyDataSetChanged();
+                    listView.setAdapter(adapter);
+                    break;
             }
             super.handleMessage(msg);
         }
