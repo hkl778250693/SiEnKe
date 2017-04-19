@@ -128,6 +128,12 @@ public class UserListActivity extends Activity {
                 Intent intent = new Intent(UserListActivity.this, UserDetailInfoActivity.class);
                 intent.putExtra("position", currentPosition);
                 intent.putExtra("security_id",item.getSecurityNumber());
+                intent.putExtra("user_number",item.getUserId());
+                intent.putExtra("user_name",item.getUserName());
+                intent.putExtra("meter_number",item.getNumber());
+                intent.putExtra("user_phone_number",item.getPhoneNumber());
+                intent.putExtra("user_address",item.getAdress());
+                intent.putExtra("check_type",item.getSecurityType());
                 startActivityForResult(intent, currentPosition);
             }
         });

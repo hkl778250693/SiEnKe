@@ -73,7 +73,8 @@ public class UserDetailInfoActivity extends Activity {
     protected static final int CROP_SMALL_PICTURE = 300;  //裁剪成小图片
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private String securityId;
+    private String securityId,UserNumber,UserName,MeterNumber,UserAddress,CheckType,UserPhoneNumber;
+    private TextView userNumber,userName,meterNumber,userAddress,checkType,userPhoneNumber;
     private List<GridviewImage> imageList = new ArrayList<>();
     private GridviewImageAdapter adapter;
     private List<Bitmap> bitmaps = new ArrayList<>();
@@ -101,6 +102,15 @@ public class UserDetailInfoActivity extends Activity {
         securityCheckCase = (TextView) findViewById(R.id.security_check_case);
         securityHiddenType = (TextView) findViewById(R.id.security_hidden_type);
         securityHiddenReason = (TextView) findViewById(R.id.security_hidden_reason);
+
+        userNumber = (TextView) findViewById(R.id.user_number);
+        userName = (TextView) findViewById(R.id.user_name);
+        meterNumber = (TextView) findViewById(R.id.meter_number);
+        userAddress = (TextView) findViewById(R.id.user_address);
+        checkType = (TextView) findViewById(R.id.check_type);
+        userPhoneNumber = (TextView) findViewById(R.id.user_phone_number);
+
+
         hiddenTypeRoot = (RelativeLayout) findViewById(R.id.hidden_type_root);
         hiddenReasonRoot = (RelativeLayout) findViewById(R.id.hidden_reason_root);
         saveBtn = (Button) findViewById(R.id.save_btn);
@@ -201,6 +211,20 @@ public class UserDetailInfoActivity extends Activity {
         //获取上一个页面传过来的用户ID
         Intent intent = getIntent();
         securityId = intent.getStringExtra("security_id");
+        UserNumber = intent.getStringExtra("user_number");
+        UserName = intent.getStringExtra("user_name");
+        MeterNumber = intent.getStringExtra("meter_number");
+        UserAddress = intent.getStringExtra("user_address");
+        CheckType = intent.getStringExtra("check_type");
+        UserPhoneNumber = intent.getStringExtra("user_phone_number");
+
+        userNumber.setText(UserNumber);
+        userName.setText(UserName);
+        meterNumber.setText(MeterNumber);
+        userAddress.setText(UserAddress);
+        checkType.setText(CheckType);
+        userPhoneNumber.setText(UserPhoneNumber);
+
     }
 
     //弹出拍照popupwindow
