@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="150dp"
         android:scrollbars="none"
-        android:background="@drawable/business_check_shape">
+        android:background="@android:color/white">
         <RadioGroup
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

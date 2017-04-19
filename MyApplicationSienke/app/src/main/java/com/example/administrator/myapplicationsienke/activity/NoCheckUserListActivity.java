@@ -108,6 +108,12 @@ public class NoCheckUserListActivity extends Activity {
                 currentPosition = position;
                 Intent intent = new Intent(NoCheckUserListActivity.this, UserDetailInfoActivity.class);
                 intent.putExtra("position",position);
+                intent.putExtra("user_number",item.getUserId());
+                intent.putExtra("user_name",item.getUserName());
+                intent.putExtra("meter_number",item.getNumber());
+                intent.putExtra("user_phone_number",item.getPhoneNumber());
+                intent.putExtra("user_address",item.getAdress());
+                intent.putExtra("check_type",item.getSecurityType());
                 startActivityForResult(intent,position);
             }
         });
