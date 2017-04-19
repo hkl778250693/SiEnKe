@@ -53,10 +53,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
             android:background="@drawable/check_hidden_danger_down_shape"
             android:drawablePadding="5dp"
             android:drawableRight="@mipmap/down"
-            android:layout_marginRight="10dp"
             android:padding="6dp"
             android:text="姓名"
             android:textColor="@color/text_gray"
@@ -134,6 +134,51 @@
                 android:text="请根据条件查询哦~"
                 android:textColor="@color/text_gray"
                 android:visibility="gone" />
+
+            <RelativeLayout
+                android:id="@+id/new_task_select_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:background="@color/transparent"
+                android:layout_alignParentBottom="true"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/select_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/search_bg_selector"
+                    android:layout_alignParentLeft="true"
+                    android:padding="5dp"
+                    android:text="全选"
+                    android:textColor="@drawable/search_text_color_selector"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/reverse"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/search_bg_selector"
+                    android:gravity="center_vertical"
+                    android:padding="5dp"
+                    android:text="反选"
+                    android:layout_centerInParent="true"
+                    android:textColor="@drawable/search_text_color_selector"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/select_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/search_bg_selector"
+                    android:gravity="center_vertical"
+                    android:padding="5dp"
+                    android:text="取消选择"
+                    android:layout_alignParentRight="true"
+                    android:textColor="@drawable/search_text_color_selector"
+                    android:textSize="14sp" />
+            </RelativeLayout>
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

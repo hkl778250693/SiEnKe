@@ -23,12 +23,14 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.NewTaskListviewAdapter;
 import com.example.administrator.myapplicationsienke.model.NewTaskListviewItem;
+import com.example.administrator.myapplicationsienke.model.NewTaskViewHolder;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
 
 import org.json.JSONArray;
@@ -68,6 +70,8 @@ public class NewTaskDetailActivity extends Activity {
     private SharedPreferences.Editor editor;
     private LayoutInflater layoutInflater;
     private LinearLayout rootLinearlayout;
+    private RelativeLayout newTaskSelectLayout;
+    private TextView selectAll,reverse,selectCancel;
     private ImageView frameAnimation;
     private AnimationDrawable animationDrawable;
     public int responseCode = 0;
@@ -94,6 +98,10 @@ public class NewTaskDetailActivity extends Activity {
         save = (TextView) findViewById(R.id.save);
         no_data = (TextView) findViewById(R.id.no_data);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
+        newTaskSelectLayout = (RelativeLayout) findViewById(R.id.new_task_select_layout);
+        selectAll = (TextView) findViewById(R.id.select_all);
+        reverse = (TextView) findViewById(R.id.reverse);
+        selectCancel = (TextView) findViewById(R.id.select_cancel);
     }
 
     //点击事件
@@ -102,11 +110,16 @@ public class NewTaskDetailActivity extends Activity {
         filter.setOnClickListener(onClickListener);
         save.setOnClickListener(onClickListener);
         searchBtn.setOnClickListener(onClickListener);
+        selectAll.setOnClickListener(onClickListener);
+        reverse.setOnClickListener(onClickListener);
+        selectCancel.setOnClickListener(onClickListener);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(NewTaskDetailActivity.this, UserDetailInfoActivity.class);
-                startActivity(intent);
+                NewTaskViewHolder holder = (NewTaskViewHolder) view.getTag();
+                holder.checkBox.toggle();
+                NewTaskListviewAdapter.getIsCheck().put(position,holder.checkBox.isChecked());
+                Log.i("NewTaskDetailActivity", "列表点击事件进来了！" );
             }
         });
     }
@@ -122,8 +135,8 @@ public class NewTaskDetailActivity extends Activity {
                     createSecurityCasePopupwindow();
                     break;
                 case R.id.save:
-                    if (newTaskListviewItemList.size() != 0) {
-                        saveTaskInfo();//保存选中的任务编号信息
+                    saveTaskInfo();//保存选中的任务编号信息
+                    if (parclebleList.size() != 0) {
                         Toast.makeText(NewTaskDetailActivity.this, "添加用户成功！", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent();
                         intent.putParcelableArrayListExtra("parclebleList", parclebleList);
@@ -174,6 +187,15 @@ public class NewTaskDetailActivity extends Activity {
                         }.start();
                     }
                     break;
+                case R.id.select_all:
+                    selectAll();
+                    break;
+                case R.id.reverse:
+                    reverse();
+                    break;
+                case R.id.select_cancel:
+                    selectCancle();
+                    break;
             }
         }
     };
@@ -187,15 +209,47 @@ public class NewTaskDetailActivity extends Activity {
             no_data.setVisibility(View.VISIBLE);
         }
         parclebleList.clear();
+        if(newTaskListviewAdapter == null){
+            newTaskSelectLayout.setVisibility(View.GONE);
+        }
+    }
+
+    //全选
+    public void selectAll(){
+        for (int i = 0; i < newTaskListviewItemList.size(); i++) {
+            newTaskListviewAdapter.getIsCheck().put(i, true);
+        }
+        newTaskListviewAdapter.notifyDataSetChanged();
+    }
+
+    //反选
+    public void reverse(){
+        for (int i = 0; i < newTaskListviewItemList.size(); i++) {
+            if (newTaskListviewAdapter.getIsCheck().get(i)) {
+                newTaskListviewAdapter.getIsCheck().put(i, false);
+            } else {
+                newTaskListviewAdapter.getIsCheck().put(i, true);
+            }
+        }
+        newTaskListviewAdapter.notifyDataSetChanged();
+    }
+
+    //取消选择
+    public void selectCancle(){
+        for (int i = 0; i < newTaskListviewItemList.size(); i++) {
+            if (newTaskListviewAdapter.getIsCheck().get(i)) {
+                newTaskListviewAdapter.getIsCheck().put(i, false);
+            }
+        }
+        newTaskListviewAdapter.notifyDataSetChanged();
     }
 
     //保存选中的任务编号信息
     public void saveTaskInfo() {
-        HashMap<Integer, Boolean> state = newTaskListviewAdapter.getHashMap();
         int count = newTaskListviewAdapter.getCount();
         Log.i("count====>", "长度为：" + count);
         for (int i = 0; i < count; i++) {
-            if (state.get(i) != null) {
+            if (newTaskListviewAdapter.getIsCheck().get(i)) {
                 Log.i("NewTaskDetailActivity", "点击的位置是：" + i);
                 NewTaskListviewItem item = newTaskListviewItemList.get((int) newTaskListviewAdapter.getItemId(i));
                 parclebleList.add(item);
@@ -400,6 +454,7 @@ public class NewTaskDetailActivity extends Activity {
                             newTaskListviewAdapter = new NewTaskListviewAdapter(NewTaskDetailActivity.this, newTaskListviewItemList);
                             newTaskListviewAdapter.notifyDataSetChanged();
                             listView.setAdapter(newTaskListviewAdapter);
+                            newTaskSelectLayout.setVisibility(View.VISIBLE);
                         }
                         popupWindow.dismiss();
                     } catch (JSONException e) {
