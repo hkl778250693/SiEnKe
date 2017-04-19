@@ -186,6 +186,7 @@ public class NewTaskDetailActivity extends Activity {
         if (no_data.getVisibility() == View.GONE) {
             no_data.setVisibility(View.VISIBLE);
         }
+        parclebleList.clear();
     }
 
     //保存选中的任务编号信息
@@ -200,22 +201,6 @@ public class NewTaskDetailActivity extends Activity {
                 parclebleList.add(item);
             }
         }
-        newTaskListviewAdapter.notifyDataSetChanged();
-    }
-
-    //删除选中的任务编号信息
-    public void deleteChecked() {
-        HashMap<Integer, Boolean> isCheck_delete = newTaskListviewAdapter.getHashMap();
-        int count = newTaskListviewAdapter.getCount();
-        for (int i = 0; i < count; i++) {
-            int position = i - (count - newTaskListviewAdapter.getCount());
-            if (isCheck_delete.get(i) != null && isCheck_delete.get(i)) {
-                isCheck_delete.remove(i);
-                newTaskListviewAdapter.removeData(position);
-                Log.i("removeData====>", "删除的位置是：" + position);
-            }
-        }
-        newTaskListviewAdapter.notifyDataSetChanged();
     }
 
     //show弹出框
@@ -413,6 +398,7 @@ public class NewTaskDetailActivity extends Activity {
                         if (newTaskListviewItemList.size() != 0) {
                             Log.i("NewTaskDetailActivity", "传入的数据长度为：" + newTaskListviewItemList.size());
                             newTaskListviewAdapter = new NewTaskListviewAdapter(NewTaskDetailActivity.this, newTaskListviewItemList);
+                            newTaskListviewAdapter.notifyDataSetChanged();
                             listView.setAdapter(newTaskListviewAdapter);
                         }
                         popupWindow.dismiss();

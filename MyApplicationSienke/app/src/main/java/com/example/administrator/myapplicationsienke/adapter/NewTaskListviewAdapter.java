@@ -31,6 +31,7 @@ public class NewTaskListviewAdapter extends BaseAdapter {
         if (context != null) {
             layoutInflater = LayoutInflater.from(context);
         }
+        isCheck.clear();
         // 默认为不选中
         initCheck(false);
     }
@@ -40,11 +41,6 @@ public class NewTaskListviewAdapter extends BaseAdapter {
         for (int i = 0; i < newTaskListviewItemList.size(); i++) {  // map集合的数量和list的数量是一致的
             getIsCheck().put(i, flag);  // 设置默认的显示
         }
-    }
-
-    // 删除一个数据
-    public void removeData(int position) {
-        newTaskListviewItemList.remove(position);
     }
 
     public HashMap<Integer, Boolean> getHashMap() {
@@ -94,16 +90,20 @@ public class NewTaskListviewAdapter extends BaseAdapter {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    isCheck.put(position, isChecked);
+                    isCheck.put(position, true);
+                    Log.i("NewTaskListviewAdapter", "当前的勾选框状态为："+isChecked);
+                    setIsCheck(isCheck);
                 } else {
                     isCheck.remove(position);
+                    Log.i("NewTaskListviewAdapter", "当前的勾选框状态为："+isChecked);
+                    setIsCheck(isCheck);
                 }
                 // 用map集合保存
                 //isCheck.put(position, isChecked);
             }
         });
         // 设置状态
-        viewHolder.checkBox.setChecked(getIsCheck().get(position) == null ? false : true);
+        viewHolder.checkBox.setChecked(getIsCheck().get(position));
         return convertView;
     }
 
@@ -122,5 +122,6 @@ public class NewTaskListviewAdapter extends BaseAdapter {
 
     public static void setIsCheck(HashMap<Integer, Boolean> isCheck) {
         NewTaskListviewAdapter.isCheck = isCheck;
+        Log.i("setIsCheck", "setIsCheck进来了！"+isCheck);
     }
 }
