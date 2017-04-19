@@ -23,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,12 +72,14 @@ public class NewTaskActivity extends Activity {
     private int day1;
     private RadioButton commonSecurityCheck, yearPlan, reCheck, passGasSecurityCheck;
     private LayoutInflater inflater;  //转换器
-    private View  securityHiddenreasonView;
+    private ProgressBar progressBar;  //下载进度条
+    private TextView progressName, progressPercent;
+    private View securityHiddenreasonView;
+    private LinearLayout linearlayoutDown;
     private PopupWindow popupWindow;
     private ImageView newTaskBack;
     private Button newPlanAddBtn;
-    private Button save_btn;
-    private LayoutInflater layoutInflater;
+    private Button save_btn, finishBtn;
     private View view;
     private ImageView frameAnimation;
     private AnimationDrawable animationDrawable;
@@ -85,6 +88,8 @@ public class NewTaskActivity extends Activity {
     private String resultTaskId;   //新增任务点保存时从服务器返回的任务编号
     private String userResult; //网络请求结果
     private JSONObject object;
+    private int currentProgress = 0;
+    private int currentPercent = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -502,13 +507,25 @@ public class NewTaskActivity extends Activity {
 
     //show弹出框
     public void showPopupwindow() {
-        layoutInflater = LayoutInflater.from(NewTaskActivity.this);
-        view = layoutInflater.inflate(R.layout.popupwindow_query_loading, null);
-        popupWindow = new PopupWindow(view, 250, 250);
-        frameAnimation = (ImageView) view.findViewById(R.id.frame_animation);
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.loading_shape));
-        popupWindow.setAnimationStyle(R.style.dialog);
-        popupWindow.update();
+        inflater = LayoutInflater.from(NewTaskActivity.this);
+        view = inflater.inflate(R.layout.popupwindow_download_progressbar, null);
+        popupWindow = new PopupWindow(view, 500, LinearLayout.LayoutParams.WRAP_CONTENT);
+        linearlayoutDown = (LinearLayout) view.findViewById(R.id.linearlayout_down);
+        finishBtn = (Button) view.findViewById(R.id.finish_btn);
+        progressBar = (ProgressBar) view.findViewById(R.id.download_progress);
+        progressName = (TextView) view.findViewById(R.id.progress_name);
+        progressPercent = (TextView) view.findViewById(R.id.progress_percent);
+        progressBar.setMax(50);
+        progressName.setText("任务正在保存，请稍后...");
+        finishBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                progressBar.setProgress(0);
+                popupWindow.dismiss();
+                NewTaskActivity.this.finish();
+            }
+        });
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.business_check_shape));
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
@@ -517,17 +534,33 @@ public class NewTaskActivity extends Activity {
                 backgroundAlpha(1.0F);
             }
         });
-        //开始加载动画
-        startFrameAnimation();
     }
 
-    //开始帧动画
-    public void startFrameAnimation() {
-        frameAnimation.setBackgroundResource(R.drawable.frame_animation_list);
-        animationDrawable = (AnimationDrawable) frameAnimation.getDrawable();
-        animationDrawable.start();
-    }
 
+    public void setProgress() {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    for (int i = 0; i < 5; i++) {
+                        Thread.sleep(300);
+                        currentProgress += 10 * 5 / 5;
+                        currentPercent = (1000 * (i + 1)) / (10 * 5);
+                        Message msg = new Message();
+                        msg.what = 7;
+                        msg.arg1 = currentProgress;
+                        msg.arg2 = currentPercent;
+                        handler.sendMessage(msg);
+                        Log.i("upload_task_progress=>", " 更新进度条" + currentProgress);
+                        Log.i("upload_task_progress=>", " 下载进度: " + currentPercent);
+                    }
+                    handler.sendEmptyMessage(8);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
 
     Handler handler = new Handler() {
         @Override
@@ -535,15 +568,10 @@ public class NewTaskActivity extends Activity {
             switch (msg.what) {
                 case 1:
                     try {
-                        Thread.sleep(1000);
-                        Toast.makeText(NewTaskActivity.this, "任务新增成功！", Toast.LENGTH_SHORT).show();
                         JSONObject taskObject = new JSONObject(result);
                         resultTaskId = taskObject.optInt("safetyPlanId", 0) + "";
                         requireSecurityId("getUserCheck.do", "safetyPlan=" + resultTaskId);
                         insertTaskDataBase();  //将新增的任务数据存到本地数据库任务表
-                        NewTaskActivity.this.finish();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -556,6 +584,8 @@ public class NewTaskActivity extends Activity {
                     break;
                 case 4:
                     try {
+                        showPopupwindow();
+                        setProgress();
                         JSONObject userObject = new JSONObject(userResult);
                         JSONArray array = userObject.getJSONArray("rows");
                         for (int i = 0; i < array.length(); i++) {
@@ -571,6 +601,18 @@ public class NewTaskActivity extends Activity {
                     break;
                 case 6:
                     Toast.makeText(NewTaskActivity.this, "任务编号请求数据错误！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 7:
+                    progressPercent.setText(String.valueOf(msg.arg2));
+                    progressBar.setProgress(msg.arg1);
+                    Log.i("down_progress=>", " 任务进度为：" + progressBar.getProgress());
+                    break;
+                case 8:
+                    progressName.setText("任务新增成功！");
+                    linearlayoutDown.setVisibility(View.GONE);
+                    finishBtn.setVisibility(View.VISIBLE);
+                    currentProgress = 0;
+                    currentPercent = 0;
                     break;
             }
             super.handleMessage(msg);
