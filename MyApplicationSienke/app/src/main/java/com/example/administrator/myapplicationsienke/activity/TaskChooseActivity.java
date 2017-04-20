@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +21,7 @@ import com.example.administrator.myapplicationsienke.adapter.TaskChooseAdapter;
 import com.example.administrator.myapplicationsienke.fragment.DataTransferFragment;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
+import com.example.administrator.myapplicationsienke.model.TaskChooseViewHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,14 +57,10 @@ public class TaskChooseActivity extends Activity {
             @Override
             public void run() {
                 getTaskData();//读取下载到本地的任务数据
+                handler.sendEmptyMessage(1);
                 super.run();
             }
         }.start();
-        getCheckStateInfo();//获得保存在这个activity中的选择框选中状态信息
-        //初始化勾选框信息，默认都是以未勾选为单位
-        for (int i = 0; i < taskChooseList.size(); i++) {
-            defaul = defaul + "0";
-        }
         bindView();//绑定控件
         setViewClickListener();//点击事件
     }
@@ -80,14 +78,21 @@ public class TaskChooseActivity extends Activity {
         db = helper.getReadableDatabase();
         sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        //初始化勾选框信息，默认都是以未勾选为单位
+        for (int i = 0; i < taskChooseList.size(); i++) {
+            defaul = defaul + "0";
+        }
     }
 
     //获得保存在这个activity中的选择框选中状态信息
     public void getCheckStateInfo() {
         String checkState = sharedPreferences.getString("checkState", defaul); //如果没有获取到的话默认是0
+        Log.i("getCheckStateInfo==>", "读取上次保存的状态方法进来了！循环次数为："+taskChooseList.size());
         for (int i = 0; i < taskChooseList.size(); i++) {
+            Log.i("getCheckStateInfo==>", "读取上次保存的状态循环进来了！");
             if (checkState.charAt(i) == '1') {
                 TaskChooseAdapter.getIsCheck().put(i, true);
+                Log.i("getCheckStateInfo==>", "读取上次保存的状态进来了！");
             }
         }
     }
@@ -95,9 +100,14 @@ public class TaskChooseActivity extends Activity {
     //点击事件
     private void setViewClickListener() {
         save.setOnClickListener(onClickListener);
-        adapter = new TaskChooseAdapter(TaskChooseActivity.this, taskChooseList);
-        adapter.notifyDataSetChanged();
-        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TaskChooseViewHolder holder = (TaskChooseViewHolder) view.getTag();
+                holder.checkBox.toggle();
+                TaskChooseAdapter.getIsCheck().put(position,holder.checkBox.isChecked());
+            }
+        });
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -133,11 +143,10 @@ public class TaskChooseActivity extends Activity {
 
     //保存选中的任务编号信息
     public void saveTaskInfo() {
-        HashMap<Integer, Boolean> state = adapter.getHashMap();
         int count = adapter.getCount();
         Log.i("count====>", "长度为：" + count);
         for (int i = 0; i < count; i++) {
-            if (state.get(i) != null) {
+            if (TaskChooseAdapter.getIsCheck().get(i)) {
                 TaskChoose taskChoose = taskChooseList.get((int) adapter.getItemId(i));
                 taskTotalUserNumber += Integer.parseInt(taskChoose.getTotalUserNumber());
                 map.put("taskId" + i, taskChoose.getTaskNumber());
@@ -157,7 +166,7 @@ public class TaskChooseActivity extends Activity {
         int count = adapter.getCount();
         Log.i("count====>", "长度为：" + count);
         for (int i = 0; i < count; i++) {
-            if (TaskChooseAdapter.getIsCheck().get(i) != null) {  //判断如果此时是选中状态就保存到SharedPreferences，“1”表示选中，0表示没选中
+            if (TaskChooseAdapter.getIsCheck().get(i)) {  //判断如果此时是选中状态就保存到SharedPreferences，“1”表示选中，0表示没选中
                 flag = flag + '1';
             } else {
                 flag = flag + '0';
@@ -276,8 +285,9 @@ public class TaskChooseActivity extends Activity {
                     break;
                 case 1:
                     adapter = new TaskChooseAdapter(TaskChooseActivity.this, taskChooseList);
-                    //adapter.notifyDataSetChanged();
+                    adapter.notifyDataSetChanged();
                     listView.setAdapter(adapter);
+                    getCheckStateInfo();//获得保存在这个activity中的选择框选中状态信息
                     break;
             }
             super.handleMessage(msg);

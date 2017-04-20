@@ -92,8 +92,8 @@ public class NewTaskListviewAdapter extends BaseAdapter {
         return isCheck;
     }
 
-    /*public static void setIsCheck(HashMap<Integer, Boolean> isCheck) {
+    public static void setIsCheck(HashMap<Integer, Boolean> isCheck) {
         NewTaskListviewAdapter.isCheck = isCheck;
         Log.i("setIsCheck", "setIsCheck进来了！"+isCheck);
-    }*/
+    }
 }

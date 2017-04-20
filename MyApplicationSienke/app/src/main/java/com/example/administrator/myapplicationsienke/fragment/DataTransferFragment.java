@@ -110,14 +110,18 @@ public class DataTransferFragment extends Fragment {
                     startActivity(intent);
                     break;
                 case R.id.download:
-                    //开启支线程进行请求任务信息
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            requireMyTask("SafeCheckPlan.do", "safePlanMember=");
-                            super.run();
-                        }
-                    }.start();
+                    if(!sharedPreferences.getBoolean("have_download", false)){
+                        //开启支线程进行请求任务信息
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                requireMyTask("SafeCheckPlan.do", "safePlanMember=");
+                                super.run();
+                            }
+                        }.start();
+                    }else {
+                        Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
+                    }
                     break;
             }
         }
@@ -148,6 +152,8 @@ public class DataTransferFragment extends Fragment {
             public void onClick(View v) {
                 downloadProgress.setProgress(0);
                 popupWindow.dismiss();
+                editor.putBoolean("have_download",true);   //下载之后必须上传才能再次下载
+                editor.commit();
             }
         });
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.business_check_shape));

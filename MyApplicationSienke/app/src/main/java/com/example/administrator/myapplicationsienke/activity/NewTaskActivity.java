@@ -225,7 +225,7 @@ public class NewTaskActivity extends Activity {
     }
 
 
-    //弹出安全隐患类型popupwindow
+    //弹出安检类型popupwindow
     public void createSecurityTypePopupwindow() {
         inflater = LayoutInflater.from(NewTaskActivity.this);
         securityHiddenreasonView = inflater.inflate(R.layout.popupwindow_security_type, null);
@@ -267,10 +267,10 @@ public class NewTaskActivity extends Activity {
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(securityType, 500, 0);
+        popupWindow.showAsDropDown(securityType, 260, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
