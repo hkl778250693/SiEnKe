@@ -210,21 +210,23 @@ public class UserDetailInfoActivity extends Activity {
 
         //获取上一个页面传过来的用户ID
         Intent intent = getIntent();
-        securityId = intent.getStringExtra("security_id");
-        UserNumber = intent.getStringExtra("user_number");
-        UserName = intent.getStringExtra("user_name");
-        MeterNumber = intent.getStringExtra("meter_number");
-        UserAddress = intent.getStringExtra("user_address");
-        CheckType = intent.getStringExtra("check_type");
-        UserPhoneNumber = intent.getStringExtra("user_phone_number");
+        if(intent != null){
+            securityId = intent.getStringExtra("security_id");
+            if(intent.getStringExtra("user_number").equals("null")){
+                userNumber.setText("无");
+            }
+            UserName = intent.getStringExtra("user_name");
+            MeterNumber = intent.getStringExtra("meter_number");
+            UserAddress = intent.getStringExtra("user_address");
+            CheckType = intent.getStringExtra("check_type");
+            UserPhoneNumber = intent.getStringExtra("user_phone_number");
 
-        userNumber.setText(UserNumber);
-        userName.setText(UserName);
-        meterNumber.setText(MeterNumber);
-        userAddress.setText(UserAddress);
-        checkType.setText(CheckType);
-        userPhoneNumber.setText(UserPhoneNumber);
-
+            userName.setText(UserName);
+            meterNumber.setText(MeterNumber);
+            userAddress.setText(UserAddress);
+            checkType.setText(CheckType);
+            userPhoneNumber.setText(UserPhoneNumber);
+        }
     }
 
     //弹出拍照popupwindow
@@ -378,7 +380,7 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityCheckCase, 0, 0);
@@ -440,7 +442,7 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityHiddenType, 0, 0);
@@ -510,7 +512,7 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityHiddenReason, 0, 0);
