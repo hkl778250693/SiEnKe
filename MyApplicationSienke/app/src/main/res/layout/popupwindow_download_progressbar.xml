@@ -26,7 +26,6 @@
             android:layout_width="match_parent"
             android:layout_height="12dp"
             android:layout_marginTop="10dp"
-            android:max="100"
             android:progressDrawable="@drawable/progressbar_layer_list" />
 
         <ImageView

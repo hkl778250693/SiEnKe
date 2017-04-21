@@ -1,5 +1,6 @@
 package com.example.administrator.myapplicationsienke.fragment;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,10 +52,11 @@ import java.util.List;
  * Created by Administrator on 2017/3/16 0016.
  */
 public class DataTransferFragment extends Fragment {
-    private View view,popupwindowView;
-    private TextView upload, download, progressName, progressPercent;
+    private View view,popupwindowView,uploadView;
+    private TextView upload, download, progressName, progressPercent,tips;
     private LinearLayout rootLinearlayout,linearlayoutDown;
     private Button finishBtn;
+    private RadioButton cancelRb,saveRb;
     private ImageView downFailed;
     private String taskResult, userResult; //网络请求结果
     private SharedPreferences sharedPreferences;
@@ -105,8 +108,7 @@ public class DataTransferFragment extends Fragment {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.upload:
-                    Intent intent = new Intent(getActivity(), UploadActivity.class);
-                    startActivity(intent);
+                    createSavePopupwindow();
                     break;
                 case R.id.download:
                     if(!sharedPreferences.getBoolean("have_download", false)){
@@ -134,7 +136,46 @@ public class DataTransferFragment extends Fragment {
         db = helper.getWritableDatabase();
     }
 
-    //show弹出框
+    //弹出上传前提示popupwindow
+    public void createSavePopupwindow() {
+        layoutInflater = LayoutInflater.from(getActivity());
+        uploadView = layoutInflater.inflate(R.layout.popupwindow_user_detail_info_save, null);
+        popupWindow = new PopupWindow(uploadView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        //绑定控件ID
+        tips = (TextView) uploadView.findViewById(R.id.tips);
+        cancelRb = (RadioButton) uploadView.findViewById(R.id.cancel_rb);
+        saveRb = (RadioButton) uploadView.findViewById(R.id.save_rb);
+        //设置点击事件
+        tips.setText("请确保你的任务完成哦！");
+        saveRb.setText("确认完成");
+        cancelRb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+        saveRb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+                Intent intent = new Intent(getActivity(), UploadActivity.class);
+                startActivity(intent);
+            }
+        });
+        popupWindow.update();
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setAnimationStyle(R.style.camera);
+        backgroundAlpha(0.8F);   //背景变暗
+        popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                backgroundAlpha(1.0F);
+            }
+        });
+    }
+
+    //show下载popupwindow
     public void showPopupwindow() {
         layoutInflater = LayoutInflater.from(getActivity());
         popupwindowView = layoutInflater.inflate(R.layout.popupwindow_download_progressbar, null);
@@ -290,9 +331,10 @@ public class DataTransferFragment extends Fragment {
                     Log.i("userResult==========>", userResult);
                     JSONObject jsonObject = new JSONObject(userResult);
                     if (!jsonObject.optString("total", "").equals("0")) {
+                        editor.putBoolean("user_data",true);
+                        editor.commit();
                         if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
                             //有相应用户数据
-                            handler.sendEmptyMessage(10);
                         }
                         return userResult;
                     } else {
@@ -378,7 +420,7 @@ public class DataTransferFragment extends Fragment {
                     url = httpUrl + taskNumbList.get(i);
                     Log.i("startAsyncTask========>", url);
                     myAsyncTask.execute(url);
-                    if(!sharedPreferences.getBoolean("user_data",true)){
+                    if(sharedPreferences.getBoolean("user_data",true)){
                         if(i == 0){
                             Log.i("jsonArray==========>", "jsonArray==" + jsonArray.length());
                             for (int j = 0; j < jsonArray.length(); j++) {
@@ -499,11 +541,15 @@ public class DataTransferFragment extends Fragment {
                 case 9:
                     progressPercent.setText(String.valueOf(msg.arg2));
                     downloadProgress.setProgress(msg.arg1);
+                    if(downloadProgress.getProgress() == 100){
+                        handler.sendEmptyMessage(10);
+                    }
                     break;
                 case 10:
                     progressName.setText("数据下载完成！");
                     linearlayoutDown.setVisibility(View.GONE);
                     finishBtn.setVisibility(View.VISIBLE);
+                    downFailed.setVisibility(View.GONE);
                     editor.putBoolean("have_download",true);   //下载之后必须上传才能再次下载
                     editor.commit();
                     userProgress = 0;

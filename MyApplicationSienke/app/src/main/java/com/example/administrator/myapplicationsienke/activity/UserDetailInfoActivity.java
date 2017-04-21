@@ -270,7 +270,7 @@ public class UserDetailInfoActivity extends Activity {
     public void createSavePopupwindow() {
         inflater = LayoutInflater.from(UserDetailInfoActivity.this);
         saveView = inflater.inflate(R.layout.popupwindow_user_detail_info_save, null);
-        popupWindow = new PopupWindow(saveView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(saveView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         //绑定控件ID
         cancelRb = (RadioButton) saveView.findViewById(R.id.cancel_rb);
         saveRb = (RadioButton) saveView.findViewById(R.id.save_rb);
@@ -298,7 +298,7 @@ public class UserDetailInfoActivity extends Activity {
             }
         });
         popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.business_check_shape));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.setAnimationStyle(R.style.camera);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);

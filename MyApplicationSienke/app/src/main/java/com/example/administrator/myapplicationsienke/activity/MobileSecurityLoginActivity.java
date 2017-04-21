@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
@@ -45,6 +46,7 @@ public class MobileSecurityLoginActivity extends Activity {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private String ip, port;  //接口ip地址   端口
+    private LinearLayout rootLinearlayout;
 
     //强制竖屏
     @Override
@@ -73,6 +75,7 @@ public class MobileSecurityLoginActivity extends Activity {
         editMobileUser = (EditText) findViewById(R.id.edit_mobile_user);
         editmobilePsw = (EditText) findViewById(R.id.edit_mobile_psw);
         remindMe = (CheckBox) findViewById(R.id.remind_me);
+        rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
     }
 
     //初始化设置
