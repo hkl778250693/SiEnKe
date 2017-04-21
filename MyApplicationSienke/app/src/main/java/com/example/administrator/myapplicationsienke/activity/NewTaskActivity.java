@@ -45,10 +45,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 /**
  * Created by Administrator on 2017/3/15.
@@ -99,7 +97,6 @@ public class NewTaskActivity extends Activity {
         bindView();//绑定控件
         defaultSetting();//初始化设置
         setViewClickListener();//点击事件
-
     }
 
 
@@ -509,7 +506,7 @@ public class NewTaskActivity extends Activity {
     public void showPopupwindow() {
         inflater = LayoutInflater.from(NewTaskActivity.this);
         view = inflater.inflate(R.layout.popupwindow_download_progressbar, null);
-        popupWindow = new PopupWindow(view, 500, LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(view, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         linearlayoutDown = (LinearLayout) view.findViewById(R.id.linearlayout_down);
         finishBtn = (Button) view.findViewById(R.id.finish_btn);
         progressBar = (ProgressBar) view.findViewById(R.id.download_progress);
@@ -525,7 +522,7 @@ public class NewTaskActivity extends Activity {
                 NewTaskActivity.this.finish();
             }
         });
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.business_check_shape));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {

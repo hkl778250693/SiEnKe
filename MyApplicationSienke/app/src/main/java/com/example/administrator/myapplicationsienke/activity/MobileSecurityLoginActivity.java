@@ -11,6 +11,8 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -38,6 +40,7 @@ import static android.app.PendingIntent.getActivity;
 public class MobileSecurityLoginActivity extends Activity {
     Button logonBtn;
     Button cancel_btn;
+    private CheckBox remindMe;  //记住账号密码
     private EditText editMobileUser, editmobilePsw;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -69,18 +72,36 @@ public class MobileSecurityLoginActivity extends Activity {
         cancel_btn = (Button) findViewById(R.id.cancel_btn);
         editMobileUser = (EditText) findViewById(R.id.edit_mobile_user);
         editmobilePsw = (EditText) findViewById(R.id.edit_mobile_psw);
+        remindMe = (CheckBox) findViewById(R.id.remind_me);
     }
 
     //初始化设置
     private void defaultSetting() {
         sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        if(sharedPreferences.getBoolean("remind_me",false)){
+            remindMe.setChecked(true);
+            editMobileUser.setText(sharedPreferences.getString("login_name",""));
+            editmobilePsw.setText(sharedPreferences.getString("login_psw",""));
+        }
     }
 
     //点击事件
     private void setViewClickListener() {
         logonBtn.setOnClickListener(clickListener);
         cancel_btn.setOnClickListener(clickListener);
+        remindMe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    editor.putBoolean("remind_me",true);
+                    editor.commit();
+                }else {
+                    editor.putBoolean("remind_me",false);
+                    editor.commit();
+                }
+            }
+        });
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
@@ -181,7 +202,8 @@ public class MobileSecurityLoginActivity extends Activity {
                             Log.i("login_result=========>", result);
                             JSONObject jsonObject = new JSONObject(result);
                             if (jsonObject.optInt("messg", 0) == 1) {
-                                editor.putString("company_id",jsonObject.optInt("companyid")+"");
+                                editor.putString("company_id",jsonObject.optInt("companyid",0)+"");
+                                editor.putString("user_name",jsonObject.optString("userName",""));
                                 editor.commit();
                                 handler.sendEmptyMessage(1);
                             }
@@ -189,8 +211,7 @@ public class MobileSecurityLoginActivity extends Activity {
                                 handler.sendEmptyMessage(2);
                             }
                         } else {
-                            Log.i("login_state===>","登录失败");
-                            Log.i("login_state===>", "登录失败");
+                            handler.sendEmptyMessage(3);
                         }
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
@@ -214,6 +235,11 @@ public class MobileSecurityLoginActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
+                    if(sharedPreferences.getBoolean("remind_me",false)){
+                        editor.putString("login_name",editMobileUser.getText().toString());
+                        editor.putString("login_psw",editmobilePsw.getText().toString());
+                        editor.commit();
+                    }
                     Toast.makeText(MobileSecurityLoginActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MobileSecurityLoginActivity.this, SecurityChooseActivity.class);
                     startActivity(intent);

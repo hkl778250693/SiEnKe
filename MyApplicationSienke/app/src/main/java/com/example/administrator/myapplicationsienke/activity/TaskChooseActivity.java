@@ -46,6 +46,7 @@ public class TaskChooseActivity extends Activity {
     private SharedPreferences.Editor editor;
     private Cursor cursor;
     private int taskTotalUserNumber = 0;
+    private String checkState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,10 +87,9 @@ public class TaskChooseActivity extends Activity {
 
     //获得保存在这个activity中的选择框选中状态信息
     public void getCheckStateInfo() {
-        String checkState = sharedPreferences.getString("checkState", defaul); //如果没有获取到的话默认是0
         Log.i("getCheckStateInfo==>", "读取上次保存的状态方法进来了！循环次数为："+taskChooseList.size());
-        for (int i = 0; i < taskChooseList.size(); i++) {
-            Log.i("getCheckStateInfo==>", "读取上次保存的状态循环进来了！");
+        for (int i = 0; i < checkState.length(); i++) {
+            Log.i("getCheckStateInfo==>", "checkState的长度为："+checkState.length());
             if (checkState.charAt(i) == '1') {
                 TaskChooseAdapter.getIsCheck().put(i, true);
                 Log.i("getCheckStateInfo==>", "读取上次保存的状态进来了！");
@@ -173,6 +173,7 @@ public class TaskChooseActivity extends Activity {
             }
         }
         editor.putString("checkState", flag);//将数据已字符串形式保存起来，下次读取再用
+        Log.i("saveCheckStateInfo=>", "checkState状态为：" + flag);
         editor.commit();
     }
 
@@ -287,7 +288,10 @@ public class TaskChooseActivity extends Activity {
                     adapter = new TaskChooseAdapter(TaskChooseActivity.this, taskChooseList);
                     adapter.notifyDataSetChanged();
                     listView.setAdapter(adapter);
-                    getCheckStateInfo();//获得保存在这个activity中的选择框选中状态信息
+                    checkState = sharedPreferences.getString("checkState", defaul); //如果没有获取到的话默认是0
+                    if(!checkState.equals("")){
+                        getCheckStateInfo();//获得保存在这个activity中的选择框选中状态信息
+                    }
                     break;
             }
             super.handleMessage(msg);
