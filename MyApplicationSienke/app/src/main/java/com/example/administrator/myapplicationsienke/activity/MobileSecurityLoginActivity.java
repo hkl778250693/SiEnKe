@@ -80,12 +80,16 @@ public class MobileSecurityLoginActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
-        sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("login_info", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        Log.i("MobileSecurityLogin", "默认设置进来了！是否记住账号："+sharedPreferences.getBoolean("remind_me",false));
         if(sharedPreferences.getBoolean("remind_me",false)){
+            Log.i("MobileSecurityLogin", "记住账号默认设置进来了！");
             remindMe.setChecked(true);
             editMobileUser.setText(sharedPreferences.getString("login_name",""));
             editmobilePsw.setText(sharedPreferences.getString("login_psw",""));
+        }else {
+            Log.i("MobileSecurityLogin", "没记住账号默认设置进来了！");
         }
     }
 
@@ -97,11 +101,13 @@ public class MobileSecurityLoginActivity extends Activity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
+                    Log.i("MobileSecurityLogin", "记住账号");
                     editor.putBoolean("remind_me",true);
-                    editor.commit();
+                    editor.apply();
                 }else {
+                    Log.i("MobileSecurityLogin", "没记住账号");
                     editor.putBoolean("remind_me",false);
-                    editor.commit();
+                    editor.apply();
                 }
             }
         });
@@ -238,10 +244,22 @@ public class MobileSecurityLoginActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
+                    if(editMobileUser.getText().toString().equals(sharedPreferences.getString("login_name",""))){
+                        Log.i("MobileSecurityLogin", "用户未改变");
+                        editor.putBoolean("user_exchanged",false);
+                        editor.apply();
+                    }else {
+                        Log.i("MobileSecurityLogin", "用户改变");
+                        editor.putBoolean("user_exchanged",true);
+                        editor.apply();
+                    }
+                    Log.i("MobileSecurityLogin", "是否记住账号"+sharedPreferences.getBoolean("remind_me",false));
                     if(sharedPreferences.getBoolean("remind_me",false)){
                         editor.putString("login_name",editMobileUser.getText().toString());
                         editor.putString("login_psw",editmobilePsw.getText().toString());
-                        editor.commit();
+                        editor.apply();
+                    }else {
+                        Log.i("MobileSecurityLogin", "未记住密码！账号为"+editMobileUser.getText().toString());
                     }
                     Toast.makeText(MobileSecurityLoginActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MobileSecurityLoginActivity.this, SecurityChooseActivity.class);

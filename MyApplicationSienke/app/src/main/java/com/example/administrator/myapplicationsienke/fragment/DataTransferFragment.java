@@ -59,7 +59,7 @@ public class DataTransferFragment extends Fragment {
     private RadioButton cancelRb,saveRb;
     private ImageView downFailed;
     private String taskResult, userResult; //网络请求结果
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private String ip, port;  //接口ip地址   端口
     public int responseCode = 0;
@@ -131,6 +131,7 @@ public class DataTransferFragment extends Fragment {
     //初始化设置
     private void defaultSetting() {
         sharedPreferences = getActivity().getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = getActivity().getSharedPreferences("login_info", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         MySqliteHelper helper = new MySqliteHelper(getActivity(), 1);
         db = helper.getWritableDatabase();
@@ -238,7 +239,7 @@ public class DataTransferFragment extends Fragment {
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
                     if (!keyAndValue.equals("")) {
-                        url = new URL(httpUrl + "?" + keyAndValue + URLEncoder.encode(sharedPreferences.getString("user_name",""), "UTF-8"));
+                        url = new URL(httpUrl + "?" + keyAndValue + URLEncoder.encode(sharedPreferences_login.getString("user_name",""), "UTF-8"));
                         //没有参数传递
                     } else {
                         url = new URL(httpUrl);
@@ -331,10 +332,49 @@ public class DataTransferFragment extends Fragment {
                     Log.i("userResult==========>", userResult);
                     JSONObject jsonObject = new JSONObject(userResult);
                     if (!jsonObject.optString("total", "").equals("0")) {
-                        editor.putBoolean("user_data",true);
-                        editor.commit();
-                        if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
+                        if (url.toString().contains(taskNumbList.get(0))) {
                             //有相应用户数据
+                            editor.putBoolean("user_data",true);
+                            editor.commit();
+                            for(int i = 0; i < taskNumbList.size(); i++){
+                                if(sharedPreferences.getBoolean("user_data",true)){
+                                    if(i == 0){
+                                        Log.i("jsonArray==========>", "jsonArray==" + jsonArray.length());
+                                        for (int j = 0; j < jsonArray.length(); j++) {
+                                            try {
+                                                taskObject = jsonArray.getJSONObject(j);
+                                                insertTaskDataBase();
+                                                editor.putInt("totalCount", totalCount);
+                                                editor.commit();
+                                                Log.i("totalCount==========>", "总户数=" + totalCount);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                    try {
+                                        Thread.sleep(200);
+                                        userProgress += 10*taskNumbList.size() / taskNumbList.size();
+                                        currentUserPercent = (1000*(i+1)) / (10*taskNumbList.size());
+                                        Message msg = new Message();
+                                        msg.what = 9;
+                                        msg.arg1 = userProgress;
+                                        msg.arg2 = currentUserPercent;
+                                        Log.i("down_user_progress=>", " 循环次数为"+taskNumbList.size());
+                                        Log.i("down_user_progress=>", " 更新进度条"+userProgress);
+                                        Log.i("down_user_progress=>", " 下载进度: "+currentUserPercent);
+                                        handler.sendMessage(msg);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }else {
+                                    handler.sendEmptyMessage(4);
+                                    break;
+                                }
+                            }
+                            /*if(sharedPreferences.getBoolean("user_data",true)){    //下载完之后做相应处理
+                                handler.sendEmptyMessage(10);
+                            }*/
                         }
                         return userResult;
                     } else {
@@ -420,40 +460,6 @@ public class DataTransferFragment extends Fragment {
                     url = httpUrl + taskNumbList.get(i);
                     Log.i("startAsyncTask========>", url);
                     myAsyncTask.execute(url);
-                    if(sharedPreferences.getBoolean("user_data",true)){
-                        if(i == 0){
-                            Log.i("jsonArray==========>", "jsonArray==" + jsonArray.length());
-                            for (int j = 0; j < jsonArray.length(); j++) {
-                                try {
-                                    taskObject = jsonArray.getJSONObject(j);
-                                    insertTaskDataBase();
-                                    editor.putInt("totalCount", totalCount);
-                                    editor.commit();
-                                    Log.i("totalCount==========>", "总户数=" + totalCount);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                        try {
-                            Thread.sleep(500);
-                            userProgress += 10*taskNumbList.size() / taskNumbList.size();
-                            currentUserPercent = (1000*(i+1)) / (10*taskNumbList.size());
-                            Message msg = new Message();
-                            msg.what = 9;
-                            msg.arg1 = userProgress;
-                            msg.arg2 = currentUserPercent;
-                            Log.i("down_user_progress=>", " 循环次数为"+taskNumbList.size());
-                            Log.i("down_user_progress=>", " 更新进度条"+userProgress);
-                            Log.i("down_user_progress=>", " 下载进度: "+currentUserPercent);
-                            handler.sendMessage(msg);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }else {
-                        handler.sendEmptyMessage(4);
-                        break;
-                    }
                 }
             }
         }.start();
@@ -476,6 +482,7 @@ public class DataTransferFragment extends Fragment {
                         Log.i("down_task_progress=>", " 更新进度条"+currentProgress);
                         Log.i("down_task_progress=>", " 下载进度: "+currentPercent);
                     }
+                    Thread.sleep(500);
                     handler.sendEmptyMessage(8);
                     startAsyncTask();//开启异步任务获取所有任务编号的用户数据
                 } catch (InterruptedException e) {
@@ -541,19 +548,17 @@ public class DataTransferFragment extends Fragment {
                 case 9:
                     progressPercent.setText(String.valueOf(msg.arg2));
                     downloadProgress.setProgress(msg.arg1);
-                    if(downloadProgress.getProgress() == 100){
-                        handler.sendEmptyMessage(10);
+                    if(downloadProgress.getProgress() == downloadProgress.getMax()){
+                        Log.i("down_progress=>", " 用户信息下载完成进来了！");
+                        progressName.setText("数据下载完成！");
+                        linearlayoutDown.setVisibility(View.GONE);
+                        finishBtn.setVisibility(View.VISIBLE);
+                        downFailed.setVisibility(View.GONE);
+                        editor.putBoolean("have_download",true);   //下载之后必须上传才能再次下载
+                        editor.commit();
+                        userProgress = 0;
+                        currentUserPercent = 0;
                     }
-                    break;
-                case 10:
-                    progressName.setText("数据下载完成！");
-                    linearlayoutDown.setVisibility(View.GONE);
-                    finishBtn.setVisibility(View.VISIBLE);
-                    downFailed.setVisibility(View.GONE);
-                    editor.putBoolean("have_download",true);   //下载之后必须上传才能再次下载
-                    editor.commit();
-                    userProgress = 0;
-                    currentUserPercent = 0;
                     break;
             }
             super.handleMessage(msg);

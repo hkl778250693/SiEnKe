@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -25,6 +26,7 @@ import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.SecurityCheckViewPagerAdapter;
 import com.example.administrator.myapplicationsienke.fragment.DataTransferFragment;
 import com.example.administrator.myapplicationsienke.fragment.SecurityChooseFragment;
+import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,12 +48,14 @@ public class SecurityChooseActivity extends FragmentActivity {
     private ViewPager viewPager;
     private SecurityCheckViewPagerAdapter adapter;
     private long exitTime = 0;//退出程序
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private Bundle params;
     private Set<String> stringSet = new HashSet<>();//保存字符串参数
     private int task_total_numb;
     private ArrayList<String> stringList = new ArrayList<>();//得到的字符串集合
+    private SQLiteDatabase db;  //数据库
+    private MySqliteHelper helper; //数据库帮助类
 
     //强制竖屏
     @Override
@@ -200,10 +204,23 @@ public class SecurityChooseActivity extends FragmentActivity {
     //初始化设置
     private void defaultSetting() {
         optionRbt.setChecked(true);
+        helper = new MySqliteHelper(SecurityChooseActivity.this, 1);
+        db = helper.getReadableDatabase();
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         editor.putInt("problem_number",sharedPreferences.getInt("problem_number",0));
-        editor.commit();
+        editor.apply();
+        Log.i("user_exchanged", "用户是否改变"+sharedPreferences_login.getBoolean("user_exchanged", false));
+        if(sharedPreferences_login.getBoolean("user_exchanged", false)){
+            editor.clear();
+            editor.apply();
+            db.delete("User",null,null);  //删除User表中的所有数据（官方推荐方法）
+            db.delete("Task",null,null);  //删除Task表中的所有数据
+            //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
+            db.execSQL("update sqlite_sequence set seq=0 where name='User'");
+            db.execSQL("update sqlite_sequence set seq=0 where name='Task'");
+        }
     }
 
     @Override
@@ -232,7 +249,7 @@ public class SecurityChooseActivity extends FragmentActivity {
                 }
                 editor.putInt("task_total_numb", task_total_numb);
                 editor.putStringSet("stringSet", stringSet);
-                editor.commit();
+                editor.apply();
             }
         }
     }
