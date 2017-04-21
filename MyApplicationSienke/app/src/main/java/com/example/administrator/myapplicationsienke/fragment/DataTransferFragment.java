@@ -23,14 +23,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.activity.UploadActivity;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
-import com.example.administrator.myapplicationsienke.model.DownloadListvieItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,6 +54,7 @@ public class DataTransferFragment extends Fragment {
     private TextView upload, download, progressName, progressPercent;
     private LinearLayout rootLinearlayout,linearlayoutDown;
     private Button finishBtn;
+    private ImageView downFailed;
     private String taskResult, userResult; //网络请求结果
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -139,8 +138,9 @@ public class DataTransferFragment extends Fragment {
     public void showPopupwindow() {
         layoutInflater = LayoutInflater.from(getActivity());
         popupwindowView = layoutInflater.inflate(R.layout.popupwindow_download_progressbar, null);
-        popupWindow = new PopupWindow(popupwindowView, 500, LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(popupwindowView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         linearlayoutDown = (LinearLayout) popupwindowView.findViewById(R.id.linearlayout_down);
+        downFailed = (ImageView) popupwindowView.findViewById(R.id.down_failed);
         finishBtn = (Button) popupwindowView.findViewById(R.id.finish_btn);
         downloadProgress = (ProgressBar) popupwindowView.findViewById(R.id.download_progress);
         progressName = (TextView) popupwindowView.findViewById(R.id.progress_name);
@@ -152,11 +152,10 @@ public class DataTransferFragment extends Fragment {
             public void onClick(View v) {
                 downloadProgress.setProgress(0);
                 popupWindow.dismiss();
-                editor.putBoolean("have_download",true);   //下载之后必须上传才能再次下载
-                editor.commit();
             }
         });
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.business_check_shape));
+        popupWindow.setFocusable(true);
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
@@ -198,7 +197,7 @@ public class DataTransferFragment extends Fragment {
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
                     if (!keyAndValue.equals("")) {
-                        url = new URL(httpUrl + "?" + keyAndValue + URLEncoder.encode("杜述洪", "UTF-8"));
+                        url = new URL(httpUrl + "?" + keyAndValue + URLEncoder.encode(sharedPreferences.getString("user_name",""), "UTF-8"));
                         //没有参数传递
                     } else {
                         url = new URL(httpUrl);
@@ -230,12 +229,7 @@ public class DataTransferFragment extends Fragment {
                         if (!jsonObject.optString("total", "").equals("0")) {
                             handler.sendEmptyMessage(1);
                         } else {
-                            try {
-                                Thread.sleep(3000);
-                                handler.sendEmptyMessage(2);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                            handler.sendEmptyMessage(2);
                         }
                     } else {
                         try {
@@ -297,12 +291,15 @@ public class DataTransferFragment extends Fragment {
                     JSONObject jsonObject = new JSONObject(userResult);
                     if (!jsonObject.optString("total", "").equals("0")) {
                         if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
-                            handler.sendEmptyMessage(5);
+                            //有相应用户数据
+                            handler.sendEmptyMessage(10);
                         }
                         return userResult;
                     } else {
+                        editor.putBoolean("user_data",false);
+                        editor.commit();
                         if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
-                            handler.sendEmptyMessage(4);
+                            //没有相应用户数据
                         }
                     }
                 } else {
@@ -381,23 +378,41 @@ public class DataTransferFragment extends Fragment {
                     url = httpUrl + taskNumbList.get(i);
                     Log.i("startAsyncTask========>", url);
                     myAsyncTask.execute(url);
-                    try {
-                        Thread.sleep(500);
-                        userProgress += 10*taskNumbList.size() / taskNumbList.size();
-                        currentUserPercent = (1000*(i+1)) / (10*taskNumbList.size());
-                        Message msg = new Message();
-                        msg.what = 9;
-                        msg.arg1 = userProgress;
-                        msg.arg2 = currentUserPercent;
-                        Log.i("down_user_progress=>", " 循环次数为"+taskNumbList.size());
-                        Log.i("down_user_progress=>", " 更新进度条"+userProgress);
-                        Log.i("down_user_progress=>", " 下载进度: "+currentUserPercent);
-                        handler.sendMessage(msg);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if(!sharedPreferences.getBoolean("user_data",true)){
+                        if(i == 0){
+                            Log.i("jsonArray==========>", "jsonArray==" + jsonArray.length());
+                            for (int j = 0; j < jsonArray.length(); j++) {
+                                try {
+                                    taskObject = jsonArray.getJSONObject(j);
+                                    insertTaskDataBase();
+                                    editor.putInt("totalCount", totalCount);
+                                    editor.commit();
+                                    Log.i("totalCount==========>", "总户数=" + totalCount);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                        try {
+                            Thread.sleep(500);
+                            userProgress += 10*taskNumbList.size() / taskNumbList.size();
+                            currentUserPercent = (1000*(i+1)) / (10*taskNumbList.size());
+                            Message msg = new Message();
+                            msg.what = 9;
+                            msg.arg1 = userProgress;
+                            msg.arg2 = currentUserPercent;
+                            Log.i("down_user_progress=>", " 循环次数为"+taskNumbList.size());
+                            Log.i("down_user_progress=>", " 更新进度条"+userProgress);
+                            Log.i("down_user_progress=>", " 下载进度: "+currentUserPercent);
+                            handler.sendMessage(msg);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }else {
+                        handler.sendEmptyMessage(4);
+                        break;
                     }
                 }
-                handler.sendEmptyMessage(10);
             }
         }.start();
     }
@@ -438,35 +453,32 @@ public class DataTransferFragment extends Fragment {
                         jsonArray = jsonObject.getJSONArray("rows");
                         showPopupwindow();
                         taskNumbList.clear();
-                        Log.i("jsonArray==========>", "jsonArray==" + jsonArray.length());
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            taskObject = jsonArray.getJSONObject(i);
-                            insertTaskDataBase();
+                        for (int j = 0; j < jsonArray.length(); j++) {             //获取到任务的个数，用于后面下载相应的用户数据
+                            taskObject = jsonArray.getJSONObject(j);
                             taskNumbList.add(taskObject.optInt("safetyplanId", 0) + "");
+                            Log.i("taskNumbList====>", "一共有" + taskNumbList.size() + "个任务");
                         }
-                        Log.i("taskNumbList====>", "一共有" + taskNumbList.size() + "个任务");
-                        editor.putInt("totalCount", totalCount);
-                        editor.commit();
-                        Log.i("totalCount==========>", "总户数=" + totalCount);
                         setProgress();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
                 case 2:
-                    popupWindow.dismiss();
-                    Toast.makeText(getActivity(), "没有任务下载！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "没有任务下载哦！", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
-                    popupWindow.dismiss();
                     Toast.makeText(getActivity(), "任务信息网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
                 case 4:
-                    popupWindow.dismiss();
-                    Toast.makeText(getActivity(), "没有相应的用户数据！", Toast.LENGTH_SHORT).show();
+                    progressName.setText("没有相应的用户数据哦！");
+                    linearlayoutDown.setVisibility(View.GONE);
+                    downloadProgress.setVisibility(View.GONE);
+                    downFailed.setVisibility(View.VISIBLE);
+                    finishBtn.setVisibility(View.VISIBLE);
+                    //Toast.makeText(getActivity(), "没有相应的用户数据！", Toast.LENGTH_SHORT).show();
                     break;
                 case 5:
-
+                    //有相应的用户数据
                     break;
                 case 6:
                     popupWindow.dismiss();
@@ -492,6 +504,8 @@ public class DataTransferFragment extends Fragment {
                     progressName.setText("数据下载完成！");
                     linearlayoutDown.setVisibility(View.GONE);
                     finishBtn.setVisibility(View.VISIBLE);
+                    editor.putBoolean("have_download",true);   //下载之后必须上传才能再次下载
+                    editor.commit();
                     userProgress = 0;
                     currentUserPercent = 0;
                     break;
