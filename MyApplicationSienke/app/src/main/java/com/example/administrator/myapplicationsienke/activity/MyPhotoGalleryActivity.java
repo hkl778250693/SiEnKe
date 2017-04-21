@@ -25,7 +25,7 @@ import java.util.ArrayList;
  */
 public class MyPhotoGalleryActivity extends Activity {
     private Gallery myGallery;
-    private TextView back;
+    private ImageView back;
     private ImageView delete;
     private MyGalleryAdapter adapter;
     private ArrayList<String> cropPathLists = new ArrayList<>();  //原始的图片路径集合
@@ -81,7 +81,7 @@ public class MyPhotoGalleryActivity extends Activity {
         popupwindowView = inflater.inflate(R.layout.popupwindow_photo_detail, null);
         popupWindow = new PopupWindow(popupwindowView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
-        back = (TextView) popupwindowView.findViewById(R.id.back);
+        back = (ImageView) popupwindowView.findViewById(R.id.back);
         delete = (ImageView) popupwindowView.findViewById(R.id.delete);
         photoCurrentNumber = (TextView) popupwindowView.findViewById(R.id.photo_current_number);
         photoNumber = (TextView) popupwindowView.findViewById(R.id.photo_number);
@@ -124,8 +124,8 @@ public class MyPhotoGalleryActivity extends Activity {
         popupWindow.setOutsideTouchable(true);
         popupWindow.update();
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
-        popupWindow.setAnimationStyle(R.style.mypopwindow_anim_style);
-        popupWindow.showAtLocation(rootLinearlayout, Gravity.TOP, 0, 0);
+        popupWindow.setAnimationStyle(R.style.camera);
+        popupWindow.showAtLocation(rootLinearlayout, Gravity.BOTTOM, 0, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
