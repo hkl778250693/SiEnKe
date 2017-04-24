@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
@@ -43,6 +44,7 @@ public class SecurityChooseActivity extends FragmentActivity {
     private PopupWindow popupWindow;
     private ImageView security_check_go;
     private RadioButton optionRbt;  //选项按钮
+    private TextView name;
     private RadioButton dataTransferRbt;  //数据传输按钮
     private List<Fragment> fragmentList;
     private ViewPager viewPager;
@@ -83,6 +85,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         optionRbt = (RadioButton) findViewById(R.id.option_rbt);
         dataTransferRbt = (RadioButton) findViewById(R.id.data_transfer_rbt);
         viewPager = (ViewPager) findViewById(R.id.security_viewpager);
+        name = (TextView) findViewById(R.id.name);
     }
 
     //点击事件
@@ -102,10 +105,12 @@ public class SecurityChooseActivity extends FragmentActivity {
                     case 0:
                         optionRbt.setChecked(true);
                         dataTransferRbt.setChecked(false);
+                        name.setText("安检选项");
                         break;
                     case 1:
                         optionRbt.setChecked(false);
                         dataTransferRbt.setChecked(true);
+                        name.setText("数据传输");
                         break;
                 }
             }
@@ -127,9 +132,11 @@ public class SecurityChooseActivity extends FragmentActivity {
                     break;
                 case R.id.option_rbt:
                     viewPager.setCurrentItem(0);
+                    name.setText("安检选项");
                     break;
                 case R.id.data_transfer_rbt:
                     viewPager.setCurrentItem(1);
+                    name.setText("数据传输");
                     break;
             }
         }

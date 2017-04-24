@@ -12,12 +12,10 @@ import java.util.Date;
  * Created by Administrator on 2017/4/14 0014.
  */
 public class MyPhotoUtils {
-    private int TYPE_FILE_IMAGE;
     private int TYPE_FILE_CROP_IMAGE;
     private String securityId;
 
     public MyPhotoUtils(int type,String securityId) {
-        this.TYPE_FILE_IMAGE = type;
         this.TYPE_FILE_CROP_IMAGE = type;
         this.securityId = securityId;
     }
@@ -32,10 +30,9 @@ public class MyPhotoUtils {
         if (!Tools.hasSdcard()) {
             return null;
         }
+        Log.i("MyPhotoUtils", "有SD卡");
         File mediaStorageDir = null;
-        if(fileType == TYPE_FILE_IMAGE){
-            mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"SiEnKe_Original");
-        }else if(fileType == TYPE_FILE_CROP_IMAGE){
+        if(fileType == TYPE_FILE_CROP_IMAGE){
             mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"SiEnKe_Crop");
         }
 
@@ -55,9 +52,7 @@ public class MyPhotoUtils {
     public String getFilePath(File mediaStorageDir, int fileType) {
         String timeFlag = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String filePath = mediaStorageDir.getPath() + File.separator;
-        if (fileType == TYPE_FILE_IMAGE) {
-            filePath += ("Original_IMG_" + timeFlag + "_" + securityId + ".jpg");
-        }else if(fileType == TYPE_FILE_CROP_IMAGE){
+        if(fileType == TYPE_FILE_CROP_IMAGE){
             filePath += ("Crop_IMG_" + timeFlag + "_" + securityId + ".jpg");
         } else {
             return null;

@@ -2,10 +2,12 @@ package com.example.administrator.myapplicationsienke.activity;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -37,6 +39,7 @@ import android.widget.Toast;
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.GridviewImageAdapter;
 import com.example.administrator.myapplicationsienke.mode.MyPhotoUtils;
+import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.mode.Tools;
 import com.example.administrator.myapplicationsienke.model.GridviewImage;
 
@@ -84,6 +87,7 @@ public class UserDetailInfoActivity extends Activity {
     private ArrayList<String>  cropPathLists_back = new ArrayList<>();  //大图页面返回的图片路径集合
     private ArrayList<String>  originalPathLists = new ArrayList<>();  //原始的图片路径集合
     private int currentPosition = 0;
+    private SQLiteDatabase db;  //数据库
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +180,11 @@ public class UserDetailInfoActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.back:
+                    if(cropPathLists.size() != 0){
+                        for(int i = 0;i<cropPathLists.size();i++){
+                            deletePicture(new File(cropPathLists.get(i)));
+                        }
+                    }
                     finish();
                     break;
                 case R.id.more:
@@ -200,6 +209,9 @@ public class UserDetailInfoActivity extends Activity {
     private void defaultSetting() {
         sharedPreferences = UserDetailInfoActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        MySqliteHelper helper = new MySqliteHelper(UserDetailInfoActivity.this, 1);
+        db = helper.getWritableDatabase();
+
         securityCheckCase.setText("安检合格");
         securityHiddenType.setText("常规安检");
         securityHiddenReason.setText("户内立管内");
@@ -285,8 +297,10 @@ public class UserDetailInfoActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                if (bitmaps.size() != 0) {
-                    //saveImage(bitmaps);
+                if(cropPathLists.size() != 0){
+                    for(int i = 0;i<cropPathLists.size();i++){
+                        insertSecurityPhoto(cropPathLists.get(i));
+                    }
                 }
                 Intent intent = new Intent();
                 setResult(Activity.RESULT_OK, intent);
@@ -534,11 +548,8 @@ public class UserDetailInfoActivity extends Activity {
     //调用相机
     public void openCamera() {
         Intent openCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // 指定照片保存路径（SD卡），image.jpg为一个临时文件，每次拍照后这个图片都会被替换
-        MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_IMAGE,securityId);
-        tempUri = photoUtils.getOutFileUri(TYPE_FILE_IMAGE);
-        originalPhotoPath = tempUri.getPath();
-        originalPathLists.add(originalPhotoPath);
+        // 指定照片保存路径（SD卡），temp.jpg为一个临时文件，每次拍照后这个图片都会被替换
+        tempUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "temp.jpg"));
         openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);
         Log.i("openCamera===>", "保存的地址为" + tempUri);
         startActivityForResult(openCameraIntent, TAKE_PHOTO);
@@ -548,8 +559,6 @@ public class UserDetailInfoActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i("onActivityResult===>", "" + true);
-        Log.i("onActivityResult===>", "" + requestCode);
         if (resultCode == RESULT_OK) {   //如果返回码是可用的
             switch (requestCode) {
                 case TAKE_PHOTO:
@@ -560,11 +569,9 @@ public class UserDetailInfoActivity extends Activity {
                     }
                     break;
                 case CROP_SMALL_PICTURE:
-                    if (data != null) {
-                        cropPathLists.add(cropPhotoPath);
-
-                        handler.sendEmptyMessage(1);
-                    }
+                    Log.i("CROP_SMALL_PICTURE===>", "有数据返回！");
+                    cropPathLists.add(cropPhotoPath);
+                    handler.sendEmptyMessage(1);
                     break;
                 case 500:
                     if(data != null){
@@ -600,27 +607,6 @@ public class UserDetailInfoActivity extends Activity {
     };
 
     /**
-     * API19以下获取图片路径的方法
-     *
-     * @param uri
-     */
-    /*private String getFilePath_below19(Uri uri) {
-        //这里开始的第二部分，获取图片的路径：低版本的是没问题的，但是sdk>19会获取不到
-        String[] proj = {MediaStore.Images.Media.DATA};
-        //好像是android多媒体数据库的封装接口，具体的看Android文档
-        Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
-        //获得用户选择的图片的索引值
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        Log.i("***************", "" + column_index);
-        //将光标移至开头 ，这个很重要，不小心很容易引起越界
-        cursor.moveToFirst();
-        //最后根据索引值获取图片路径   结果类似：/mnt/sdcard/DCIM/Camera/IMG_20151124_013332.jpg
-        String path = cursor.getString(column_index);
-        Log.i("path:", path);
-        return path;
-    }*/
-
-    /**
      * 裁剪图片方法实现
      *
      * @param uri
@@ -651,26 +637,24 @@ public class UserDetailInfoActivity extends Activity {
     }
 
     /**
-     * 压缩图片大小
-     *
-     * @param path 图片的路径
-     * @return
+     * 返回的时候，删除所有拍照的图片
      */
-    private Bitmap decodeSampleBitmap(String path) {
-        //int targetW = photoOne.getWidth();
-        //int targetH = photoOne.getHeight();
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path, options);
-        int photoW = options.outWidth;
-        int photoH = options.outHeight;
-        //获取图片的最大压缩比
-        //int scaleFactor = Math.max(photoW/targetW,photoH/targetH);
-        options.inJustDecodeBounds = false;
-        //options.inSampleSize = scaleFactor;
-        options.inPurgeable = true;
-        Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-        return bitmap;
+    private void deletePicture(File file){
+        if(file.exists()){
+            file.delete();
+        }else {
+            Log.i("deletePicture", "没有相应的图片文件");
+        }
+    }
+
+    /**
+     * 将拍的照片路径保存到本地数据库安检图片表
+     */
+    private void insertSecurityPhoto(String photoPath) {
+        ContentValues values = new ContentValues();
+        values.put("securityNumber",securityId);
+        values.put("photoPath",photoPath);
+        db.insert("security_photo", null, values);
     }
 
     /**

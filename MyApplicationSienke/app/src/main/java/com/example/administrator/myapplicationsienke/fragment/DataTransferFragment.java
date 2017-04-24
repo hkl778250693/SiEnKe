@@ -578,7 +578,6 @@ public class DataTransferFragment extends Fragment {
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
         db.insert("Task", null, values);
-        Log.i("db==========>", "task_db!" + db);
     }
 
     //将服务器下载的用户信息数据存到本地数据库用户表
@@ -599,7 +598,6 @@ public class DataTransferFragment extends Fragment {
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
         db.insert("User", null, values);
-        Log.i("db==========>", "user_db!" + db);
     }
 
     @Override
