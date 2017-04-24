@@ -11,10 +11,9 @@
         <RadioGroup
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="8dp">
+            android:padding="4dp">
 
             <RadioButton
                 android:id="@+id/not_security_check"

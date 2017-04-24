@@ -20,9 +20,9 @@ public class MySqliteHelper extends SQLiteOpenHelper {
     final String CREATE_TABLE_SQL_TASK = "CREATE TABLE Task " +
             "(task_id integer primary key AUTOINCREMENT,taskName varchar(200),taskId varchar(200),securityType varchar(200),totalCount varchar(200),endTime varchar(200))";
 
-    //安全信息表
+    //安检图片表
     final String CREATE_TABLE_SQL_SECURITY_PHOTO_INFO = "CREATE TABLE security_photo " +
-            "(id integer primary key AUTOINCREMENT,photo_path varchar(200),u_id integer)";
+            "(id integer primary key AUTOINCREMENT,photoPath varchar(200),securityNumber varchar(200))";
 
     //安全情况表
     final String CREATE_TABLE_SQL_SECURITY_CASE = "CREATE TABLE security_case " +
