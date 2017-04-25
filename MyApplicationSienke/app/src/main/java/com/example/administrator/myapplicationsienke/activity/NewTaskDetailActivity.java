@@ -191,6 +191,10 @@ public class NewTaskDetailActivity extends Activity {
                     }
                     break;
                 case R.id.search_btn:
+                    if(newTaskListviewItemList.size() != 0){
+                        newTaskListviewItemList.clear();
+                        newTaskListviewAdapter.notifyDataSetChanged();
+                    }
                     if (filter.getText().equals("筛选")) {
                         Toast.makeText(NewTaskDetailActivity.this, "请选择筛选条件哦！", Toast.LENGTH_SHORT).show();
                     }
