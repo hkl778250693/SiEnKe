@@ -57,7 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:background="@color/transparent_gray"
+                android:background="@color/transparent_blue"
                 android:padding="10dp">
 
                 <TextView
