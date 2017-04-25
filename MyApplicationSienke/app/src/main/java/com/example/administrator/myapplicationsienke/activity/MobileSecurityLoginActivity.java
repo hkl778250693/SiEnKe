@@ -86,7 +86,8 @@ public class MobileSecurityLoginActivity extends Activity {
         if(sharedPreferences.getBoolean("remind_me",false)){
             Log.i("MobileSecurityLogin", "记住账号默认设置进来了！");
             remindMe.setChecked(true);
-            editMobileUser.setText(sharedPreferences.getString("login_name",""));
+            editMobileUser.setText(sharedPreferences.getString("login_name",""));//设置EditText控件的内容
+            editMobileUser.setSelection(sharedPreferences.getString("login_name","").length());//将光标移至文字末尾
             editmobilePsw.setText(sharedPreferences.getString("login_psw",""));
         }else {
             Log.i("MobileSecurityLogin", "没记住账号默认设置进来了！");
