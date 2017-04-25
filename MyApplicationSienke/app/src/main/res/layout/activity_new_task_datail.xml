@@ -140,7 +140,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:background="@color/transparent_gray"
+                android:background="@color/transparent_blue"
                 android:layout_alignParentBottom="true"
                 android:visibility="gone">
 
@@ -174,7 +174,7 @@
                     android:background="@drawable/search_bg_selector"
                     android:gravity="center_vertical"
                     android:padding="5dp"
-                    android:text="取消选择"
+                    android:text="取消"
                     android:layout_alignParentRight="true"
                     android:textColor="@drawable/search_text_color_selector"
                     android:textSize="14sp" />
