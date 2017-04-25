@@ -28,15 +28,6 @@
             android:text="新增任务"
             android:textColor="@android:color/white"
             android:textSize="21sp" />
-
-        <ImageView
-            android:id="@+id/newplan_go"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:padding="16dp"
-            android:src="@mipmap/more" />
     </RelativeLayout>
 
     <ScrollView
