@@ -75,7 +75,7 @@
                     android:layout_weight="1"
                     android:layout_marginLeft="10dp"
                     android:background="@drawable/linearlayout_shape"
-                    android:padding="9dp"
+                    android:padding="11dp"
                     android:textSize="12sp"
                     android:hint="请输入任务名称"/>
 
@@ -129,7 +129,7 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/data"
+                    android:id="@+id/start_date"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -161,7 +161,7 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/data1"
+                    android:id="@+id/end_date"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

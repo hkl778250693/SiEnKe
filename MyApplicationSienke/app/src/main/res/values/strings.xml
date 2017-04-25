@@ -10,4 +10,12 @@
     <string name="business_manage">业务办理</string>
     <string name="business_check">业务审核</string>
     <string name="pass">通过</string>
+    <string name="security_hidden_reason">安全隐患原因：</string>
+    <string name="security_hidden_type">安全隐患类型：</string>
+    <string name="check_time">上次安检时间</string>
+    <string name="check_type">安检类型</string>
+    <string name="user_address">用户地址</string>
+    <string name="user_phone_number">用户电话</string>
+    <string name="meter_number">表编号</string>
+    <string name="user_number">用户编号</string>
 </resources>
