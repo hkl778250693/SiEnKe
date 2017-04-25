@@ -124,8 +124,8 @@ public class NewTaskActivity extends Activity {
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
-        startDate.setText(year + "-" + (month + 1) + "-" + day);
-        endDate.setText(year + "-" + (month + 1) + "-" + day);
+        startDate.setText(year + " / " + (month + 1) + " / " + day);
+        endDate.setText(year + " / " + (month + 1) + " / " + day);
     }
 
     //点击事件
@@ -170,7 +170,7 @@ public class NewTaskActivity extends Activity {
                     new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            startDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                            startDate.setText(year + " / " + (monthOfYear + 1) + " / " + dayOfMonth);
                         }
                     }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
                     break;
@@ -179,7 +179,7 @@ public class NewTaskActivity extends Activity {
                     new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            endDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                            endDate.setText(year + " / " + (monthOfYear + 1) + " / " + dayOfMonth);
                         }
                     }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
                     break;

@@ -10,6 +10,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -54,10 +57,10 @@ import java.util.List;
  */
 public class NewTaskDetailActivity extends Activity {
     private View view;
-    private ImageView back;
+    private ImageView back,editDelete;
     private ListView listView;
     private TextView filter, save, no_data;
-    private EditText setEsearchTextChanged;//搜索框
+    private EditText etSearch;//搜索框
     private TextView searchBtn;
     private PopupWindow popupWindow;
     private View securityCaseView;
@@ -93,7 +96,7 @@ public class NewTaskDetailActivity extends Activity {
         back = (ImageView) findViewById(R.id.back);
         listView = (ListView) findViewById(R.id.listview);
         filter = (TextView) findViewById(R.id.filter);
-        setEsearchTextChanged = (EditText) findViewById(R.id.etSearch);
+        etSearch = (EditText) findViewById(R.id.etSearch);
         searchBtn = (TextView) findViewById(R.id.search_btn);
         save = (TextView) findViewById(R.id.save);
         no_data = (TextView) findViewById(R.id.no_data);
@@ -102,6 +105,7 @@ public class NewTaskDetailActivity extends Activity {
         selectAll = (TextView) findViewById(R.id.select_all);
         reverse = (TextView) findViewById(R.id.reverse);
         selectCancel = (TextView) findViewById(R.id.select_cancel);
+        editDelete = (ImageView) findViewById(R.id.edit_delete);
     }
 
     //点击事件
@@ -113,6 +117,45 @@ public class NewTaskDetailActivity extends Activity {
         selectAll.setOnClickListener(onClickListener);
         reverse.setOnClickListener(onClickListener);
         selectCancel.setOnClickListener(onClickListener);
+        editDelete.setOnClickListener(onClickListener);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(newTaskListviewItemList.size() != 0){
+                    if(TextUtils.isEmpty(s.toString().trim())){
+                        newTaskListviewItemList.clear();
+                        newTaskListviewAdapter.notifyDataSetChanged();
+                        if (editDelete.getVisibility() == View.VISIBLE) {
+                            editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
+                        }
+                    }else {
+                        if (editDelete.getVisibility() == View.GONE) {
+                            editDelete.setVisibility(View.VISIBLE);  //反之则显示
+                        }
+                    }
+                }else {
+                    if(TextUtils.isEmpty(s.toString().trim())){
+                        if (editDelete.getVisibility() == View.VISIBLE) {
+                            editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
+                        }
+                    }else {
+                        if (editDelete.getVisibility() == View.GONE) {
+                            editDelete.setVisibility(View.VISIBLE);  //反之则显示
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -152,13 +195,13 @@ public class NewTaskDetailActivity extends Activity {
                         Toast.makeText(NewTaskDetailActivity.this, "请选择筛选条件哦！", Toast.LENGTH_SHORT).show();
                     }
                     if (filter.getText().equals("姓名")) {
-                        if(setEsearchTextChanged.getText().length() >= 2){
+                        if(etSearch.getText().length() >= 2){
                             showPopupwindow();
                             //开启支线程进行请求任务信息
                             new Thread() {
                                 @Override
                                 public void run() {
-                                    requireMyTask("getCostomer.do", "userName=" + setEsearchTextChanged.getText().toString());
+                                    requireMyTask("getCostomer.do", "userName=" + etSearch.getText().toString());
                                     super.run();
                                 }
                             }.start();
@@ -171,7 +214,7 @@ public class NewTaskDetailActivity extends Activity {
                         new Thread() {
                             @Override
                             public void run() {
-                                requireMyTask("getCostomer.do", "meterNumber=" + setEsearchTextChanged.getText().toString());
+                                requireMyTask("getCostomer.do", "meterNumber=" + etSearch.getText().toString());
                                 super.run();
                             }
                         }.start();
@@ -181,10 +224,25 @@ public class NewTaskDetailActivity extends Activity {
                         new Thread() {
                             @Override
                             public void run() {
-                                requireMyTask("getCostomer.do", "userAdress=" + setEsearchTextChanged.getText().toString());
+                                requireMyTask("getCostomer.do", "userAdress=" + etSearch.getText().toString());
                                 super.run();
                             }
                         }.start();
+                    }
+                    break;
+                case R.id.edit_delete:
+                    if(newTaskListviewItemList.size() != 0){
+                        newTaskListviewItemList.clear();
+                        newTaskListviewAdapter.notifyDataSetChanged();
+                        etSearch.setText("");
+                        if (editDelete.getVisibility() == View.VISIBLE) {
+                            editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
+                        }
+                    }else {
+                        etSearch.setText("");
+                        if (editDelete.getVisibility() == View.VISIBLE) {
+                            editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
+                        }
                     }
                     break;
                 case R.id.select_all:

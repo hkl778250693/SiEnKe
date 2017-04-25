@@ -67,24 +67,40 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:background="@drawable/search_bg"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/etSearch"
-                android:layout_width="0dp"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@null"
-                android:gravity="center_vertical"
-                android:hint="请输入查询信息"
-                android:maxLines="1"
-                android:paddingBottom="7dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="7dp"
-                android:textColor="@color/text_black"
-                android:textSize="14sp" />
+                android:background="@drawable/search_bg">
+
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="请输入查询信息"
+                    android:maxLines="1"
+                    android:maxLength="11"
+                    android:paddingBottom="7dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="7dp"
+                    android:textColor="@color/text_black"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/edit_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:padding="4dp"
+                    android:src="@mipmap/edit_delete"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
 
         </LinearLayout>
 
@@ -139,17 +155,17 @@
                 android:id="@+id/new_task_select_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:background="@color/transparent"
                 android:layout_alignParentBottom="true"
+                android:background="@color/transparent"
+                android:padding="10dp"
                 android:visibility="gone">
 
                 <TextView
                     android:id="@+id/select_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/search_bg_selector"
                     android:layout_alignParentLeft="true"
+                    android:background="@drawable/search_bg_selector"
                     android:padding="5dp"
                     android:text="全选"
                     android:textColor="@drawable/search_text_color_selector"
@@ -159,11 +175,11 @@
                     android:id="@+id/reverse"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
                     android:background="@drawable/search_bg_selector"
                     android:gravity="center_vertical"
                     android:padding="5dp"
                     android:text="反选"
-                    android:layout_centerInParent="true"
                     android:textColor="@drawable/search_text_color_selector"
                     android:textSize="14sp" />
 
@@ -171,11 +187,11 @@
                     android:id="@+id/select_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
                     android:background="@drawable/search_bg_selector"
                     android:gravity="center_vertical"
                     android:padding="5dp"
                     android:text="取消选择"
-                    android:layout_alignParentRight="true"
                     android:textColor="@drawable/search_text_color_selector"
                     android:textSize="14sp" />
             </RelativeLayout>
