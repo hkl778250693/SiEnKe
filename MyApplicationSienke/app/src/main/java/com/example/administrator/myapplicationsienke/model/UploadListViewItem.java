@@ -8,7 +8,8 @@ public class UploadListViewItem {
     private String taskNumber;  //任务编号
     private String checkType;   //安检类型
     private String totalUserNumber;  //总用户数
-    private String checkedUserNumber;   //已检用户数
+    private String endTime;   //结束时间
+    private boolean isChecked;  //是否是选中状态
 
     public String getTaskName() {
         return taskName;
@@ -42,11 +43,19 @@ public class UploadListViewItem {
         this.totalUserNumber = totalUserNumber;
     }
 
-    public String getCheckedUserNumber() {
-        return checkedUserNumber;
+    public String getEndTime() {
+        return endTime;
     }
 
-    public void setCheckedUserNumber(String checkedUserNumber) {
-        this.checkedUserNumber = checkedUserNumber;
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
     }
 }

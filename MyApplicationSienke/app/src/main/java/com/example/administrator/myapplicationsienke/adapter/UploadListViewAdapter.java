@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.model.UploadListViewItem;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -19,12 +20,21 @@ public class UploadListViewAdapter extends BaseAdapter {
     private Context context;
     private List<UploadListViewItem> uploadListViewItemList;
     private LayoutInflater layoutInflater;
+    private static HashMap<Integer, Boolean> isCheck = new HashMap<Integer, Boolean>();
 
     public UploadListViewAdapter(Context context, List<UploadListViewItem> uploadListViewItemList) {
         this.context = context;
         this.uploadListViewItemList = uploadListViewItemList;
         if (context != null) {
             layoutInflater = LayoutInflater.from(context);
+        }
+        // 默认为不选中
+        initCheck(false);
+    }
+    // 初始化map集合
+    public void initCheck(boolean flag) {
+        for (int i = 0; i < uploadListViewItemList.size(); i++) {  // map集合的数量和list的数量是一致的
+            getIsCheck().put(i, flag);  // 设置默认的显示
         }
     }
 
@@ -58,9 +68,19 @@ public class UploadListViewAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-
         UploadListViewItem uploadListViewItem = uploadListViewItemList.get(position);
+        viewHolder.taskName.setText(uploadListViewItem.getTaskName());
+        viewHolder.taskNumber.setText(uploadListViewItem.getTaskNumber());
+        viewHolder.checkType.setText(uploadListViewItem.getCheckType());
+        viewHolder.totalUserNumber.setText(uploadListViewItem.getTotalUserNumber());
         return convertView;
+    }
+    public static HashMap<Integer, Boolean> getIsCheck() {
+        return isCheck;
+    }
+
+    public static void setIsCheck(HashMap<Integer, Boolean> isCheck) {
+        UploadListViewAdapter.isCheck = isCheck;
     }
 
     class ViewHolder {
