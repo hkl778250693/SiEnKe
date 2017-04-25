@@ -421,13 +421,11 @@ public class NewTaskDetailActivity extends Activity {
                     Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         ip = "88.88.88.66:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         port = "8088";
                     }
