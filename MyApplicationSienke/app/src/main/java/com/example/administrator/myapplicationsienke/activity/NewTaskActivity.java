@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -54,20 +53,14 @@ import java.util.Calendar;
 public class NewTaskActivity extends Activity {
     private TextView securityType;// 安检类型
     private EditText taskName;//安检名称
-    private TextView startTime;//开始日期选择器
-    private TextView endTime;//结束日期选择器
+    private TextView startDate;//开始日期选择器
+    private TextView endDate;//结束日期选择器
     private String ip, port;  //接口ip地址   端口
     private String result; //网络请求结果
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private SQLiteDatabase db;  //数据库
     public int responseCode = 0;
-    private int year;
-    private int month;
-    private int day;
-    private int year1;
-    private int month1;
-    private int day1;
     private RadioButton commonSecurityCheck, yearPlan, reCheck, passGasSecurityCheck;
     private LayoutInflater inflater;  //转换器
     private ProgressBar progressBar;  //下载进度条
@@ -79,8 +72,6 @@ public class NewTaskActivity extends Activity {
     private Button newPlanAddBtn;
     private Button save_btn, finishBtn;
     private View view;
-    private ImageView frameAnimation;
-    private AnimationDrawable animationDrawable;
     private LinearLayout rootLinearlayout;
     private ArrayList<NewTaskListviewItem> parclebleList = new ArrayList<>();
     private String resultTaskId;   //新增任务点保存时从服务器返回的任务编号
@@ -88,6 +79,7 @@ public class NewTaskActivity extends Activity {
     private JSONObject object;
     private int currentProgress = 0;
     private int currentPercent = 0;
+    private Calendar c; //日历
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,10 +108,24 @@ public class NewTaskActivity extends Activity {
         newPlanAddBtn = (Button) findViewById(R.id.newplan_add_btn);
         taskName = (EditText) findViewById(R.id.task_name);
         securityType = (TextView) findViewById(R.id.security_type);
-        startTime = (TextView) findViewById(R.id.data);
-        endTime = (TextView) findViewById(R.id.data1);
+        startDate = (TextView) findViewById(R.id.start_date);
+        endDate = (TextView) findViewById(R.id.end_date);
         save_btn = (Button) findViewById(R.id.save_btn);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
+    }
+
+    //初始化设置
+    private void defaultSetting() {
+        sharedPreferences = NewTaskActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        MySqliteHelper helper = new MySqliteHelper(NewTaskActivity.this, 1);
+        db = helper.getWritableDatabase();
+        c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        startDate.setText(year + "-" + (month + 1) + "-" + day);
+        endDate.setText(year + "-" + (month + 1) + "-" + day);
     }
 
     //点击事件
@@ -128,8 +134,8 @@ public class NewTaskActivity extends Activity {
         newPlanAddBtn.setOnClickListener(onClickListener);
         taskName.setOnClickListener(onClickListener);
         securityType.setOnClickListener(onClickListener);
-        startTime.setOnClickListener(onClickListener);
-        endTime.setOnClickListener(onClickListener);
+        startDate.setOnClickListener(onClickListener);
+        endDate.setOnClickListener(onClickListener);
         save_btn.setOnClickListener(onClickListener);
     }
 
@@ -159,68 +165,27 @@ public class NewTaskActivity extends Activity {
                 case R.id.security_type:
                     createSecurityTypePopupwindow();
                     break;
-                case R.id.data:
-                    Calendar cale1 = Calendar.getInstance();
-                    year = cale1.get(Calendar.YEAR);
-                    month = cale1.get(Calendar.MONTH);
-                    day = cale1.get(Calendar.DAY_OF_MONTH);
-                    startTime.setText(year + "-" + (month + 1) + "-" + day);
+                case R.id.start_date:
                     //开始时间选择器
                     new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
-                        public void onDateSet(DatePicker view, int myyear, int monthOfYear,
-                                              int dayOfMonth) {
-                            year = myyear;
-                            month = monthOfYear;
-                            day = dayOfMonth;
-                            updateDate();
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            startDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                         }
-
-                        private void updateDate() {
-                            startTime.setText(year + "-" + (month + 1) + "-" + day);
-                        }
-                    }
-                            , cale1.get(Calendar.YEAR)
-                            , cale1.get(Calendar.MONTH)
-                            , cale1.get(Calendar.DAY_OF_MONTH)).show();
+                    }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
                     break;
-                case R.id.data1:
-                    Calendar cale2 = Calendar.getInstance();
-                    year1 = cale2.get(Calendar.YEAR);
-                    month1 = cale2.get(Calendar.MONTH);
-                    day1 = cale2.get(Calendar.DAY_OF_MONTH);
-                    endTime.setText(year + "-" + (month + 1) + "-" + day);
+                case R.id.end_date:
                     //结束时间选择器
                     new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
-                        public void onDateSet(DatePicker view, int myyear, int monthOfYear,
-                                              int dayOfMonth) {
-                            year = myyear;
-                            month = monthOfYear;
-                            day = dayOfMonth;
-                            updateDate();
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            endDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                         }
-
-                        private void updateDate() {
-                            endTime.setText(year + "-" + (month + 1) + "-" + day);
-                        }
-                    }
-                            , cale2.get(Calendar.YEAR)
-                            , cale2.get(Calendar.MONTH)
-                            , cale2.get(Calendar.DAY_OF_MONTH)).show();
+                    }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
                     break;
             }
         }
     };
-
-    //初始化设置
-    private void defaultSetting() {
-        sharedPreferences = NewTaskActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
-        MySqliteHelper helper = new MySqliteHelper(NewTaskActivity.this, 1);
-        db = helper.getWritableDatabase();
-    }
-
 
     //弹出安检类型popupwindow
     public void createSecurityTypePopupwindow() {
@@ -377,8 +342,8 @@ public class NewTaskActivity extends Activity {
             JSONObject object = new JSONObject();
             object.put("c_safety_plan_name", taskName.getText().toString());      //安检任务名称
             object.put("c_safety_plan_member", "杜述洪");    //操作员
-            object.put("d_safety_start", startTime.getText().toString());       //开始时间
-            object.put("d_safety_end", endTime.getText().toString());    //结束时间
+            object.put("d_safety_start", startDate.getText().toString());       //开始时间
+            object.put("d_safety_end", endDate.getText().toString());    //结束时间
             object.put("n_company_id", Integer.parseInt(sharedPreferences.getString("company_id", "")));       //公司id
             JSONArray jsonArray = new JSONArray();
             for (int i = 0; i < parclebleList.size(); i++) {
@@ -406,7 +371,7 @@ public class NewTaskActivity extends Activity {
         values.put("taskId", resultTaskId);
         values.put("securityType", securityType.getText().toString());
         values.put("totalCount", parclebleList.size());
-        values.put("endTime", endTime.getText().toString());
+        values.put("endTime", endDate.getText().toString());
         db.insert("Task", null, values);
     }
 

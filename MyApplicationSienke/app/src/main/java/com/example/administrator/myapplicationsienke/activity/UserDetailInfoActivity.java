@@ -529,7 +529,7 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(securityHiddenReason, 0, 0);
+        popupWindow.showAsDropDown(securityHiddenReason, Gravity.CENTER_HORIZONTAL, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -581,7 +581,7 @@ public class UserDetailInfoActivity extends Activity {
                     break;
             }
         }else if(resultCode == RESULT_CANCELED){
-            Toast.makeText(UserDetailInfoActivity.this, "您取消了拍照哦", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(UserDetailInfoActivity.this, "您取消了拍照哦", Toast.LENGTH_SHORT).show();
         }
 
     }

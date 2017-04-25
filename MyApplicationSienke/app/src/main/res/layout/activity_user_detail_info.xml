@@ -64,7 +64,7 @@
                     android:drawableLeft="@mipmap/user_number"
                     android:drawablePadding="20dp"
                     android:gravity="center_vertical"
-                    android:text="用户编号"
+                    android:text="@string/user_number"
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
 
@@ -140,7 +140,7 @@
                     android:drawableLeft="@mipmap/meter_number"
                     android:drawablePadding="20dp"
                     android:gravity="center_vertical"
-                    android:text="表编号"
+                    android:text="@string/meter_number"
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
 
@@ -178,7 +178,7 @@
                     android:drawableLeft="@mipmap/user_phonenumber"
                     android:drawablePadding="20dp"
                     android:gravity="center_vertical"
-                    android:text="用户电话"
+                    android:text="@string/user_phone_number"
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
 
@@ -216,7 +216,7 @@
                     android:drawableLeft="@mipmap/user_address"
                     android:drawablePadding="20dp"
                     android:gravity="center_vertical"
-                    android:text="用户地址"
+                    android:text="@string/user_address"
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
 
@@ -254,7 +254,7 @@
                     android:drawableLeft="@mipmap/check_type"
                     android:drawablePadding="20dp"
                     android:gravity="center_vertical"
-                    android:text="安检类型"
+                    android:text="@string/check_type"
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
 
@@ -292,7 +292,7 @@
                     android:drawableLeft="@mipmap/check_time"
                     android:drawablePadding="20dp"
                     android:gravity="center_vertical"
-                    android:text="上次安检时间"
+                    android:text="@string/check_time"
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
 
@@ -418,7 +418,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:text="安检隐患类型："
+                    android:text="@string/security_hidden_type"
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
 
@@ -451,7 +451,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:text="安检隐患原因："
+                    android:text="@string/security_hidden_reason"
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
 
