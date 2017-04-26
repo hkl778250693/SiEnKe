@@ -628,7 +628,7 @@ public class UserDetailInfoActivity extends Activity {
                     break;
                 case 11:
                     cursor4.moveToPosition(0);
-                    securityHiddenReason.setText(cursor3.getString(3));
+                    securityHiddenReason.setText(cursor4.getString(3));
                     break;
             }
             super.handleMessage(msg);
