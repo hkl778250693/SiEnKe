@@ -3,8 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@android:color/white">
-    <Button
+    android:background="@android:color/white"
+    android:descendantFocusability="blocksDescendants">
+    <TextView
         android:id="@+id/item_name"
         android:layout_width="match_parent"
         android:layout_height="35dp"

@@ -216,15 +216,16 @@ public class NewTaskActivity extends Activity {
         popupWindow = new PopupWindow(securityHiddenreasonView,securityType.getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
         listView = (ListView) securityHiddenreasonView.findViewById(R.id.listview);
+        popupWindow.setFocusable(true);
+        popupWindow.setOutsideTouchable(true);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
+                securityType.setText(item.getItemName());
                 popupWindow.dismiss();
-                securityType.setText("");
             }
         });
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
         popupWindow.update();
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
@@ -233,7 +234,6 @@ public class NewTaskActivity extends Activity {
         new Thread(){
             @Override
             public void run() {
-                Log.i("getSecurityState=>", " 调用了！");
                 getSecurityState();
                 if (cursor.getCount() != 0) {
                     handler.sendEmptyMessage(9);
@@ -602,7 +602,8 @@ public class NewTaskActivity extends Activity {
                     listView.setAdapter(adapter);
                     break;
                 case 11:
-                    securityType.setText(cursor.getColumnName(2));
+                    cursor.moveToPosition(0);
+                    securityType.setText(cursor.getString(2));
                     break;
                 case 12:
                     securityType.setText("无");
@@ -626,7 +627,6 @@ public class NewTaskActivity extends Activity {
             popupwindowListItemList.add(item);
         }
         Log.i("getSecurityState=>", " 安检状态个数为：" + popupwindowListItemList.size());
-        cursor.close(); //游标关闭
     }
 
     @Override
@@ -645,6 +645,7 @@ public class NewTaskActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         //释放和数据库的连接
+        cursor.close(); //游标关闭
         db.close();
     }
 }
