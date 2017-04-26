@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,11 +17,13 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
@@ -28,8 +31,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
+import com.example.administrator.myapplicationsienke.adapter.PopupwindowListAdapter;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.NewTaskListviewItem;
+import com.example.administrator.myapplicationsienke.model.PopupwindowListItem;
+import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,6 +52,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/3/15.
@@ -61,7 +68,7 @@ public class NewTaskActivity extends Activity {
     private SharedPreferences.Editor editor;
     private SQLiteDatabase db;  //数据库
     public int responseCode = 0;
-    private RadioButton commonSecurityCheck, yearPlan, reCheck, passGasSecurityCheck;
+    private ListView listView;
     private LayoutInflater inflater;  //转换器
     private ProgressBar progressBar;  //下载进度条
     private TextView progressName, progressPercent;
@@ -80,6 +87,10 @@ public class NewTaskActivity extends Activity {
     private int currentProgress = 0;
     private int currentPercent = 0;
     private Calendar c; //日历
+    private List<PopupwindowListItem> popupwindowListItemList = new ArrayList<>();
+    private List<PopupwindowListItem> defaultList = new ArrayList<>();
+    private Cursor cursor;
+    private PopupwindowListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +137,17 @@ public class NewTaskActivity extends Activity {
         int day = c.get(Calendar.DAY_OF_MONTH);
         startDate.setText(year + " / " + (month + 1) + " / " + day);
         endDate.setText(year + " / " + (month + 1) + " / " + day);
+        new Thread(){
+            @Override
+            public void run() {
+                getSecurityState();
+                if (cursor.getCount() != 0) {
+                    handler.sendEmptyMessage(11);
+                }else {
+                    handler.sendEmptyMessage(12);
+                }
+            }
+        }.start();
     }
 
     //点击事件
@@ -191,39 +213,14 @@ public class NewTaskActivity extends Activity {
     public void createSecurityTypePopupwindow() {
         inflater = LayoutInflater.from(NewTaskActivity.this);
         securityHiddenreasonView = inflater.inflate(R.layout.popupwindow_security_type, null);
-        popupWindow = new PopupWindow(securityHiddenreasonView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(securityHiddenreasonView,securityType.getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
-        commonSecurityCheck = (RadioButton) securityHiddenreasonView.findViewById(R.id.common_security_check);
-        yearPlan = (RadioButton) securityHiddenreasonView.findViewById(R.id.year_plan);
-        reCheck = (RadioButton) securityHiddenreasonView.findViewById(R.id.recheck);
-        passGasSecurityCheck = (RadioButton) securityHiddenreasonView.findViewById(R.id.pass_gas_security_check);
-        //设置点击事件
-        commonSecurityCheck.setOnClickListener(new View.OnClickListener() {
+        listView = (ListView) securityHiddenreasonView.findViewById(R.id.listview);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 popupWindow.dismiss();
-                securityType.setText(commonSecurityCheck.getText());
-            }
-        });
-        yearPlan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityType.setText(yearPlan.getText());
-            }
-        });
-        reCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityType.setText(reCheck.getText());
-            }
-        });
-        passGasSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityType.setText(passGasSecurityCheck.getText());
+                securityType.setText("");
             }
         });
         popupWindow.setFocusable(true);
@@ -232,7 +229,20 @@ public class NewTaskActivity extends Activity {
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(securityType, 260, 0);
+        popupWindow.showAsDropDown(securityType, 0, 0);
+        new Thread(){
+            @Override
+            public void run() {
+                Log.i("getSecurityState=>", " 调用了！");
+                getSecurityState();
+                if (cursor.getCount() != 0) {
+                    handler.sendEmptyMessage(9);
+                }else {
+                    handler.sendEmptyMessage(10);
+                }
+
+            }
+        }.start();
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -576,10 +586,48 @@ public class NewTaskActivity extends Activity {
                     currentProgress = 0;
                     currentPercent = 0;
                     break;
+                case 9:
+                    adapter = new PopupwindowListAdapter(NewTaskActivity.this,popupwindowListItemList);
+                    adapter.notifyDataSetChanged();
+                    listView.setAdapter(adapter);
+                    break;
+                case 10:
+                    defaultList.clear();
+                    securityType.setText("无");
+                    PopupwindowListItem item = new PopupwindowListItem();
+                    item.setItemName("无");
+                    defaultList.add(item);
+                    adapter = new PopupwindowListAdapter(NewTaskActivity.this,defaultList);
+                    adapter.notifyDataSetChanged();
+                    listView.setAdapter(adapter);
+                    break;
+                case 11:
+                    securityType.setText(cursor.getColumnName(2));
+                    break;
+                case 12:
+                    securityType.setText("无");
+                    break;
             }
             super.handleMessage(msg);
         }
     };
+    //读取安检状态信息
+    public void getSecurityState() {
+        popupwindowListItemList.clear();
+        cursor = db.query("SecurityState", null, null, null, null, null, null);//查询并获得游标
+        Log.i("getSecurityState=>", " 查询到的状态个数为：" + cursor.getCount());
+        //如果游标为空，则显示默认数据
+        if (cursor.getCount() == 0) {
+            return;
+        }
+        while (cursor.moveToNext()) {
+            PopupwindowListItem item = new PopupwindowListItem();
+            item.setItemName(cursor.getString(2));
+            popupwindowListItemList.add(item);
+        }
+        Log.i("getSecurityState=>", " 安检状态个数为：" + popupwindowListItemList.size());
+        cursor.close(); //游标关闭
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -591,5 +639,12 @@ public class NewTaskActivity extends Activity {
                 }
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //释放和数据库的连接
+        db.close();
     }
 }

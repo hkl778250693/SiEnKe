@@ -52,14 +52,14 @@ import java.util.List;
  * Created by Administrator on 2017/3/16 0016.
  */
 public class DataTransferFragment extends Fragment {
-    private View view,popupwindowView,uploadView;
-    private TextView upload, download, progressName, progressPercent,tips;
-    private LinearLayout rootLinearlayout,linearlayoutDown;
+    private View view, popupwindowView, uploadView;
+    private TextView upload, download, progressName, progressPercent, tips;
+    private LinearLayout rootLinearlayout, linearlayoutDown;
     private Button finishBtn;
-    private RadioButton cancelRb,saveRb;
+    private RadioButton cancelRb, saveRb;
     private ImageView downFailed;
-    private String taskResult, userResult; //网络请求结果
-    private SharedPreferences sharedPreferences,sharedPreferences_login;
+    private String taskResult, userResult, stateResult, contentResult, hiddenResult, reasonResult; //网络请求结果
+    private SharedPreferences sharedPreferences, sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private String ip, port;  //接口ip地址   端口
     public int responseCode = 0;
@@ -67,7 +67,7 @@ public class DataTransferFragment extends Fragment {
     private LayoutInflater layoutInflater;
     private PopupWindow popupWindow;
     private AnimationDrawable animationDrawable;
-    private JSONObject taskObject, userObject;
+    private JSONObject taskObject, userObject, stateObject, contentObject, hiddenObject, reasonObject;
     private SQLiteDatabase db;  //数据库
     private int totalCount = 0;  //总户数
     private List<String> taskNumbList = new ArrayList<>();
@@ -111,16 +111,20 @@ public class DataTransferFragment extends Fragment {
                     createSavePopupwindow();
                     break;
                 case R.id.download:
-                    if(!sharedPreferences.getBoolean("have_download", false)){
+                    if (!sharedPreferences.getBoolean("have_download", false)) {
                         //开启支线程进行请求任务信息
                         new Thread() {
                             @Override
                             public void run() {
                                 requireMyTask("SafeCheckPlan.do", "safePlanMember=");
+                                requireSecurityState("findSecurityState.do "); //安检状态
+                                requireSecurityContent("findSecurityContent.do");//安检内容
+                                requireSafetyHidden("findSafetyHidden.do");//安检原因类型
+                                requireSafetyReason("findSafetyReason.do");//安检原因
                                 super.run();
                             }
                         }.start();
-                    }else {
+                    } else {
                         Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -187,7 +191,7 @@ public class DataTransferFragment extends Fragment {
         downloadProgress = (ProgressBar) popupwindowView.findViewById(R.id.download_progress);
         progressName = (TextView) popupwindowView.findViewById(R.id.progress_name);
         progressPercent = (TextView) popupwindowView.findViewById(R.id.progress_percent);
-        downloadProgress.setMax(10*jsonArray.length());
+        downloadProgress.setMax(10 * jsonArray.length());
         progressName.setText("任务正在下载，请稍后...");
         finishBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -239,7 +243,7 @@ public class DataTransferFragment extends Fragment {
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
                     if (!keyAndValue.equals("")) {
-                        url = new URL(httpUrl + "?" + keyAndValue + URLEncoder.encode(sharedPreferences_login.getString("user_name",""), "UTF-8"));
+                        url = new URL(httpUrl + "?" + keyAndValue + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8"));
                         //没有参数传递
                     } else {
                         url = new URL(httpUrl);
@@ -296,6 +300,307 @@ public class DataTransferFragment extends Fragment {
         }.start();
     }
 
+    //请求安检状态网络数据
+    private void requireSecurityState(final String method) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    URL url;
+                    HttpURLConnection httpURLConnection;
+                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
+                    if (!sharedPreferences.getString("security_ip", "").equals("")) {
+                        ip = sharedPreferences.getString("security_ip", "");
+                        //Log.i("sharedPreferences=ip=>",ip);
+                    } else {
+                        ip = "88.88.88.66:";
+                    }
+                    if (!sharedPreferences.getString("security_port", "").equals("")) {
+                        port = sharedPreferences.getString("security_port", "");
+                        //Log.i("sharedPreferences=ip=>",ip);
+                    } else {
+                        port = "8088";
+                    }
+                    String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
+                    url = new URL(httpUrl);
+                    Log.i("url=============>", url + "");
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setRequestMethod("GET");
+                    httpURLConnection.setRequestProperty("Accept-Encoding", "identity");
+                    httpURLConnection.setRequestProperty("Content-Type", "applicaton/json;charset=UTF-8");
+                    httpURLConnection.setConnectTimeout(6000);
+                    httpURLConnection.setReadTimeout(6000);
+                    httpURLConnection.connect();
+                    //传回的数据解析成String
+                    if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
+                        InputStream inputStream = httpURLConnection.getInputStream();
+                        Log.i("start_inputStream==>", "" + inputStream);
+                        Log.i("mid_inputStream==>", "" + inputStream);
+                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String str;
+                        while ((str = bufferedReader.readLine()) != null) {
+                            stringBuilder.append(str);
+                        }
+                        Log.i("end_inputStream==>", "" + inputStream);
+                        stateResult = stringBuilder.toString();
+                        Log.i("taskResult=====>", stateResult);
+                        JSONObject jsonObject = new JSONObject(stateResult);
+                        if (!jsonObject.optString("total", "").equals("0")) {
+                            handler.sendEmptyMessage(10);
+                        } else {
+                            handler.sendEmptyMessage(11);
+                        }
+                    } else {
+                        try {
+                            Thread.sleep(3000);
+                            handler.sendEmptyMessage(3);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    Log.i("IOException==========>", "网络请求异常!");
+                    handler.sendEmptyMessage(3);
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    //请求安检内容网络数据
+    private void requireSecurityContent(final String method) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    URL url;
+                    HttpURLConnection httpURLConnection;
+                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
+                    if (!sharedPreferences.getString("security_ip", "").equals("")) {
+                        ip = sharedPreferences.getString("security_ip", "");
+                        //Log.i("sharedPreferences=ip=>",ip);
+                    } else {
+                        ip = "88.88.88.66:";
+                    }
+                    if (!sharedPreferences.getString("security_port", "").equals("")) {
+                        port = sharedPreferences.getString("security_port", "");
+                        //Log.i("sharedPreferences=ip=>",ip);
+                    } else {
+                        port = "8088";
+                    }
+                    String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
+                    url = new URL(httpUrl);
+                    Log.i("url=============>", url + "");
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setRequestMethod("GET");
+                    httpURLConnection.setRequestProperty("Accept-Encoding", "identity");
+                    httpURLConnection.setRequestProperty("Content-Type", "applicaton/json;charset=UTF-8");
+                    httpURLConnection.setConnectTimeout(6000);
+                    httpURLConnection.setReadTimeout(6000);
+                    httpURLConnection.connect();
+                    //传回的数据解析成String
+                    if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
+                        InputStream inputStream = httpURLConnection.getInputStream();
+                        Log.i("start_inputStream==>", "" + inputStream);
+                        Log.i("mid_inputStream==>", "" + inputStream);
+                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String str;
+                        while ((str = bufferedReader.readLine()) != null) {
+                            stringBuilder.append(str);
+                        }
+                        Log.i("end_inputStream==>", "" + inputStream);
+                        contentResult = stringBuilder.toString();
+                        Log.i("taskResult=====>", contentResult);
+                        JSONObject jsonObject = new JSONObject(contentResult);
+                        if (!jsonObject.optString("total", "").equals("0")) {
+                            handler.sendEmptyMessage(12);
+                        } else {
+                            handler.sendEmptyMessage(13);
+                        }
+                    } else {
+                        try {
+                            Thread.sleep(3000);
+                            handler.sendEmptyMessage(3);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    Log.i("IOException==========>", "网络请求异常!");
+                    handler.sendEmptyMessage(3);
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    //请求安检隐患类型网络数据
+    private void requireSafetyHidden(final String method) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    URL url;
+                    HttpURLConnection httpURLConnection;
+                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
+                    if (!sharedPreferences.getString("security_ip", "").equals("")) {
+                        ip = sharedPreferences.getString("security_ip", "");
+                        //Log.i("sharedPreferences=ip=>",ip);
+                    } else {
+                        ip = "88.88.88.66:";
+                    }
+                    if (!sharedPreferences.getString("security_port", "").equals("")) {
+                        port = sharedPreferences.getString("security_port", "");
+                        //Log.i("sharedPreferences=ip=>",ip);
+                    } else {
+                        port = "8088";
+                    }
+                    String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
+                    url = new URL(httpUrl);
+                    Log.i("url=============>", url + "");
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setRequestMethod("GET");
+                    httpURLConnection.setRequestProperty("Accept-Encoding", "identity");
+                    httpURLConnection.setRequestProperty("Content-Type", "applicaton/json;charset=UTF-8");
+                    httpURLConnection.setConnectTimeout(6000);
+                    httpURLConnection.setReadTimeout(6000);
+                    httpURLConnection.connect();
+                    //传回的数据解析成String
+                    if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
+                        InputStream inputStream = httpURLConnection.getInputStream();
+                        Log.i("start_inputStream==>", "" + inputStream);
+                        Log.i("mid_inputStream==>", "" + inputStream);
+                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String str;
+                        while ((str = bufferedReader.readLine()) != null) {
+                            stringBuilder.append(str);
+                        }
+                        Log.i("end_inputStream==>", "" + inputStream);
+                        hiddenResult = stringBuilder.toString();
+                        Log.i("taskResult=====>", hiddenResult);
+                        JSONObject jsonObject = new JSONObject(hiddenResult);
+                        if (!jsonObject.optString("total", "").equals("0")) {
+                            handler.sendEmptyMessage(14);
+                        } else {
+                            handler.sendEmptyMessage(15);
+                        }
+                    } else {
+                        try {
+                            Thread.sleep(3000);
+                            handler.sendEmptyMessage(3);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    Log.i("IOException==========>", "网络请求异常!");
+                    handler.sendEmptyMessage(3);
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    //请求安检隐患原因网络数据
+    private void requireSafetyReason(final String method) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    URL url;
+                    HttpURLConnection httpURLConnection;
+                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
+                    if (!sharedPreferences.getString("security_ip", "").equals("")) {
+                        ip = sharedPreferences.getString("security_ip", "");
+                        //Log.i("sharedPreferences=ip=>",ip);
+                    } else {
+                        ip = "88.88.88.66:";
+                    }
+                    if (!sharedPreferences.getString("security_port", "").equals("")) {
+                        port = sharedPreferences.getString("security_port", "");
+                        //Log.i("sharedPreferences=ip=>",ip);
+                    } else {
+                        port = "8088";
+                    }
+                    String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
+                    url = new URL(httpUrl);
+                    Log.i("url=============>", url + "");
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setRequestMethod("GET");
+                    httpURLConnection.setRequestProperty("Accept-Encoding", "identity");
+                    httpURLConnection.setRequestProperty("Content-Type", "applicaton/json;charset=UTF-8");
+                    httpURLConnection.setConnectTimeout(6000);
+                    httpURLConnection.setReadTimeout(6000);
+                    httpURLConnection.connect();
+                    //传回的数据解析成String
+                    if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
+                        InputStream inputStream = httpURLConnection.getInputStream();
+                        Log.i("start_inputStream==>", "" + inputStream);
+                        Log.i("mid_inputStream==>", "" + inputStream);
+                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String str;
+                        while ((str = bufferedReader.readLine()) != null) {
+                            stringBuilder.append(str);
+                        }
+                        Log.i("end_inputStream==>", "" + inputStream);
+                        reasonResult = stringBuilder.toString();
+                        Log.i("taskResult=====>", reasonResult);
+                        JSONObject jsonObject = new JSONObject(reasonResult);
+                        if (!jsonObject.optString("total", "").equals("0")) {
+                            handler.sendEmptyMessage(16);
+                        } else {
+                            handler.sendEmptyMessage(17);
+                        }
+                    } else {
+                        try {
+                            Thread.sleep(3000);
+                            handler.sendEmptyMessage(3);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    Log.i("IOException==========>", "网络请求异常!");
+                    handler.sendEmptyMessage(3);
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+
     //自定义异步任务
     //启动任务的参数，进度参数，结果参数
     public class MyAsyncTask extends AsyncTask<String, Integer, String> {
@@ -334,11 +639,11 @@ public class DataTransferFragment extends Fragment {
                     if (!jsonObject.optString("total", "").equals("0")) {
                         if (url.toString().contains(taskNumbList.get(0))) {
                             //有相应用户数据
-                            editor.putBoolean("user_data",true);
+                            editor.putBoolean("user_data", true);
                             editor.commit();
-                            for(int i = 0; i < taskNumbList.size(); i++){
-                                if(sharedPreferences.getBoolean("user_data",true)){
-                                    if(i == 0){
+                            for (int i = 0; i < taskNumbList.size(); i++) {
+                                if (sharedPreferences.getBoolean("user_data", true)) {
+                                    if (i == 0) {
                                         Log.i("jsonArray==========>", "jsonArray==" + jsonArray.length());
                                         for (int j = 0; j < jsonArray.length(); j++) {
                                             try {
@@ -354,20 +659,20 @@ public class DataTransferFragment extends Fragment {
                                     }
                                     try {
                                         Thread.sleep(200);
-                                        userProgress += 10*taskNumbList.size() / taskNumbList.size();
-                                        currentUserPercent = (1000*(i+1)) / (10*taskNumbList.size());
+                                        userProgress += 10 * taskNumbList.size() / taskNumbList.size();
+                                        currentUserPercent = (1000 * (i + 1)) / (10 * taskNumbList.size());
                                         Message msg = new Message();
                                         msg.what = 9;
                                         msg.arg1 = userProgress;
                                         msg.arg2 = currentUserPercent;
-                                        Log.i("down_user_progress=>", " 循环次数为"+taskNumbList.size());
-                                        Log.i("down_user_progress=>", " 更新进度条"+userProgress);
-                                        Log.i("down_user_progress=>", " 下载进度: "+currentUserPercent);
+                                        Log.i("down_user_progress=>", " 循环次数为" + taskNumbList.size());
+                                        Log.i("down_user_progress=>", " 更新进度条" + userProgress);
+                                        Log.i("down_user_progress=>", " 下载进度: " + currentUserPercent);
                                         handler.sendMessage(msg);
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
-                                }else {
+                                } else {
                                     handler.sendEmptyMessage(4);
                                     break;
                                 }
@@ -378,7 +683,7 @@ public class DataTransferFragment extends Fragment {
                         }
                         return userResult;
                     } else {
-                        editor.putBoolean("user_data",false);
+                        editor.putBoolean("user_data", false);
                         editor.commit();
                         if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
                             //没有相应用户数据
@@ -408,7 +713,7 @@ public class DataTransferFragment extends Fragment {
         @Override
         protected void onProgressUpdate(Integer... values) {   //更新类似于进度条的控件的进度效果
             super.onProgressUpdate(values);
-            if(isCancelled()){
+            if (isCancelled()) {
                 return;
             }
             downloadProgress.setProgress(values[0]);
@@ -448,7 +753,7 @@ public class DataTransferFragment extends Fragment {
         } else {
             port = "8088";
         }
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 String url;
@@ -465,22 +770,22 @@ public class DataTransferFragment extends Fragment {
         }.start();
     }
 
-    public void setProgress(){
+    public void setProgress() {
         new Thread() {
             @Override
             public void run() {
                 try {
-                    for(int i = 0;i<jsonArray.length();i++){
+                    for (int i = 0; i < jsonArray.length(); i++) {
                         Thread.sleep(200);
-                        currentProgress += 10*jsonArray.length() / jsonArray.length();
-                        currentPercent = (1000*(i+1)) / (10*jsonArray.length());
+                        currentProgress += 10 * jsonArray.length() / jsonArray.length();
+                        currentPercent = (1000 * (i + 1)) / (10 * jsonArray.length());
                         Message msg = new Message();
                         msg.what = 7;
                         msg.arg1 = currentProgress;
                         msg.arg2 = currentPercent;
                         handler.sendMessage(msg);
-                        Log.i("down_task_progress=>", " 更新进度条"+currentProgress);
-                        Log.i("down_task_progress=>", " 下载进度: "+currentPercent);
+                        Log.i("down_task_progress=>", " 更新进度条" + currentProgress);
+                        Log.i("down_task_progress=>", " 下载进度: " + currentPercent);
                     }
                     Thread.sleep(500);
                     handler.sendEmptyMessage(8);
@@ -516,7 +821,7 @@ public class DataTransferFragment extends Fragment {
                     Toast.makeText(getActivity(), "没有任务下载哦！", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
-                    Toast.makeText(getActivity(), "任务信息网络请求超时！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
                 case 4:
                     progressName.setText("没有相应的用户数据哦！");
@@ -548,24 +853,84 @@ public class DataTransferFragment extends Fragment {
                 case 9:
                     progressPercent.setText(String.valueOf(msg.arg2));
                     downloadProgress.setProgress(msg.arg1);
-                    if(downloadProgress.getProgress() == downloadProgress.getMax()){
+                    if (downloadProgress.getProgress() == downloadProgress.getMax()) {
                         Log.i("down_progress=>", " 用户信息下载完成进来了！");
                         progressName.setText("数据下载完成！");
                         linearlayoutDown.setVisibility(View.GONE);
                         finishBtn.setVisibility(View.VISIBLE);
                         downFailed.setVisibility(View.GONE);
-                        editor.putBoolean("have_download",true);   //下载之后必须上传才能再次下载
+                        editor.putBoolean("have_download", true);   //下载之后必须上传才能再次下载
                         editor.commit();
                         userProgress = 0;
                         currentUserPercent = 0;
                     }
+                    break;
+                case 10:
+                    try {
+                        JSONObject jsonObject = new JSONObject(stateResult);
+                        JSONArray jsonArray = jsonObject.getJSONArray("rows");
+                        for (int j = 0; j < jsonArray.length(); j++) {
+                            stateObject = jsonArray.getJSONObject(j);
+                            insertSecurityState();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 11:
+                    Toast.makeText(getActivity(), "没有任务状态信息！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 12:
+                    try {
+                        JSONObject jsonObject = new JSONObject(contentResult);
+                        JSONArray jsonArray = jsonObject.getJSONArray("rows");
+                        for (int j = 0; j < jsonArray.length(); j++) {
+                            contentObject = jsonArray.getJSONObject(j);
+                            insertSecurityContent();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 13:
+                    Toast.makeText(getActivity(), "没有安检内容信息！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 14:
+                    try {
+                        JSONObject jsonObject = new JSONObject(hiddenResult);
+                        JSONArray jsonArray = jsonObject.getJSONArray("rows");
+                        for (int j = 0; j < jsonArray.length(); j++) {
+                            hiddenObject = jsonArray.getJSONObject(j);
+                            insertSecurityHidden();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 15:
+                    Toast.makeText(getActivity(), "没有安全隐患信息！", Toast.LENGTH_SHORT).show();
+                    break;
+                case 16:
+                    try {
+                        JSONObject jsonObject = new JSONObject(reasonResult);
+                        JSONArray jsonArray = jsonObject.getJSONArray("rows");
+                        for (int j = 0; j < jsonArray.length(); j++) {
+                            reasonObject = jsonArray.getJSONObject(j);
+                            insertSecurityHiddenReason();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 17:
+                    Toast.makeText(getActivity(), "没有安全隐患原因信息！", Toast.LENGTH_SHORT).show();
                     break;
             }
             super.handleMessage(msg);
         }
     };
 
-    //将服务器下载的任务数据存到本地数据库任务表
+    //任务数据存到本地数据库任务表
     private void insertTaskDataBase() {
         ContentValues values = new ContentValues();
         values.put("taskName", taskObject.optString("safetyPlanName", ""));
@@ -580,7 +945,7 @@ public class DataTransferFragment extends Fragment {
         db.insert("Task", null, values);
     }
 
-    //将服务器下载的用户信息数据存到本地数据库用户表
+    //用户信息数据存到本地数据库用户表
     private void insertUserDataBase() {
         ContentValues values = new ContentValues();
         values.put("securityNumber", userObject.optString("safetyInspectionId", ""));
@@ -598,6 +963,39 @@ public class DataTransferFragment extends Fragment {
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
         db.insert("User", null, values);
+    }
+
+    //安检状态数据存到本地数据库安检状态表
+    private void insertSecurityState() {
+        ContentValues values = new ContentValues();
+        values.put("securityId", stateObject.optInt("securityId", 0) + "");
+        values.put("securityName", stateObject.optString("securityName", ""));
+        db.insert("SecurityState", null, values);
+    }
+
+    //安检内容数据存到本地数据库安检内容表
+    private void insertSecurityContent() {
+        ContentValues values = new ContentValues();
+        values.put("securityId", contentObject.optInt("securityId", 0) + "");
+        values.put("securityName", contentObject.optString("securityName", ""));
+        db.insert("security_content", null, values);
+    }
+
+    //安检隐患类型数据存到本地数据库安检内容表
+    private void insertSecurityHidden() {
+        ContentValues values = new ContentValues();
+        values.put("n_safety_hidden_id", hiddenObject.optInt("n_safety_hidden_id", 0) + "");
+        values.put("n_safety_hidden_name", hiddenObject.optString("n_safety_hidden_name", ""));
+        db.insert("security_hidden", null, values);
+    }
+
+    //安检隐患原因数据存到本地数据库安检内容表
+    private void insertSecurityHiddenReason() {
+        ContentValues values = new ContentValues();
+        values.put("n_safety_hidden_reason_id", reasonObject.optInt("n_safety_hidden_reason_id", 0) + "");
+        values.put("n_safety_hidden_id", reasonObject.optInt("n_safety_hidden_id", 0) + "");
+        values.put("n_safety_hidden_reason_name", reasonObject.optString("n_safety_hidden_reason_name", ""));
+        db.insert("security_hidden_reason", null, values);
     }
 
     @Override
