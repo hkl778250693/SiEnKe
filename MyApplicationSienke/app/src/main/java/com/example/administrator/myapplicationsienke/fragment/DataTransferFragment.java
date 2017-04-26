@@ -106,7 +106,12 @@ public class DataTransferFragment extends Fragment {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.upload:
-                    createSavePopupwindow();
+                    if(sharedPreferences.getBoolean("have_download",false)){
+                        createSavePopupwindow();
+                    }else {
+                        Intent intent = new Intent(getActivity(), UploadActivity.class);
+                        startActivity(intent);
+                    }
                     break;
                 case R.id.download:
                     if (!sharedPreferences.getBoolean("have_download", false)) {

@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,8 +33,9 @@ import java.util.List;
  */
 public class UploadActivity extends Activity {
     private ImageView back;
-    private TextView upLoad;
+    private TextView upLoad,noData;
     private ListView listView;
+    private RelativeLayout uploadTaskSelectLayout;
     private List<TaskChoose> taskChooseList = new ArrayList<>();
     private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
     private HashMap<String, Object> map = new HashMap<String, Object>();
@@ -56,7 +58,6 @@ public class UploadActivity extends Activity {
         defaultSetting();//初始化设置
         //绑定控件
         bindView();
-        setViewClickListener();//点击事件
         //获取数据
         new Thread() {
             @Override
@@ -66,6 +67,7 @@ public class UploadActivity extends Activity {
                 super.run();
             }
         }.start();
+        setViewClickListener();//点击事件
     }
 
 
@@ -101,6 +103,8 @@ public class UploadActivity extends Activity {
         selectAll = (TextView) findViewById(R.id.select_all);
         reverse = (TextView) findViewById(R.id.reverse);
         selectCancel = (TextView) findViewById(R.id.select_cancel);
+        noData = (TextView) findViewById(R.id.no_data);
+        uploadTaskSelectLayout = (RelativeLayout) findViewById(R.id.upload_task_select_layout);
     }
 
     //点击事件
@@ -220,6 +224,19 @@ public class UploadActivity extends Activity {
     //读取下载到本地的任务数据
     public void getTaskData() {
         cursor = db.query("Task", null, null, null, null, null, null);//查询并获得游标
+        if (cursor.getCount() == 0) {
+            if (noData.getVisibility() == View.GONE) {
+                noData.setVisibility(View.VISIBLE);
+            }
+            uploadTaskSelectLayout.setVisibility(View.GONE);
+            return;
+        }
+        if (noData.getVisibility() == View.VISIBLE) {
+            noData.setVisibility(View.GONE);
+        }
+        if(uploadTaskSelectLayout.getVisibility() == View.GONE){
+            uploadTaskSelectLayout.setVisibility(View.VISIBLE);
+        }
         while (cursor.moveToNext()) {
             TaskChoose taskChoose = new TaskChoose();
             taskChoose.setTaskName(cursor.getString(1));

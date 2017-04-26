@@ -51,14 +51,26 @@
                 android:layout_height="wrap_content"
                 android:dividerHeight="5dp"
                 android:scrollbars="none" />
+            <TextView
+                android:id="@+id/no_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:drawablePadding="10dp"
+                android:drawableTop="@mipmap/no_data"
+                android:gravity="center_horizontal"
+                android:text="抱歉，本地没有数据上传哦~"
+                android:textColor="@color/text_gray"
+                android:visibility="gone" />
 
             <RelativeLayout
-                android:id="@+id/new_task_select_layout"
+                android:id="@+id/upload_task_select_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:background="@color/transparent_blue"
-                android:padding="10dp">
+                android:padding="10dp"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/select_all"
