@@ -58,7 +58,7 @@ import java.util.List;
  * Created by Administrator on 2017/3/16 0016.
  */
 public class UserDetailInfoActivity extends Activity {
-    private ImageView back, more;  //返回，更多
+    private ImageView back;  //返回
     private GridView gridView;
     private LinearLayout rootLinearlayout;  //添加图片
     private RelativeLayout hiddenTypeRoot, hiddenReasonRoot;
@@ -73,7 +73,6 @@ public class UserDetailInfoActivity extends Activity {
     private View popupwindowView, securityCaseView, securityHiddenTypeView, securityHiddenreasonView, saveView;
     private PopupWindow popupWindow;
     int sdkVersion = Build.VERSION.SDK_INT;  //当前SDK版本
-    private int TYPE_FILE_IMAGE = 1;
     private int TYPE_FILE_CROP_IMAGE = 2;
     protected static Uri tempUri,cropPhotoUri;
     protected static final int TAKE_PHOTO = 100;//拍照
@@ -82,15 +81,12 @@ public class UserDetailInfoActivity extends Activity {
     private SharedPreferences.Editor editor;
     private String securityId,UserNumber,UserName,MeterNumber,UserAddress,CheckType,UserPhoneNumber;
     private TextView userNumber,userName,meterNumber,userAddress,checkType,userPhoneNumber;
-    private List<GridviewImage> imageList = new ArrayList<>();
     private GridviewImageAdapter adapter;
     private PopupwindowListAdapter padapter;
     private List<Bitmap> bitmaps = new ArrayList<>();
     private String cropPhotoPath;  //裁剪的图片路径
-    private String originalPhotoPath;  //未裁剪图片路径
     private ArrayList<String>  cropPathLists = new ArrayList<>();  //裁剪的图片路径集合
     private ArrayList<String>  cropPathLists_back = new ArrayList<>();  //大图页面返回的图片路径集合
-    private ArrayList<String>  originalPathLists = new ArrayList<>();  //原始的图片路径集合
     private int currentPosition = 0;
     private SQLiteDatabase db;  //数据库
     private List<PopupwindowListItem> popupwindowListItemList = new ArrayList<>();
@@ -110,7 +106,6 @@ public class UserDetailInfoActivity extends Activity {
     //绑定控件
     private void bindView() {
         back = (ImageView) findViewById(R.id.back);
-        more = (ImageView) findViewById(R.id.more);
         securityCheckCase = (TextView) findViewById(R.id.security_check_case);
         securityHiddenType = (TextView) findViewById(R.id.security_hidden_type);
         securityHiddenReason = (TextView) findViewById(R.id.security_hidden_reason);
@@ -133,7 +128,6 @@ public class UserDetailInfoActivity extends Activity {
     //点击事件
     private void setViewClickListener() {
         back.setOnClickListener(onClickListener);
-        more.setOnClickListener(onClickListener);
         securityCheckCase.setOnClickListener(onClickListener);
         securityHiddenType.setOnClickListener(onClickListener);
         securityHiddenReason.setOnClickListener(onClickListener);
@@ -195,8 +189,6 @@ public class UserDetailInfoActivity extends Activity {
                     }
                     finish();
                     break;
-                case R.id.more:
-                    break;
                 case R.id.security_check_case:
                     createSecurityCasePopupwindow();
                     break;
@@ -232,20 +224,27 @@ public class UserDetailInfoActivity extends Activity {
         Intent intent = getIntent();
         if(intent != null){
             securityId = intent.getStringExtra("security_id");
-            if(intent.getStringExtra("user_number").equals("null")){
-                userNumber.setText("无");
-            }
+            UserNumber = intent.getStringExtra("user_number");
             UserName = intent.getStringExtra("user_name");
             MeterNumber = intent.getStringExtra("meter_number");
             UserAddress = intent.getStringExtra("user_address");
             CheckType = intent.getStringExtra("check_type");
             UserPhoneNumber = intent.getStringExtra("user_phone_number");
 
+            if(!UserNumber.equals("null")){
+                userNumber.setText(UserNumber);
+            }else {
+                userNumber.setText("无");
+            }
             userName.setText(UserName);
             meterNumber.setText(MeterNumber);
             userAddress.setText(UserAddress);
             checkType.setText(CheckType);
-            userPhoneNumber.setText(UserPhoneNumber);
+            if (!UserPhoneNumber.equals("null")) {
+                userPhoneNumber.setText(UserPhoneNumber);
+            } else {
+                userPhoneNumber.setText("无");
+            }
         }
     }
 
