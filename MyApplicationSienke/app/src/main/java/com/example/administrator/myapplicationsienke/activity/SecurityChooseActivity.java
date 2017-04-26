@@ -149,11 +149,11 @@ public class SecurityChooseActivity extends FragmentActivity {
         popupwindowView = inflater.inflate(R.layout.popup_window_security, null);
         popupWindow = new PopupWindow(popupwindowView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
-        file = (RadioButton) popupwindowView.findViewById(R.id.file);//文件管理
+        //file = (RadioButton) popupwindowView.findViewById(R.id.file);//文件管理
         settings = (RadioButton) popupwindowView.findViewById(R.id.settings);//系统设置
         quite = (RadioButton) popupwindowView.findViewById(R.id.quite);//安全退出
         //设置点击事件
-        file.setOnClickListener(new View.OnClickListener() {
+        /*file.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch (v.getId()) {
@@ -164,7 +164,7 @@ public class SecurityChooseActivity extends FragmentActivity {
                         break;
                 }
             }
-        });
+        });*/
 
         settings.setOnClickListener(new View.OnClickListener() {
             @Override

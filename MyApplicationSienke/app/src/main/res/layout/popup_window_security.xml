@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <RadioButton
+        <!--<RadioButton
             android:id="@+id/file"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
         <View
             android:layout_width="120dp"
             android:layout_height="5dp"
-            android:background="@color/gray_thin" />
+            android:background="@color/gray_thin" />-->
 
         <RadioButton
             android:id="@+id/settings"

@@ -28,14 +28,6 @@
             android:text="用户详细信息"
             android:textColor="@android:color/white"
             android:textSize="21sp" />
-
-        <ImageView
-            android:id="@+id/more"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:padding="15dp"
-            android:src="@mipmap/more" />
     </RelativeLayout>
 
     <ScrollView
@@ -366,7 +358,7 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:background="@drawable/linearlayout_shape"
-                    android:hint="请输入表编号"
+                    android:hint="请输入表编号(非必须)"
                     android:textColor="@color/text_gray"
                     android:textSize="12sp"
                     android:paddingTop="6dp"
@@ -395,7 +387,7 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:background="@drawable/linearlayout_shape"
-                    android:hint="备注信息"
+                    android:hint="备注信息(非必须)"
                     android:textColor="@color/text_gray"
                     android:textSize="12sp"
                     android:paddingTop="6dp"
