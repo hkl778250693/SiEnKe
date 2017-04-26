@@ -514,6 +514,7 @@ public class NewTaskDetailActivity extends Activity {
                             newTaskListviewItemList.add(item);
                         }
                         if (newTaskListviewItemList.size() != 0) {
+                            no_data.setVisibility(View.GONE);
                             Log.i("NewTaskDetailActivity", "传入的数据长度为：" + newTaskListviewItemList.size());
                             newTaskListviewAdapter = new NewTaskListviewAdapter(NewTaskDetailActivity.this, newTaskListviewItemList);
                             newTaskListviewAdapter.notifyDataSetChanged();

@@ -440,13 +440,14 @@ public class UserDetailInfoActivity extends Activity {
                     @Override
                     public void run() {
                         Log.i("getSecurityState=>", " 调用了！");
-                        getSecurityHiddenReasonDefault(itemId);
-                        if (cursor4.getCount() != 0) {
-                            handler.sendEmptyMessage(11);
-                        } else {
-                            handler.sendEmptyMessage(10);
+                        if(itemId != null){
+                            getSecurityHiddenReasonDefault(itemId);
+                            if (cursor4.getCount() != 0) {
+                                handler.sendEmptyMessage(11);
+                            } else {
+                                handler.sendEmptyMessage(10);
+                            }
                         }
-
                     }
                 }.start();
             }
@@ -505,13 +506,21 @@ public class UserDetailInfoActivity extends Activity {
             @Override
             public void run() {
                 Log.i("getSecurityState=>", " 调用了！");
-                getSecurityHiddenReason(itemId);
-                if (cursor3.getCount() != 0) {
-                    handler.sendEmptyMessage(3);
-                } else {
-                    handler.sendEmptyMessage(4);
+                if(itemId != null){
+                    getSecurityHiddenReason(itemId);
+                    if (cursor3.getCount() != 0) {
+                        handler.sendEmptyMessage(3);
+                    } else {
+                        handler.sendEmptyMessage(4);
+                    }
+                }else {
+                    getSecurityHiddenReason("8");
+                    if (cursor3.getCount() != 0) {
+                        handler.sendEmptyMessage(3);
+                    } else {
+                        handler.sendEmptyMessage(4);
+                    }
                 }
-
             }
         }.start();
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
@@ -628,7 +637,7 @@ public class UserDetailInfoActivity extends Activity {
                     break;
                 case 11:
                     cursor4.moveToPosition(0);
-                    securityHiddenReason.setText(cursor3.getString(3));
+                    securityHiddenReason.setText(cursor4.getString(3));
                     break;
             }
             super.handleMessage(msg);
@@ -799,7 +808,9 @@ public class UserDetailInfoActivity extends Activity {
         cursor1.close(); //游标关闭
         cursor2.close();
         cursor3.close();
-        cursor4.close();
+        if(cursor4 != null){
+            cursor4.close();
+        }
         db.close();
     }
 }
