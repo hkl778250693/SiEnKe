@@ -44,7 +44,7 @@ public class SecurityChooseActivity extends FragmentActivity {
     private PopupWindow popupWindow;
     private ImageView security_check_go;
     private RadioButton optionRbt;  //选项按钮
-    private TextView name;
+    private TextView name,userName;
     private RadioButton dataTransferRbt;  //数据传输按钮
     private List<Fragment> fragmentList;
     private ViewPager viewPager;
@@ -86,6 +86,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         dataTransferRbt = (RadioButton) findViewById(R.id.data_transfer_rbt);
         viewPager = (ViewPager) findViewById(R.id.security_viewpager);
         name = (TextView) findViewById(R.id.name);
+        userName = (TextView) findViewById(R.id.user_name);
     }
 
     //点击事件
@@ -216,6 +217,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
         sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        userName.setText(sharedPreferences_login.getString("user_name","")); //设置登录用户的名称
         editor.putInt("problem_number",sharedPreferences.getInt("problem_number",0));
         editor.apply();
         Log.i("user_exchanged", "用户是否改变"+sharedPreferences_login.getBoolean("user_exchanged", false));
