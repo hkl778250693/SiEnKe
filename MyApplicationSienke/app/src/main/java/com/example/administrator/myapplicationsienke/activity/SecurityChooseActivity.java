@@ -212,7 +212,7 @@ public class SecurityChooseActivity extends FragmentActivity {
     private void defaultSetting() {
         optionRbt.setChecked(true);
         helper = new MySqliteHelper(SecurityChooseActivity.this, 1);
-        db = helper.getReadableDatabase();
+        db = helper.getWritableDatabase();
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
         sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();

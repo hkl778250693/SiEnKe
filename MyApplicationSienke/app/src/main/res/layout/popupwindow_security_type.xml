@@ -1,82 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="100dp"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="150dp"
-        android:scrollbars="none">
-
-        <RadioGroup
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <RadioButton
-                android:id="@+id/common_security_check"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:background="@drawable/button_white_bg_take_photo_selector"
-                android:button="@null"
-                android:text="常规安检"
-                android:gravity="center"
-                android:textColor="@drawable/radiogroup_text_selector"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/gray_thin" />
-
-            <RadioButton
-                android:id="@+id/year_plan"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:background="@drawable/button_white_bg_album_selector"
-                android:button="@null"
-                android:text="年度计划"
-                android:gravity="center"
-                android:textColor="@drawable/radiogroup_text_selector"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/gray_thin" />
-
-            <RadioButton
-                android:id="@+id/recheck"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:background="@drawable/button_white_bg_album_selector"
-                android:button="@null"
-                android:text="复检"
-                android:gravity="center"
-                android:textColor="@drawable/radiogroup_text_selector"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/gray_thin" />
-
-            <RadioButton
-                android:id="@+id/pass_gas_security_check"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:background="@drawable/button_white_bg_album_selector"
-                android:button="@null"
-                android:text="通气安检"
-                android:gravity="center"
-                android:textColor="@drawable/radiogroup_text_selector"
-                android:textSize="14sp" />
-
-        </RadioGroup>
-    </ScrollView>
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:dividerHeight="1dp"
+        android:padding="5dp"/>
 
 </LinearLayout>
