@@ -441,7 +441,7 @@ public class UserDetailInfoActivity extends Activity {
                     public void run() {
                         Log.i("getSecurityState=>", " 调用了！");
                         getSecurityHiddenReasonDefault(itemId);
-                        if (cursor3.getCount() != 0) {
+                        if (cursor4.getCount() != 0) {
                             handler.sendEmptyMessage(9);
                         } else {
                             handler.sendEmptyMessage(10);
@@ -685,14 +685,14 @@ public class UserDetailInfoActivity extends Activity {
 
     //读取安全隐患原因默认信息
     public void getSecurityHiddenReasonDefault(String itemId) {
-        cursor3 =  db.rawQuery("select * from security_hidden_reason where n_safety_hidden_id=?", new String[]{itemId});//查询并获得游标
+        cursor4 =  db.rawQuery("select * from security_hidden_reason where n_safety_hidden_id=?", new String[]{itemId});//查询并获得游标
         //如果游标为空，则显示默认数据
-        if (cursor3.getCount() == 0) {
+        if (cursor4.getCount() == 0) {
             return;
         }
-        while (cursor3.moveToNext()) {
+        while (cursor4.moveToNext()) {
             PopupwindowListItem item = new PopupwindowListItem();
-            item.setItemName(cursor3.getString(3));
+            item.setItemName(cursor4.getString(3));
         }
     }
 
