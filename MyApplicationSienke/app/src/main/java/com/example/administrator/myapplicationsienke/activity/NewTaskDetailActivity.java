@@ -108,6 +108,19 @@ public class NewTaskDetailActivity extends Activity {
         editDelete = (ImageView) findViewById(R.id.edit_delete);
     }
 
+    //初始化设置
+    private void defaultSetting() {
+        sharedPreferences = NewTaskDetailActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        if (no_data.getVisibility() == View.GONE) {
+            no_data.setVisibility(View.VISIBLE);
+        }
+        parclebleList.clear();
+        if(newTaskListviewAdapter == null){
+            newTaskSelectLayout.setVisibility(View.GONE);
+        }
+    }
+
     //点击事件
     private void setOnClickListener() {
         back.setOnClickListener(onClickListener);
@@ -195,9 +208,6 @@ public class NewTaskDetailActivity extends Activity {
                         newTaskListviewItemList.clear();
                         newTaskListviewAdapter.notifyDataSetChanged();
                     }
-                    if (filter.getText().equals("筛选")) {
-                        Toast.makeText(NewTaskDetailActivity.this, "请选择筛选条件哦！", Toast.LENGTH_SHORT).show();
-                    }
                     if (filter.getText().equals("姓名")) {
                         if(etSearch.getText().length() >= 2){
                             showPopupwindow();
@@ -210,28 +220,36 @@ public class NewTaskDetailActivity extends Activity {
                                 }
                             }.start();
                         }else {
-                            Toast.makeText(NewTaskDetailActivity.this, "请至少输入两个字哦！", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(NewTaskDetailActivity.this, "请至少输入两个字！", Toast.LENGTH_SHORT).show();
                         }
                     } else if (filter.getText().equals("表编号")) {
-                        showPopupwindow();
-                        //开启支线程进行请求任务信息
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                requireMyTask("getCostomer.do", "meterNumber=" + etSearch.getText().toString());
-                                super.run();
-                            }
-                        }.start();
+                        if(etSearch.getText().length() != 0){
+                            showPopupwindow();
+                            //开启支线程进行请求任务信息
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    requireMyTask("getCostomer.do", "meterNumber=" + etSearch.getText().toString());
+                                    super.run();
+                                }
+                            }.start();
+                        }else {
+                            Toast.makeText(NewTaskDetailActivity.this, "请输入表编号！", Toast.LENGTH_SHORT).show();
+                        }
                     } else if (filter.getText().equals("地址")) {
-                        showPopupwindow();
-                        //开启支线程进行请求任务信息
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                requireMyTask("getCostomer.do", "userAdress=" + etSearch.getText().toString());
-                                super.run();
-                            }
-                        }.start();
+                        if(etSearch.getText().length() != 0){
+                            showPopupwindow();
+                            //开启支线程进行请求任务信息
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    requireMyTask("getCostomer.do", "userAdress=" + etSearch.getText().toString());
+                                    super.run();
+                                }
+                            }.start();
+                        }else {
+                            Toast.makeText(NewTaskDetailActivity.this, "请输入地址！", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     break;
                 case R.id.edit_delete:
@@ -261,20 +279,6 @@ public class NewTaskDetailActivity extends Activity {
             }
         }
     };
-
-    //初始化设置
-    private void defaultSetting() {
-        sharedPreferences = NewTaskDetailActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
-        filter.setText("筛选");
-        if (no_data.getVisibility() == View.GONE) {
-            no_data.setVisibility(View.VISIBLE);
-        }
-        parclebleList.clear();
-        if(newTaskListviewAdapter == null){
-            newTaskSelectLayout.setVisibility(View.GONE);
-        }
-    }
 
     //全选
     public void selectAll(){

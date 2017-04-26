@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.model.PopupwindowListItem;
@@ -50,7 +51,7 @@ public class PopupwindowListAdapter extends BaseAdapter {
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = layoutInflater.inflate(R.layout.popupwindow_list_item, null);
-            viewHolder.itemName = (Button) convertView.findViewById(R.id.item_name);
+            viewHolder.itemName = (TextView) convertView.findViewById(R.id.item_name);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -61,6 +62,6 @@ public class PopupwindowListAdapter extends BaseAdapter {
     }
 
     public class ViewHolder {
-        Button itemName;
+        TextView itemName;
     }
 }
