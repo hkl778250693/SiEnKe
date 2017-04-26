@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
@@ -38,10 +39,12 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.GridviewImageAdapter;
+import com.example.administrator.myapplicationsienke.adapter.PopupwindowListAdapter;
 import com.example.administrator.myapplicationsienke.mode.MyPhotoUtils;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.mode.Tools;
 import com.example.administrator.myapplicationsienke.model.GridviewImage;
+import com.example.administrator.myapplicationsienke.model.PopupwindowListItem;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -62,6 +65,7 @@ public class UserDetailInfoActivity extends Activity {
     private TextView securityCheckCase, securityHiddenType, securityHiddenReason;  //安全情况,安全隐患类型，安全隐患原因
     private Button saveBtn, takePhoto, cancel;  //保存、拍照、相册、取消
     private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck, overSecurityCheckTime, nobodyHere, refuseSecurityCheck;
+    private ListView listView;
     private RadioButton commonSecurityCheck, yearPlan, recheck, passGasSecurityCheck;
     private RadioButton indoorStandPipe, indoorBranchPipe, fuelGasMeter, burningAppliances, gasFacilitiesRoom, threeWayPipe;
     private RadioButton cancelRb, saveRb;
@@ -80,6 +84,7 @@ public class UserDetailInfoActivity extends Activity {
     private TextView userNumber,userName,meterNumber,userAddress,checkType,userPhoneNumber;
     private List<GridviewImage> imageList = new ArrayList<>();
     private GridviewImageAdapter adapter;
+    private PopupwindowListAdapter padapter;
     private List<Bitmap> bitmaps = new ArrayList<>();
     private String cropPhotoPath;  //裁剪的图片路径
     private String originalPhotoPath;  //未裁剪图片路径
@@ -88,6 +93,9 @@ public class UserDetailInfoActivity extends Activity {
     private ArrayList<String>  originalPathLists = new ArrayList<>();  //原始的图片路径集合
     private int currentPosition = 0;
     private SQLiteDatabase db;  //数据库
+    private List<PopupwindowListItem> popupwindowListItemList = new ArrayList<>();
+    private Cursor cursor;
+    private List<PopupwindowListItem> defaultList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -327,68 +335,15 @@ public class UserDetailInfoActivity extends Activity {
     //弹出安全情况popupwindow
     public void createSecurityCasePopupwindow() {
         inflater = LayoutInflater.from(UserDetailInfoActivity.this);
-        securityCaseView = inflater.inflate(R.layout.popupwindow_security_case, null);
-        popupWindow = new PopupWindow(securityCaseView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        securityCaseView = inflater.inflate(R.layout.popupwindow_security_type, null);
+        popupWindow = new PopupWindow(securityCaseView,securityCheckCase.getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
-        notSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.not_security_check);
-        passSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.pass_security_check);
-        notPassSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.not_pass_security_check);
-        overSecurityCheckTime = (RadioButton) securityCaseView.findViewById(R.id.over_security_check_time);
-        nobodyHere = (RadioButton) securityCaseView.findViewById(R.id.nobody_here);
-        refuseSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.refuse_security_check);
-        //设置点击事件
-        notSecurityCheck.setOnClickListener(new View.OnClickListener() {
+        listView = (ListView) securityCaseView.findViewById(R.id.listview);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 popupWindow.dismiss();
-                securityCheckCase.setText(notSecurityCheck.getText());
-                showHiddenTypeAndReason();
-            }
-        });
-        passSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityCheckCase.setText(passSecurityCheck.getText());
-                if (securityCheckCase.getText().equals("安检合格")) {
-                    Log.i("securityCheckCase", "安检合格");
-                    if (hiddenTypeRoot.getVisibility() == View.VISIBLE && hiddenReasonRoot.getVisibility() == View.VISIBLE) {
-                        hiddenTypeRoot.setVisibility(View.GONE);
-                        hiddenReasonRoot.setVisibility(View.GONE);
-                    }
-                }
-            }
-        });
-        notPassSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityCheckCase.setText(notPassSecurityCheck.getText());
-                showHiddenTypeAndReason();
-            }
-        });
-        overSecurityCheckTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityCheckCase.setText(overSecurityCheckTime.getText());
-                showHiddenTypeAndReason();
-            }
-        });
-        nobodyHere.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityCheckCase.setText(nobodyHere.getText());
-                showHiddenTypeAndReason();
-            }
-        });
-        refuseSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityCheckCase.setText(refuseSecurityCheck.getText());
-                showHiddenTypeAndReason();
+                securityCheckCase.setText("");
             }
         });
         popupWindow.setFocusable(true);
@@ -398,6 +353,19 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityCheckCase, 0, 0);
+        new Thread(){
+            @Override
+            public void run() {
+                Log.i("getSecurityState=>", " 调用了！");
+                getSecurityCheckCase();
+                if (cursor.getCount() != 0) {
+                    handler.sendEmptyMessage(3);
+                }else {
+                    handler.sendEmptyMessage(4);
+                }
+
+            }
+        }.start();
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -417,40 +385,15 @@ public class UserDetailInfoActivity extends Activity {
     //弹出安全隐患类型popupwindow
     public void createSecurityHiddenTypePopupwindow() {
         inflater = LayoutInflater.from(UserDetailInfoActivity.this);
-        securityHiddenTypeView = inflater.inflate(R.layout.popupwindow_security_hidden_type, null);
-        popupWindow = new PopupWindow(securityHiddenTypeView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        securityHiddenTypeView = inflater.inflate(R.layout.popupwindow_security_type, null);
+        popupWindow = new PopupWindow(securityHiddenTypeView,securityHiddenType.getWidth() , LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
-        commonSecurityCheck = (RadioButton) securityHiddenTypeView.findViewById(R.id.common_security_check);
-        yearPlan = (RadioButton) securityHiddenTypeView.findViewById(R.id.year_plan);
-        recheck = (RadioButton) securityHiddenTypeView.findViewById(R.id.recheck);
-        passGasSecurityCheck = (RadioButton) securityHiddenTypeView.findViewById(R.id.pass_gas_security_check);
-        //设置点击事件
-        commonSecurityCheck.setOnClickListener(new View.OnClickListener() {
+        listView = (ListView) securityHiddenTypeView.findViewById(R.id.listview);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 popupWindow.dismiss();
-                securityHiddenType.setText(commonSecurityCheck.getText());
-            }
-        });
-        yearPlan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityHiddenType.setText(yearPlan.getText());
-            }
-        });
-        recheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityHiddenType.setText(passGasSecurityCheck.getText());
-            }
-        });
-        passGasSecurityCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityHiddenType.setText(commonSecurityCheck.getText());
+                securityHiddenType.setText("");
             }
         });
         popupWindow.setFocusable(true);
@@ -460,6 +403,19 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityHiddenType, 0, 0);
+        new Thread(){
+            @Override
+            public void run() {
+                Log.i("getSecurityState=>", " 调用了！");
+                getSecurityHiddenType();
+                if (cursor.getCount() != 0) {
+                    handler.sendEmptyMessage(3);
+                }else {
+                    handler.sendEmptyMessage(4);
+                }
+
+            }
+        }.start();
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -471,56 +427,15 @@ public class UserDetailInfoActivity extends Activity {
     //弹出安全隐患原因popupwindow
     public void createSecurityHiddenReasonPopupwindow() {
         inflater = LayoutInflater.from(UserDetailInfoActivity.this);
-        securityHiddenreasonView = inflater.inflate(R.layout.popupwindow_security_hidden_reason, null);
-        popupWindow = new PopupWindow(securityHiddenreasonView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        securityHiddenreasonView = inflater.inflate(R.layout.popupwindow_security_type, null);
+        popupWindow = new PopupWindow(securityHiddenreasonView,securityHiddenReason.getWidth() , LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
-        indoorStandPipe = (RadioButton) securityHiddenreasonView.findViewById(R.id.indoor_stand_pipe);
-        indoorBranchPipe = (RadioButton) securityHiddenreasonView.findViewById(R.id.indoor_branch_pipe);
-        fuelGasMeter = (RadioButton) securityHiddenreasonView.findViewById(R.id.fuel_gas_meter);
-        burningAppliances = (RadioButton) securityHiddenreasonView.findViewById(R.id.burning_appliances);
-        gasFacilitiesRoom = (RadioButton) securityHiddenreasonView.findViewById(R.id.gas_facilities_room);
-        threeWayPipe = (RadioButton) securityHiddenreasonView.findViewById(R.id.three_way_pipe);
-        //设置点击事件
-        indoorStandPipe.setOnClickListener(new View.OnClickListener() {
+        listView = (ListView) securityHiddenTypeView.findViewById(R.id.listview);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 popupWindow.dismiss();
-                securityHiddenReason.setText(indoorStandPipe.getText());
-            }
-        });
-        indoorBranchPipe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityHiddenReason.setText(indoorBranchPipe.getText());
-            }
-        });
-        fuelGasMeter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityHiddenReason.setText(fuelGasMeter.getText());
-            }
-        });
-        burningAppliances.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityHiddenReason.setText(burningAppliances.getText());
-            }
-        });
-        gasFacilitiesRoom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityHiddenReason.setText(gasFacilitiesRoom.getText());
-            }
-        });
-        threeWayPipe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                securityHiddenReason.setText(threeWayPipe.getText());
+                securityHiddenReason.setText("");
             }
         });
         popupWindow.setFocusable(true);
@@ -530,6 +445,19 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityHiddenReason, Gravity.CENTER_HORIZONTAL, 0);
+        new Thread(){
+            @Override
+            public void run() {
+                Log.i("getSecurityState=>", " 调用了！");
+                getSecurityHiddenReason();
+                if (cursor.getCount() != 0) {
+                    handler.sendEmptyMessage(3);
+                }else {
+                    handler.sendEmptyMessage(4);
+                }
+
+            }
+        }.start();
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -601,10 +529,79 @@ public class UserDetailInfoActivity extends Activity {
                     gridView.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
                     break;
+                case 3:
+                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this,popupwindowListItemList);
+                    padapter.notifyDataSetChanged();
+                    listView.setAdapter(padapter);
+                    break;
+                case 4:
+                    defaultList.clear();
+                    securityCheckCase.setText("无");
+                    PopupwindowListItem item = new PopupwindowListItem();
+                    item.setItemName("无");
+                    defaultList.add(item);
+                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this,defaultList);
+                    padapter.notifyDataSetChanged();
+                    listView.setAdapter(padapter);
+                    break;
             }
             super.handleMessage(msg);
         }
     };
+
+    //读取安全情况状态信息
+    public void getSecurityCheckCase() {
+        popupwindowListItemList.clear();
+        cursor = db.query("security_content", null, null, null, null, null, null);//查询并获得游标
+        Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor.getCount());
+        //如果游标为空，则显示默认数据
+        if (cursor.getCount() == 0) {
+            return;
+        }
+        while (cursor.moveToNext()) {
+            PopupwindowListItem item = new PopupwindowListItem();
+            item.setItemName(cursor.getString(2));
+            popupwindowListItemList.add(item);
+        }
+        Log.i("getSecurityState=>", " 安检状态个数为：" + popupwindowListItemList.size());
+        cursor.close(); //游标关闭
+    }
+
+    //读取安全隐患类型信息
+    public void getSecurityHiddenType() {
+        popupwindowListItemList.clear();
+        cursor = db.query("security_hidden", null, null, null, null, null, null);//查询并获得游标
+        Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor.getCount());
+        //如果游标为空，则显示默认数据
+        if (cursor.getCount() == 0) {
+            return;
+        }
+        while (cursor.moveToNext()) {
+            PopupwindowListItem item = new PopupwindowListItem();
+            item.setItemName(cursor.getString(2));
+            popupwindowListItemList.add(item);
+        }
+        Log.i("getSecurityState=>", " 安检状态个数为：" + popupwindowListItemList.size());
+        cursor.close(); //游标关闭
+    }
+
+    //读取安全隐患原因信息
+    public void getSecurityHiddenReason() {
+        popupwindowListItemList.clear();
+        cursor = db.query("security_hidden_reason", null, null, null, null, null, null);//查询并获得游标
+        Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor.getCount());
+        //如果游标为空，则显示默认数据
+        if (cursor.getCount() == 0) {
+            return;
+        }
+        while (cursor.moveToNext()) {
+            PopupwindowListItem item = new PopupwindowListItem();
+            item.setItemName(cursor.getString(2));
+            popupwindowListItemList.add(item);
+        }
+        Log.i("getSecurityState=>", " 安检状态个数为：" + popupwindowListItemList.size());
+        cursor.close(); //游标关闭
+    }
 
     /**
      * 裁剪图片方法实现
