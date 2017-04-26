@@ -1,7 +1,6 @@
 package com.example.administrator.myapplicationsienke.activity;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +8,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -24,7 +22,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
@@ -35,7 +32,6 @@ import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.GridviewImageAdapter;
@@ -43,15 +39,12 @@ import com.example.administrator.myapplicationsienke.adapter.PopupwindowListAdap
 import com.example.administrator.myapplicationsienke.mode.MyPhotoUtils;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.mode.Tools;
-import com.example.administrator.myapplicationsienke.model.GridviewImage;
 import com.example.administrator.myapplicationsienke.model.PopupwindowListItem;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -64,34 +57,32 @@ public class UserDetailInfoActivity extends Activity {
     private RelativeLayout hiddenTypeRoot, hiddenReasonRoot;
     private TextView securityCheckCase, securityHiddenType, securityHiddenReason;  //安全情况,安全隐患类型，安全隐患原因
     private Button saveBtn, takePhoto, cancel;  //保存、拍照、相册、取消
-    private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck, overSecurityCheckTime, nobodyHere, refuseSecurityCheck;
     private ListView listView;
-    private RadioButton commonSecurityCheck, yearPlan, recheck, passGasSecurityCheck;
-    private RadioButton indoorStandPipe, indoorBranchPipe, fuelGasMeter, burningAppliances, gasFacilitiesRoom, threeWayPipe;
     private RadioButton cancelRb, saveRb;
     private LayoutInflater inflater;  //转换器
     private View popupwindowView, securityCaseView, securityHiddenTypeView, securityHiddenreasonView, saveView;
     private PopupWindow popupWindow;
     int sdkVersion = Build.VERSION.SDK_INT;  //当前SDK版本
     private int TYPE_FILE_CROP_IMAGE = 2;
-    protected static Uri tempUri,cropPhotoUri;
+    protected static Uri tempUri, cropPhotoUri;
     protected static final int TAKE_PHOTO = 100;//拍照
     protected static final int CROP_SMALL_PICTURE = 300;  //裁剪成小图片
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private String securityId,UserNumber,UserName,MeterNumber,UserAddress,CheckType,UserPhoneNumber;
-    private TextView userNumber,userName,meterNumber,userAddress,checkType,userPhoneNumber;
+    private String securityId, UserNumber, UserName, MeterNumber, UserAddress, CheckType, UserPhoneNumber;
+    private TextView userNumber, userName, meterNumber, userAddress, checkType, userPhoneNumber;
     private GridviewImageAdapter adapter;
     private PopupwindowListAdapter padapter;
     private List<Bitmap> bitmaps = new ArrayList<>();
     private String cropPhotoPath;  //裁剪的图片路径
-    private ArrayList<String>  cropPathLists = new ArrayList<>();  //裁剪的图片路径集合
-    private ArrayList<String>  cropPathLists_back = new ArrayList<>();  //大图页面返回的图片路径集合
+    private ArrayList<String> cropPathLists = new ArrayList<>();  //裁剪的图片路径集合
+    private ArrayList<String> cropPathLists_back = new ArrayList<>();  //大图页面返回的图片路径集合
     private int currentPosition = 0;
     private SQLiteDatabase db;  //数据库
     private List<PopupwindowListItem> popupwindowListItemList = new ArrayList<>();
-    private Cursor cursor;
+    private Cursor cursor1,cursor2,cursor3,cursor4;
     private List<PopupwindowListItem> defaultList = new ArrayList<>();
+    private String itemId;//安检隐患类型id
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +124,7 @@ public class UserDetailInfoActivity extends Activity {
         securityHiddenReason.setOnClickListener(onClickListener);
         saveBtn.setOnClickListener(onClickListener);
 
-        adapter = new GridviewImageAdapter(UserDetailInfoActivity.this,cropPathLists);
+        adapter = new GridviewImageAdapter(UserDetailInfoActivity.this, cropPathLists);
         gridView.setSelector(new ColorDrawable(Color.TRANSPARENT));
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -152,12 +143,12 @@ public class UserDetailInfoActivity extends Activity {
                         }
                     }
                 }
-                if(!adapter.getDeleteShow() && adapter.getCount() - 1 != position){
-                    Intent intent = new Intent(UserDetailInfoActivity.this,MyPhotoGalleryActivity.class);
-                    intent.putExtra("currentPosition",currentPosition);
-                    intent.putStringArrayListExtra("cropPathLists",cropPathLists);
-                    Log.i("UserDetailInfoActivity", "点击图片跳转进来到预览详情页面的图片数量为："+cropPathLists.size());
-                    startActivityForResult(intent,500);
+                if (!adapter.getDeleteShow() && adapter.getCount() - 1 != position) {
+                    Intent intent = new Intent(UserDetailInfoActivity.this, MyPhotoGalleryActivity.class);
+                    intent.putExtra("currentPosition", currentPosition);
+                    intent.putStringArrayListExtra("cropPathLists", cropPathLists);
+                    Log.i("UserDetailInfoActivity", "点击图片跳转进来到预览详情页面的图片数量为：" + cropPathLists.size());
+                    startActivityForResult(intent, 500);
                 }
             }
         });
@@ -182,8 +173,8 @@ public class UserDetailInfoActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.back:
-                    if(cropPathLists.size() != 0){
-                        for(int i = 0;i<cropPathLists.size();i++){
+                    if (cropPathLists.size() != 0) {
+                        for (int i = 0; i < cropPathLists.size(); i++) {
                             deletePicture(new File(cropPathLists.get(i)));
                         }
                     }
@@ -222,7 +213,7 @@ public class UserDetailInfoActivity extends Activity {
 
         //获取上一个页面传过来的用户ID
         Intent intent = getIntent();
-        if(intent != null){
+        if (intent != null) {
             securityId = intent.getStringExtra("security_id");
             UserNumber = intent.getStringExtra("user_number");
             UserName = intent.getStringExtra("user_name");
@@ -231,9 +222,9 @@ public class UserDetailInfoActivity extends Activity {
             CheckType = intent.getStringExtra("check_type");
             UserPhoneNumber = intent.getStringExtra("user_phone_number");
 
-            if(!UserNumber.equals("null")){
+            if (!UserNumber.equals("null")) {
                 userNumber.setText(UserNumber);
-            }else {
+            } else {
                 userNumber.setText("无");
             }
             userName.setText(UserName);
@@ -246,6 +237,43 @@ public class UserDetailInfoActivity extends Activity {
                 userPhoneNumber.setText("无");
             }
         }
+
+        //显示默认安全情况
+        new Thread() {
+            @Override
+            public void run() {
+                getSecurityCheckCase();
+                if (cursor1.getCount() != 0) {
+                    handler.sendEmptyMessage(5);
+                } else {
+                    handler.sendEmptyMessage(6);
+                }
+            }
+        }.start();
+        //显示默认安全隐患类型
+        new Thread() {
+            @Override
+            public void run() {
+                getSecurityHiddenType();
+                if (cursor2.getCount() != 0) {
+                    handler.sendEmptyMessage(7);
+                } else {
+                    handler.sendEmptyMessage(8);
+                }
+            }
+        }.start();
+        //显示默认安全隐患原因
+        new Thread() {
+            @Override
+            public void run() {
+                getSecurityHiddenReason("8");
+                if (cursor3.getCount() != 0) {
+                    handler.sendEmptyMessage(9);
+                } else {
+                    handler.sendEmptyMessage(10);
+                }
+            }
+        }.start();
     }
 
     //弹出拍照popupwindow
@@ -304,8 +332,8 @@ public class UserDetailInfoActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                if(cropPathLists.size() != 0){
-                    for(int i = 0;i<cropPathLists.size();i++){
+                if (cropPathLists.size() != 0) {
+                    for (int i = 0; i < cropPathLists.size(); i++) {
                         insertSecurityPhoto(cropPathLists.get(i));
                     }
                 }
@@ -335,14 +363,20 @@ public class UserDetailInfoActivity extends Activity {
     public void createSecurityCasePopupwindow() {
         inflater = LayoutInflater.from(UserDetailInfoActivity.this);
         securityCaseView = inflater.inflate(R.layout.popupwindow_security_type, null);
-        popupWindow = new PopupWindow(securityCaseView,securityCheckCase.getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(securityCaseView, securityCheckCase.getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
         listView = (ListView) securityCaseView.findViewById(R.id.listview);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
+                securityCheckCase.setText(item.getItemName());
+                if(!securityCheckCase.getText().equals("合格")){
+                    showHiddenTypeAndReason();
+                }else {
+                    noShowHiddenTypeAndReason();
+                }
                 popupWindow.dismiss();
-                securityCheckCase.setText("");
             }
         });
         popupWindow.setFocusable(true);
@@ -352,14 +386,13 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityCheckCase, 0, 0);
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
-                Log.i("getSecurityState=>", " 调用了！");
                 getSecurityCheckCase();
-                if (cursor.getCount() != 0) {
+                if (cursor1.getCount() != 0) {
                     handler.sendEmptyMessage(3);
-                }else {
+                } else {
                     handler.sendEmptyMessage(4);
                 }
 
@@ -381,18 +414,41 @@ public class UserDetailInfoActivity extends Activity {
         }
     }
 
+    //当是安检合格的时候，不显示安全隐患和安全隐患原因
+    public void noShowHiddenTypeAndReason() {
+        if (hiddenTypeRoot.getVisibility() == View.VISIBLE && hiddenReasonRoot.getVisibility() == View.VISIBLE) {
+            hiddenTypeRoot.setVisibility(View.GONE);
+            hiddenReasonRoot.setVisibility(View.GONE);
+        }
+    }
+
     //弹出安全隐患类型popupwindow
     public void createSecurityHiddenTypePopupwindow() {
         inflater = LayoutInflater.from(UserDetailInfoActivity.this);
         securityHiddenTypeView = inflater.inflate(R.layout.popupwindow_security_type, null);
-        popupWindow = new PopupWindow(securityHiddenTypeView,securityHiddenType.getWidth() , LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(securityHiddenTypeView, securityHiddenType.getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
         listView = (ListView) securityHiddenTypeView.findViewById(R.id.listview);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
+                securityHiddenType.setText(item.getItemName());
                 popupWindow.dismiss();
-                securityHiddenType.setText("");
+                itemId = item.getItemId();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        Log.i("getSecurityState=>", " 调用了！");
+                        getSecurityHiddenReasonDefault(itemId);
+                        if (cursor3.getCount() != 0) {
+                            handler.sendEmptyMessage(9);
+                        } else {
+                            handler.sendEmptyMessage(10);
+                        }
+
+                    }
+                }.start();
             }
         });
         popupWindow.setFocusable(true);
@@ -402,14 +458,14 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityHiddenType, 0, 0);
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 Log.i("getSecurityState=>", " 调用了！");
                 getSecurityHiddenType();
-                if (cursor.getCount() != 0) {
+                if (cursor2.getCount() != 0) {
                     handler.sendEmptyMessage(3);
-                }else {
+                } else {
                     handler.sendEmptyMessage(4);
                 }
 
@@ -427,14 +483,15 @@ public class UserDetailInfoActivity extends Activity {
     public void createSecurityHiddenReasonPopupwindow() {
         inflater = LayoutInflater.from(UserDetailInfoActivity.this);
         securityHiddenreasonView = inflater.inflate(R.layout.popupwindow_security_type, null);
-        popupWindow = new PopupWindow(securityHiddenreasonView,securityHiddenReason.getWidth() , LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(securityHiddenreasonView, securityHiddenReason.getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
-        listView = (ListView) securityHiddenTypeView.findViewById(R.id.listview);
+        listView = (ListView) securityHiddenreasonView.findViewById(R.id.listview);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
+                securityHiddenReason.setText(item.getItemName());
                 popupWindow.dismiss();
-                securityHiddenReason.setText("");
             }
         });
         popupWindow.setFocusable(true);
@@ -443,15 +500,15 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
-        popupWindow.showAsDropDown(securityHiddenReason, Gravity.CENTER_HORIZONTAL, 0);
-        new Thread(){
+        popupWindow.showAsDropDown(securityHiddenReason, 0, 0);
+        new Thread() {
             @Override
             public void run() {
                 Log.i("getSecurityState=>", " 调用了！");
-                getSecurityHiddenReason();
-                if (cursor.getCount() != 0) {
+                getSecurityHiddenReason(itemId);
+                if (cursor3.getCount() != 0) {
                     handler.sendEmptyMessage(3);
-                }else {
+                } else {
                     handler.sendEmptyMessage(4);
                 }
 
@@ -491,7 +548,7 @@ public class UserDetailInfoActivity extends Activity {
                 case TAKE_PHOTO:
                     startCropPhoto(tempUri);
                     Log.i("TAKE_PHOTO=====>", "没有数据返回！");
-                    if(data != null){
+                    if (data != null) {
                         Log.i("TAKE_PHOTO=====>", "有数据返回！");
                     }
                     break;
@@ -501,13 +558,13 @@ public class UserDetailInfoActivity extends Activity {
                     handler.sendEmptyMessage(1);
                     break;
                 case 500:
-                    if(data != null){
+                    if (data != null) {
                         cropPathLists_back = data.getStringArrayListExtra("cropPathLists_back");
                         handler.sendEmptyMessage(2);
                     }
                     break;
             }
-        }else if(resultCode == RESULT_CANCELED){
+        } else if (resultCode == RESULT_CANCELED) {
             //Toast.makeText(UserDetailInfoActivity.this, "您取消了拍照哦", Toast.LENGTH_SHORT).show();
         }
 
@@ -516,7 +573,7 @@ public class UserDetailInfoActivity extends Activity {
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case 1:
                     adapter = new GridviewImageAdapter(UserDetailInfoActivity.this, cropPathLists);
                     gridView.setAdapter(adapter);
@@ -529,7 +586,7 @@ public class UserDetailInfoActivity extends Activity {
                     adapter.notifyDataSetChanged();
                     break;
                 case 3:
-                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this,popupwindowListItemList);
+                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this, popupwindowListItemList);
                     padapter.notifyDataSetChanged();
                     listView.setAdapter(padapter);
                     break;
@@ -539,9 +596,35 @@ public class UserDetailInfoActivity extends Activity {
                     PopupwindowListItem item = new PopupwindowListItem();
                     item.setItemName("无");
                     defaultList.add(item);
-                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this,defaultList);
+                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this, defaultList);
                     padapter.notifyDataSetChanged();
                     listView.setAdapter(padapter);
+                    break;
+                case 5:
+                    cursor1.moveToPosition(0);
+                    securityCheckCase.setText(cursor1.getString(2));
+                    if(!securityCheckCase.getText().equals("合格")){
+                        showHiddenTypeAndReason();
+                    }else {
+                        noShowHiddenTypeAndReason();
+                    }
+                    break;
+                case 6:
+                    securityCheckCase.setText("无");
+                    break;
+                case 7:
+                    cursor2.moveToPosition(0);
+                    securityHiddenType.setText(cursor2.getString(2));
+                    break;
+                case 8:
+                    securityHiddenType.setText("无");
+                    break;
+                case 9:
+                    cursor3.moveToPosition(0);
+                    securityHiddenReason.setText(cursor3.getString(3));
+                    break;
+                case 10:
+                    securityHiddenReason.setText("无");
                     break;
             }
             super.handleMessage(msg);
@@ -551,55 +634,66 @@ public class UserDetailInfoActivity extends Activity {
     //读取安全情况状态信息
     public void getSecurityCheckCase() {
         popupwindowListItemList.clear();
-        cursor = db.query("security_content", null, null, null, null, null, null);//查询并获得游标
-        Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor.getCount());
+        cursor1 = db.query("security_content", null, null, null, null, null, null);//查询并获得游标
+        Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor1.getCount());
         //如果游标为空，则显示默认数据
-        if (cursor.getCount() == 0) {
+        if (cursor1.getCount() == 0) {
             return;
         }
-        while (cursor.moveToNext()) {
+        while (cursor1.moveToNext()) {
             PopupwindowListItem item = new PopupwindowListItem();
-            item.setItemName(cursor.getString(2));
+            item.setItemName(cursor1.getString(2));
             popupwindowListItemList.add(item);
         }
         Log.i("getSecurityState=>", " 安检状态个数为：" + popupwindowListItemList.size());
-        cursor.close(); //游标关闭
     }
 
     //读取安全隐患类型信息
     public void getSecurityHiddenType() {
         popupwindowListItemList.clear();
-        cursor = db.query("security_hidden", null, null, null, null, null, null);//查询并获得游标
-        Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor.getCount());
+        cursor2 = db.query("security_hidden", null, null, null, null, null, null);//查询并获得游标
+        Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor2.getCount());
         //如果游标为空，则显示默认数据
-        if (cursor.getCount() == 0) {
+        if (cursor2.getCount() == 0) {
             return;
         }
-        while (cursor.moveToNext()) {
+        while (cursor2.moveToNext()) {
             PopupwindowListItem item = new PopupwindowListItem();
-            item.setItemName(cursor.getString(2));
+            item.setItemName(cursor2.getString(2));
+            item.setItemId(cursor2.getString(1));
             popupwindowListItemList.add(item);
         }
-        Log.i("getSecurityState=>", " 安检状态个数为：" + popupwindowListItemList.size());
-        cursor.close(); //游标关闭
+        Log.i("getSecurityState=>", " 安全隐患个数为：" + popupwindowListItemList.size());
     }
 
     //读取安全隐患原因信息
-    public void getSecurityHiddenReason() {
+    public void getSecurityHiddenReason(String itemId) {
         popupwindowListItemList.clear();
-        cursor = db.query("security_hidden_reason", null, null, null, null, null, null);//查询并获得游标
-        Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor.getCount());
+        cursor3 =  db.rawQuery("select * from security_hidden_reason where n_safety_hidden_id=?", new String[]{itemId});//查询并获得游标
         //如果游标为空，则显示默认数据
-        if (cursor.getCount() == 0) {
+        if (cursor3.getCount() == 0) {
             return;
         }
-        while (cursor.moveToNext()) {
+        while (cursor3.moveToNext()) {
             PopupwindowListItem item = new PopupwindowListItem();
-            item.setItemName(cursor.getString(2));
+            item.setItemName(cursor3.getString(3));
             popupwindowListItemList.add(item);
         }
-        Log.i("getSecurityState=>", " 安检状态个数为：" + popupwindowListItemList.size());
-        cursor.close(); //游标关闭
+
+        Log.i("getSecurityState=>", " 安全隐患原因个数为：" + popupwindowListItemList.size());
+    }
+
+    //读取安全隐患原因默认信息
+    public void getSecurityHiddenReasonDefault(String itemId) {
+        cursor3 =  db.rawQuery("select * from security_hidden_reason where n_safety_hidden_id=?", new String[]{itemId});//查询并获得游标
+        //如果游标为空，则显示默认数据
+        if (cursor3.getCount() == 0) {
+            return;
+        }
+        while (cursor3.moveToNext()) {
+            PopupwindowListItem item = new PopupwindowListItem();
+            item.setItemName(cursor3.getString(3));
+        }
     }
 
     /**
@@ -623,7 +717,7 @@ public class UserDetailInfoActivity extends Activity {
             // 当图片的宽高不足时，会出现黑边，去除黑边
             intent.putExtra("scale", true);
             intent.putExtra("scaleUpIfNeeded", true);
-            MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_CROP_IMAGE,securityId);
+            MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_CROP_IMAGE, securityId);
             cropPhotoUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);
             Log.i("startCropPhoto", "图片裁剪的uri = " + cropPhotoUri);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, cropPhotoUri);
@@ -635,10 +729,10 @@ public class UserDetailInfoActivity extends Activity {
     /**
      * 返回的时候，删除所有拍照的图片
      */
-    private void deletePicture(File file){
-        if(file.exists()){
+    private void deletePicture(File file) {
+        if (file.exists()) {
             file.delete();
-        }else {
+        } else {
             Log.i("deletePicture", "没有相应的图片文件");
         }
     }
@@ -648,8 +742,8 @@ public class UserDetailInfoActivity extends Activity {
      */
     private void insertSecurityPhoto(String photoPath) {
         ContentValues values = new ContentValues();
-        values.put("securityNumber",securityId);
-        values.put("photoPath",photoPath);
+        values.put("securityNumber", securityId);
+        values.put("photoPath", photoPath);
         db.insert("security_photo", null, values);
     }
 
@@ -693,5 +787,15 @@ public class UserDetailInfoActivity extends Activity {
             e.printStackTrace();
             Log.i("UserDetailInfoActivity", "getImageToView 抛出异常");
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cursor1.close(); //游标关闭
+        cursor2.close();
+        cursor3.close();
+        cursor4.close();
+        db.close();
     }
 }
