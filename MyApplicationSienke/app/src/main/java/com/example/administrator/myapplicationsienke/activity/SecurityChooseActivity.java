@@ -185,7 +185,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                 System.exit(0);
             }
         });
-
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.update();
