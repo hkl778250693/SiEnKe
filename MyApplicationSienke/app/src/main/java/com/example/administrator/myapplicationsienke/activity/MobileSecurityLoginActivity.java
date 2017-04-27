@@ -89,6 +89,7 @@ public class MobileSecurityLoginActivity extends Activity {
             editMobileUser.setText(sharedPreferences.getString("login_name",""));//设置EditText控件的内容
             editMobileUser.setSelection(sharedPreferences.getString("login_name","").length());//将光标移至文字末尾
             editmobilePsw.setText(sharedPreferences.getString("login_psw",""));
+            editmobilePsw.setSelection(sharedPreferences.getString("login_psw","").length());//将光标移至文字末尾
         }else {
             Log.i("MobileSecurityLogin", "没记住账号默认设置进来了！");
         }

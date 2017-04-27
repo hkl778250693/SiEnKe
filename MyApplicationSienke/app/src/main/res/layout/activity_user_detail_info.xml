@@ -269,7 +269,7 @@
                 android:layout_marginRight="16dp"
                 android:background="#CBCBCB" />
 
-            <RelativeLayout
+            <!--<RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
@@ -298,7 +298,7 @@
                     android:textColor="@color/text_gray"
                     android:textSize="14sp" />
 
-            </RelativeLayout>
+            </RelativeLayout>-->
 
             <View
                 android:layout_width="match_parent"
