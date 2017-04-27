@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
@@ -124,6 +125,7 @@ public class SystemSettingActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 clearData();
+                Toast.makeText(SystemSettingActivity.this,"清除数据成功！",Toast.LENGTH_SHORT).show();
             }
         });
         popupWindow.update();

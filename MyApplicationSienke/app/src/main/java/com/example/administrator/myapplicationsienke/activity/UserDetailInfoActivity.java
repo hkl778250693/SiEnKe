@@ -40,6 +40,7 @@ import com.example.administrator.myapplicationsienke.mode.MyPhotoUtils;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.mode.Tools;
 import com.example.administrator.myapplicationsienke.model.PopupwindowListItem;
+import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -227,10 +228,26 @@ public class UserDetailInfoActivity extends Activity {
             } else {
                 userNumber.setText("无");
             }
-            userName.setText(UserName);
-            meterNumber.setText(MeterNumber);
-            userAddress.setText(UserAddress);
-            checkType.setText(CheckType);
+            if(!UserName.equals("null")){
+                userName.setText(UserName);
+            }else {
+                userName.setText("无");
+            }
+            if(!MeterNumber.equals("null")){
+                meterNumber.setText(MeterNumber);
+            }else {
+                meterNumber.setText("无");
+            }
+            if(!UserAddress.equals("null")){
+                userAddress.setText(UserAddress);
+            }else {
+                userAddress.setText("无");
+            }
+            if(!CheckType.equals("null")){
+                checkType.setText(CheckType);
+            }else {
+                checkType.setText("无");
+            }
             if (!UserPhoneNumber.equals("null")) {
                 userPhoneNumber.setText(UserPhoneNumber);
             } else {
@@ -238,42 +255,46 @@ public class UserDetailInfoActivity extends Activity {
             }
         }
 
-        //显示默认安全情况
-        new Thread() {
-            @Override
-            public void run() {
-                getSecurityCheckCase();
-                if (cursor1.getCount() != 0) {
-                    handler.sendEmptyMessage(5);
-                } else {
-                    handler.sendEmptyMessage(6);
+        if(querySecurityState(securityId)){
+            
+        }else {
+            //显示默认安全情况
+            new Thread() {
+                @Override
+                public void run() {
+                    getSecurityCheckCase();
+                    if (cursor1.getCount() != 0) {
+                        handler.sendEmptyMessage(5);
+                    } else {
+                        handler.sendEmptyMessage(6);
+                    }
                 }
-            }
-        }.start();
-        //显示默认安全隐患类型
-        new Thread() {
-            @Override
-            public void run() {
-                getSecurityHiddenType();
-                if (cursor2.getCount() != 0) {
-                    handler.sendEmptyMessage(7);
-                } else {
-                    handler.sendEmptyMessage(8);
+            }.start();
+            //显示默认安全隐患类型
+            new Thread() {
+                @Override
+                public void run() {
+                    getSecurityHiddenType();
+                    if (cursor2.getCount() != 0) {
+                        handler.sendEmptyMessage(7);
+                    } else {
+                        handler.sendEmptyMessage(8);
+                    }
                 }
-            }
-        }.start();
-        //显示默认安全隐患原因
-        new Thread() {
-            @Override
-            public void run() {
-                getSecurityHiddenReason("8");
-                if (cursor3.getCount() != 0) {
-                    handler.sendEmptyMessage(9);
-                } else {
-                    handler.sendEmptyMessage(10);
+            }.start();
+            //显示默认安全隐患原因
+            new Thread() {
+                @Override
+                public void run() {
+                    getSecurityHiddenReason("8");
+                    if (cursor3.getCount() != 0) {
+                        handler.sendEmptyMessage(9);
+                    } else {
+                        handler.sendEmptyMessage(10);
+                    }
                 }
-            }
-        }.start();
+            }.start();
+        }
     }
 
     //弹出拍照popupwindow
@@ -761,6 +782,22 @@ public class UserDetailInfoActivity extends Activity {
     }
 
     /**
+     * 根据安检ID查询用户是否处于安检状态，如果是安检状态，则显示上次安检所记录的内容，否则显示默认的内容
+     */
+    private boolean querySecurityState(String securityId){
+        Cursor cursor = db.rawQuery("select * from User where securityNumber=?", new String[]{securityId});//查询并获得游标
+        while (cursor.moveToNext()) {
+            UserListviewItem item = new UserListviewItem();
+            if (cursor.getString(10).equals("true")) {
+                return true;
+            }else {
+
+            }
+        }
+        return false;
+    }
+
+    /**
      * 保存裁剪之后的图片数据
      *
      * @param bitmaps
@@ -772,11 +809,9 @@ public class UserDetailInfoActivity extends Activity {
             for (int i = 0; i < bitmaps.size(); i++) {
                 Bitmap photo = bitmaps.get(i);
                 if (Tools.hasSdcard()) {
-                    Log.i("UserDetailInfoActivity", "有SD卡");
                     filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Sienke/files/img/" + securityId + "_" + i + ".jpg";
                     file = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
                 } else {
-                    Log.i("UserDetailInfoActivity", "没有SD卡");
                     filePath = "data/data/" + UserDetailInfoActivity.this.getPackageName() + "/Sienke/files/img/" + securityId + "_" + i + ".jpg";
                     file = new File("data/data/" + UserDetailInfoActivity.this.getPackageName());
                 }
@@ -790,15 +825,9 @@ public class UserDetailInfoActivity extends Activity {
                 fileOutputStream.flush();
                 fileOutputStream.close();
                 Log.i("UserDetailInfoActivity", "bitmap写入到文件");
-                //保存记录到本地数据库
-
-                //上传到数据库
-                //postImage();
-                Log.i("UserDetailInfoActivity", "上传到数据库");
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Log.i("UserDetailInfoActivity", "getImageToView 抛出异常");
         }
     }
 

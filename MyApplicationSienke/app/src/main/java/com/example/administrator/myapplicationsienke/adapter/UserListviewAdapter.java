@@ -90,8 +90,16 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         UserListviewItem userListviewItem = userListviewList.get(position);
-        viewHolder.security_number.setText(userListviewItem.getSecurityNumber());
-        viewHolder.user_name.setText(userListviewItem.getUserName());
+        if(!userListviewItem.getSecurityNumber().equals("null")){
+            viewHolder.security_number.setText(userListviewItem.getSecurityNumber());
+        }else {
+            viewHolder.security_number.setText("无");
+        }
+        if(!userListviewItem.getUserName().equals("null")){
+            viewHolder.user_name.setText(userListviewItem.getUserName());
+        }else {
+            viewHolder.user_name.setText("无");
+        }
         if(!userListviewItem.getNumber().equals("null")){
             viewHolder.number.setText(userListviewItem.getNumber());
         }else {
@@ -102,13 +110,21 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
         } else {
             viewHolder.phone_number.setText("无");
         }
-        viewHolder.security_type.setText(userListviewItem.getSecurityType());
+        if(!userListviewItem.getSecurityType().equals("null")){
+            viewHolder.security_type.setText(userListviewItem.getSecurityType());
+        }else {
+            viewHolder.security_type.setText("无");
+        }
         if (!userListviewItem.getUserId().equals("null")) {
             viewHolder.user_id.setText(userListviewItem.getUserId());
         } else {
             viewHolder.user_id.setText("无");
         }
-        viewHolder.address.setText(userListviewItem.getAdress());
+        if(!userListviewItem.getAdress().equals("null")){
+            viewHolder.address.setText(userListviewItem.getAdress());
+        }else {
+            viewHolder.address.setText("无");
+        }
         viewHolder.if_edit.setImageResource(userListviewItem.getIfEdit());
 
         if (userListviewList != null) {

@@ -77,7 +77,11 @@ public class NewTaskListviewAdapter extends BaseAdapter {
             viewHolder = (NewTaskViewHolder) convertView.getTag();
         }
         NewTaskListviewItem item = newTaskListviewItemList.get(position);
-        viewHolder.user_name.setText(item.getUserName());
+        if(!item.getUserName().equals("null")){
+            viewHolder.user_name.setText(item.getUserName());
+        }else {
+            viewHolder.user_name.setText("无");
+        }
         if(!item.getNumber().equals("null")){
             viewHolder.number.setText(item.getNumber());
         }else {
@@ -88,8 +92,16 @@ public class NewTaskListviewAdapter extends BaseAdapter {
         }else {
             viewHolder.phone_number.setText("无");
         }
-        viewHolder.user_id.setText(item.getUserId());
-        viewHolder.address.setText(item.getAdress());
+        if(!item.getUserId().equals("null")){
+            viewHolder.user_id.setText(item.getUserId());
+        }else {
+            viewHolder.user_id.setText("无");
+        }
+        if(!item.getAdress().equals("null")){
+            viewHolder.address.setText(item.getAdress());
+        }else {
+            viewHolder.address.setText("无");
+        }
         // 设置状态
         viewHolder.checkBox.setChecked(getIsCheck().get(position));
         return convertView;
