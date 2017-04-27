@@ -48,6 +48,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -215,7 +216,11 @@ public class NewTaskDetailActivity extends Activity {
                             new Thread() {
                                 @Override
                                 public void run() {
-                                    requireMyTask("getCostomer.do", "userName=" + etSearch.getText().toString());
+                                    try {
+                                        requireMyTask("getCostomer.do", "userName=" + URLEncoder.encode(etSearch.getText().toString().trim(), "UTF-8"));
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
                                     super.run();
                                 }
                             }.start();
@@ -229,7 +234,11 @@ public class NewTaskDetailActivity extends Activity {
                             new Thread() {
                                 @Override
                                 public void run() {
-                                    requireMyTask("getCostomer.do", "meterNumber=" + etSearch.getText().toString());
+                                    try {
+                                        requireMyTask("getCostomer.do", "meterNumber=" + URLEncoder.encode(etSearch.getText().toString().trim(), "UTF-8"));
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
                                     super.run();
                                 }
                             }.start();
@@ -243,7 +252,11 @@ public class NewTaskDetailActivity extends Activity {
                             new Thread() {
                                 @Override
                                 public void run() {
-                                    requireMyTask("getCostomer.do", "userAdress=" + etSearch.getText().toString());
+                                    try {
+                                        requireMyTask("getCostomer.do", "userAdress=" + URLEncoder.encode(etSearch.getText().toString().trim(), "UTF-8"));
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
                                     super.run();
                                 }
                             }.start();
@@ -264,6 +277,9 @@ public class NewTaskDetailActivity extends Activity {
                         etSearch.setText("");
                         if (editDelete.getVisibility() == View.VISIBLE) {
                             editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
+                        }
+                        if(newTaskSelectLayout.getVisibility() == View.VISIBLE){
+                            newTaskSelectLayout.setVisibility(View.GONE);
                         }
                     }
                     break;

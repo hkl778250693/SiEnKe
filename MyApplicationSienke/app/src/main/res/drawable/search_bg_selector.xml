@@ -9,7 +9,6 @@
     <item android:state_pressed="true" >
         <shape>
             <corners android:radius="8dp"/>
-            <corners android:bottomRightRadius="8dp"/>
             <solid android:color="@color/theme_colors"/>
         </shape>
     </item>

@@ -339,7 +339,7 @@ public class UserDetailInfoActivity extends Activity {
                 }
                 Intent intent = new Intent();
                 setResult(Activity.RESULT_OK, intent);
-                if (!securityCheckCase.getText().equals("安检合格")) {
+                if (!securityCheckCase.getText().equals("合格")) {
                     editor.putInt("problem_number", sharedPreferences.getInt("problem_number", 0) + 1);  //保存到sharedPreferences
                     editor.commit();
                 }
