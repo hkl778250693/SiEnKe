@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -81,9 +82,10 @@ public class UserDetailInfoActivity extends Activity {
     private int currentPosition = 0;
     private SQLiteDatabase db;  //数据库
     private List<PopupwindowListItem> popupwindowListItemList = new ArrayList<>();
-    private Cursor cursor1,cursor2,cursor3,cursor4;
+    private Cursor cursor,cursor1,cursor2,cursor3,cursor4,cursor5;
     private List<PopupwindowListItem> defaultList = new ArrayList<>();
     private String itemId;//安检隐患类型id
+    private EditText newMeterNumb,remarks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,15 +103,14 @@ public class UserDetailInfoActivity extends Activity {
         securityCheckCase = (TextView) findViewById(R.id.security_check_case);
         securityHiddenType = (TextView) findViewById(R.id.security_hidden_type);
         securityHiddenReason = (TextView) findViewById(R.id.security_hidden_reason);
-
         userNumber = (TextView) findViewById(R.id.user_number);
         userName = (TextView) findViewById(R.id.user_name);
         meterNumber = (TextView) findViewById(R.id.meter_number);
         userAddress = (TextView) findViewById(R.id.user_address);
         checkType = (TextView) findViewById(R.id.check_type);
         userPhoneNumber = (TextView) findViewById(R.id.user_phone_number);
-
-
+        newMeterNumb= (EditText) findViewById(R.id.new_meter_numb);
+        remarks= (EditText) findViewById(R.id.remarks);
         hiddenTypeRoot = (RelativeLayout) findViewById(R.id.hidden_type_root);
         hiddenReasonRoot = (RelativeLayout) findViewById(R.id.hidden_reason_root);
         saveBtn = (Button) findViewById(R.id.save_btn);
@@ -256,7 +257,18 @@ public class UserDetailInfoActivity extends Activity {
         }
 
         if(querySecurityState(securityId)){
-            
+            securityCheckCase.setText(cursor.getString(11));
+            if(!cursor.getString(12).equals("null")){
+                newMeterNumb.setText(cursor.getString(12));
+            }
+            if (!cursor.getString(13).equals("null")){
+                remarks.setText(cursor.getString(13));
+            }
+            securityHiddenType.setText(cursor.getString(14));
+            securityHiddenReason.setText(cursor.getString(15));
+            if(cropPathLists.size() != 0){
+                querySecurityPhoto(securityId);
+            }
         }else {
             //显示默认安全情况
             new Thread() {
@@ -785,16 +797,22 @@ public class UserDetailInfoActivity extends Activity {
      * 根据安检ID查询用户是否处于安检状态，如果是安检状态，则显示上次安检所记录的内容，否则显示默认的内容
      */
     private boolean querySecurityState(String securityId){
-        Cursor cursor = db.rawQuery("select * from User where securityNumber=?", new String[]{securityId});//查询并获得游标
-        while (cursor.moveToNext()) {
-            UserListviewItem item = new UserListviewItem();
-            if (cursor.getString(10).equals("true")) {
-                return true;
-            }else {
-
-            }
+        cursor = db.rawQuery("select * from User where securityNumber=?", new String[]{securityId});//查询并获得游标
+        if (cursor.getString(10).equals("true")) {
+            return true;
+        }else {
+            return false;
         }
-        return false;
+    }
+
+    /**
+     * 根据安检ID查询用户是否处于安检状态，如果是安检状态，则显示上次安检所记录的图片，否则不显示
+     */
+    private void querySecurityPhoto(String securityId){
+        cursor5 = db.rawQuery("select * from security_photo where securityNumber=?", new String[]{securityId});//查询并获得游标
+        while (cursor5.moveToNext()) {
+            cropPathLists.add(cursor5.getString(1));
+        }
     }
 
     /**
@@ -834,11 +852,15 @@ public class UserDetailInfoActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        cursor.close();
         cursor1.close(); //游标关闭
         cursor2.close();
         cursor3.close();
         if(cursor4 != null){
             cursor4.close();
+        }
+        if(cursor5 != null){
+            cursor5.close();
         }
         db.close();
     }
