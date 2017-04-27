@@ -80,7 +80,11 @@ public class NewTaskListviewAdapter extends BaseAdapter {
         Log.i("security_number=====>", "security_number=" + item.getUserName());
         viewHolder.user_name.setText(item.getUserName());
         viewHolder.number.setText(item.getNumber());
-        viewHolder.phone_number.setText(item.getPhoneNumber());
+        if(!item.getPhoneNumber().equals("null")){
+            viewHolder.phone_number.setText(item.getPhoneNumber());
+        }else {
+            viewHolder.phone_number.setText("无");
+        }
         viewHolder.user_id.setText(item.getUserId());
         viewHolder.address.setText(item.getAdress());
         // 设置状态
