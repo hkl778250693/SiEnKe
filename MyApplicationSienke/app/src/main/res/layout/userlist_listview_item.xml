@@ -10,7 +10,9 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -71,7 +73,7 @@
                     android:padding="2dp"
                     android:text="表编号:"
                     android:textColor="#a8a8a8a8"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/number"
@@ -80,7 +82,7 @@
                     android:layout_weight="1"
                     android:text="012345678"
                     android:textColor="#a8a8a8"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -95,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:text="电话:"
                     android:textColor="#a8a8a8"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/phone_number"
@@ -103,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:text="13802596472"
                     android:textColor="#a8a8a8"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -128,7 +130,7 @@
                     android:padding="2dp"
                     android:text="安检类型:"
                     android:textColor="#a8a8a8"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/security_type"
@@ -136,7 +138,7 @@
                     android:layout_height="wrap_content"
                     android:text="通气安检"
                     android:textColor="#a8a8a8"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -151,7 +153,7 @@
                     android:layout_height="wrap_content"
                     android:text="用户编号："
                     android:textColor="#a8a8a8"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/user_id"
@@ -159,7 +161,7 @@
                     android:layout_height="wrap_content"
                     android:text="565464654"
                     android:textColor="#a8a8a8"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -185,7 +187,7 @@
                     android:padding="2dp"
                     android:text="用户地址:"
                     android:textColor="#a8a8a8"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/address"
@@ -193,7 +195,7 @@
                     android:layout_height="wrap_content"
                     android:text="水果湖苹果路123号"
                     android:textColor="#a8a8a8"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
 
             </LinearLayout>
 

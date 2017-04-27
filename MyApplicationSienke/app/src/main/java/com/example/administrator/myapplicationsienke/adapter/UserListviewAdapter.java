@@ -92,7 +92,11 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
         UserListviewItem userListviewItem = userListviewList.get(position);
         viewHolder.security_number.setText(userListviewItem.getSecurityNumber());
         viewHolder.user_name.setText(userListviewItem.getUserName());
-        viewHolder.number.setText(userListviewItem.getNumber());
+        if(!userListviewItem.getNumber().equals("null")){
+            viewHolder.number.setText(userListviewItem.getNumber());
+        }else {
+            viewHolder.number.setText("无");
+        }
         if (!userListviewItem.getPhoneNumber().equals("null")) {
             viewHolder.phone_number.setText(userListviewItem.getPhoneNumber());
         } else {

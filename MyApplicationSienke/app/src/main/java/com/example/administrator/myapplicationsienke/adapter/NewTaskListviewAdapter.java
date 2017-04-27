@@ -77,9 +77,12 @@ public class NewTaskListviewAdapter extends BaseAdapter {
             viewHolder = (NewTaskViewHolder) convertView.getTag();
         }
         NewTaskListviewItem item = newTaskListviewItemList.get(position);
-        Log.i("security_number=====>", "security_number=" + item.getUserName());
         viewHolder.user_name.setText(item.getUserName());
-        viewHolder.number.setText(item.getNumber());
+        if(!item.getNumber().equals("null")){
+            viewHolder.number.setText(item.getNumber());
+        }else {
+            viewHolder.number.setText("无");
+        }
         if(!item.getPhoneNumber().equals("null")){
             viewHolder.phone_number.setText(item.getPhoneNumber());
         }else {

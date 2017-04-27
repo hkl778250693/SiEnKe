@@ -64,7 +64,7 @@ public class NewTaskActivity extends Activity {
     private TextView endDate;//结束日期选择器
     private String ip, port;  //接口ip地址   端口
     private String result; //网络请求结果
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private SQLiteDatabase db;  //数据库
     public int responseCode = 0;
@@ -91,6 +91,7 @@ public class NewTaskActivity extends Activity {
     private List<PopupwindowListItem> defaultList = new ArrayList<>();
     private Cursor cursor;
     private PopupwindowListAdapter adapter;
+    private String itemId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +129,7 @@ public class NewTaskActivity extends Activity {
     //初始化设置
     private void defaultSetting() {
         sharedPreferences = NewTaskActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         MySqliteHelper helper = new MySqliteHelper(NewTaskActivity.this, 1);
         db = helper.getWritableDatabase();
@@ -135,8 +137,8 @@ public class NewTaskActivity extends Activity {
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
-        startDate.setText(year + " / " + (month + 1) + " / " + day);
-        endDate.setText(year + " / " + (month + 1) + " / " + day);
+        startDate.setText(year + "-" + (month + 1) + "-" + day);
+        endDate.setText(year + "-" + (month + 1) + "-" + day);
         new Thread(){
             @Override
             public void run() {
@@ -223,6 +225,7 @@ public class NewTaskActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
                 securityType.setText(item.getItemName());
+                itemId = item.getItemId();
                 popupWindow.dismiss();
             }
         });
@@ -351,10 +354,10 @@ public class NewTaskActivity extends Activity {
         try {
             JSONObject object = new JSONObject();
             object.put("c_safety_plan_name", taskName.getText().toString());      //安检任务名称
-            object.put("c_safety_plan_member", "杜述洪");    //操作员
+            object.put("c_safety_plan_member", sharedPreferences_login.getString("user_name",""));    //操作员
             object.put("d_safety_start", startDate.getText().toString());       //开始时间
             object.put("d_safety_end", endDate.getText().toString());    //结束时间
-            object.put("n_company_id", Integer.parseInt(sharedPreferences.getString("company_id", "")));       //公司id
+            object.put("n_company_id", sharedPreferences_login.getInt("company_id", 0));       //公司id
             JSONArray jsonArray = new JSONArray();
             for (int i = 0; i < parclebleList.size(); i++) {
                 JSONObject object1 = new JSONObject();
@@ -362,7 +365,7 @@ public class NewTaskActivity extends Activity {
                 object1.put("n_data_state", 1);
                 object1.put("n_safety_state", 1);
                 object1.put("n_safety_date_type", 0);
-                object1.put("c_safety_type", 2 + "");       //安检类型
+                object1.put("c_safety_type", Integer.parseInt(itemId));       //安检类型
                 jsonArray.put(i, object1);
             }
             jsonObject.put("safetyInspection", jsonArray);
@@ -388,19 +391,17 @@ public class NewTaskActivity extends Activity {
     //将添加的用户信息数据存到本地数据库用户表
     private void insertUserDataBase(String securityId) {
         ContentValues values = new ContentValues();
-        for (int i = 0; i < parclebleList.size(); i++) {
-            values.put("securityNumber", securityId);
-            values.put("userName", parclebleList.get(i).getUserName());
-            values.put("meterNumber", parclebleList.get(i).getNumber());
-            values.put("userPhone", parclebleList.get(i).getPhoneNumber());
-            values.put("securityType", securityType.getText().toString());
-            values.put("oldUserId", object.optString("oldUserId", ""));
-            values.put("newUserId", parclebleList.get(i).getUserId());
-            values.put("userAddress", parclebleList.get(i).getAdress());
-            values.put("taskId", resultTaskId);
-            values.put("ifChecked", "false");
-            db.insert("User", null, values);
-        }
+        values.put("securityNumber", securityId);
+        values.put("userName", object.optString("userName",""));
+        values.put("meterNumber", object.optString("meterNumber",""));
+        values.put("userPhone", object.optString("userPhone",""));
+        values.put("securityType", object.optString("securityName",""));
+        values.put("oldUserId", object.optString("oldUserId", ""));
+        values.put("newUserId", object.optString("userId",""));
+        values.put("userAddress", object.optString("userAdress",""));
+        values.put("taskId", resultTaskId);
+        values.put("ifChecked", "false");
+        db.insert("User", null, values);
     }
 
     //根据数据库返回回来的任务编号去查询相应用户的安检编号
@@ -447,7 +448,7 @@ public class NewTaskActivity extends Activity {
                             stringBuilder.append(str);
                         }
                         userResult = stringBuilder.toString();
-                        Log.i("taskResult=====>", userResult);
+                        Log.i("userResult=====>", userResult);
                         JSONObject jsonObject = new JSONObject(userResult);
                         if (!jsonObject.optString("total", "").equals("0")) {
                             handler.sendEmptyMessage(4);
@@ -623,6 +624,7 @@ public class NewTaskActivity extends Activity {
         }
         while (cursor.moveToNext()) {
             PopupwindowListItem item = new PopupwindowListItem();
+            item.setItemId(cursor.getString(1));
             item.setItemName(cursor.getString(2));
             popupwindowListItemList.add(item);
         }
