@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,7 @@ import java.io.File;
  */
 public class SystemSettingActivity extends Activity {
     private ImageView back;
-    private TextView ip,clearData;
+    private TextView ip, clearData;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private SQLiteDatabase db;  //数据库
@@ -55,7 +56,7 @@ public class SystemSettingActivity extends Activity {
         back = (ImageView) findViewById(R.id.back);
         ip = (TextView) findViewById(R.id.ip);
         clearData = (TextView) findViewById(R.id.clear_data);
-        rootLinearlayout = (LinearLayout)findViewById(R.id.root_linearlayout);
+        rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
     }
 
     //点击事件
@@ -73,7 +74,7 @@ public class SystemSettingActivity extends Activity {
                     finish();
                     break;
                 case R.id.ip:
-                    Intent intent = new Intent(SystemSettingActivity.this,IpSettingActivity.class);
+                    Intent intent = new Intent(SystemSettingActivity.this, IpSettingActivity.class);
                     startActivity(intent);
                     break;
                 case R.id.clear_data:
@@ -83,19 +84,19 @@ public class SystemSettingActivity extends Activity {
         }
     };
 
-    private void clearData(){
+    private void clearData() {
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         helper = new MySqliteHelper(SystemSettingActivity.this, 1);
         db = helper.getWritableDatabase();
         editor.clear();
         editor.apply();
-        db.delete("User",null,null);  //删除User表中的所有数据（官方推荐方法）
-        db.delete("Task",null,null);  //删除Task表中的所有数据
-        db.delete("SecurityState",null,null);  //删除SecurityState表中的所有数据
-        db.delete("security_content",null,null);  //删除security_content表中的所有数据
-        db.delete("security_hidden",null,null);  //删除security_hidden表中的所有数据
-        db.delete("security_hidden_reason",null,null);  //删除security_hidden_reason表中的所有数据
+        db.delete("User", null, null);  //删除User表中的所有数据（官方推荐方法）
+        db.delete("Task", null, null);  //删除Task表中的所有数据
+        db.delete("SecurityState", null, null);  //删除SecurityState表中的所有数据
+        db.delete("security_content", null, null);  //删除security_content表中的所有数据
+        db.delete("security_hidden", null, null);  //删除security_hidden表中的所有数据
+        db.delete("security_hidden_reason", null, null);  //删除security_hidden_reason表中的所有数据
         //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
         db.execSQL("update sqlite_sequence set seq=0 where name='User'");
         db.execSQL("update sqlite_sequence set seq=0 where name='Task'");
@@ -105,15 +106,29 @@ public class SystemSettingActivity extends Activity {
         db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden_reason'");
     }
 
-    private boolean clearPhoto(){
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"SiEnKe_Crop");
-        if (!file.exists()) {
+    private boolean clearPhoto() {
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "///SiEnKe_Crop///");
+        if (file.exists()) { // 判断文件是否存在
+            if (file.isFile()) { // 判断是否是文件
+                Log.i("clearPhoto=>", "删除的照片文件夹路径为：" + file.getPath());
+                file.delete();
+                return true;
+            } else if (file.isDirectory()) { // 否则如果它是一个目录
+                File childFiles[] = file.listFiles(); // 声明目录下所有的文件 files[];
+                if (childFiles == null || childFiles.length == 0) {
+                    file.delete();
+                    return true;
+                }
+                for (int i = 0; i < childFiles.length; i++) { // 遍历目录下所有的文件
+                    childFiles[i].delete(); // 把每个文件 用这个方法进行迭代
+                }
+            }
+            file.delete();
+            return true;
+        } else {
+            Log.i("clearPhoto=>", "文件不存在！");
             return false;
         }
-        if (file.isDirectory()) {
-            file.delete();
-        }
-        return true;
     }
 
     //弹出清空数据前提示popupwindow
@@ -139,11 +154,11 @@ public class SystemSettingActivity extends Activity {
             public void onClick(View v) {
                 popupWindow.dismiss();
                 clearData();
-                Toast.makeText(SystemSettingActivity.this,"清除数据成功！",Toast.LENGTH_SHORT).show();
-                if(clearPhoto()){
-                    Toast.makeText(SystemSettingActivity.this,"照片删除成功！",Toast.LENGTH_SHORT).show();
-                }else {
-                    Toast.makeText(SystemSettingActivity.this,"照片删除失败！",Toast.LENGTH_SHORT).show();
+                Toast.makeText(SystemSettingActivity.this, "清除数据成功！", Toast.LENGTH_SHORT).show();
+                if (clearPhoto()) {
+                    Toast.makeText(SystemSettingActivity.this, "照片删除成功！", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(SystemSettingActivity.this, "照片删除失败！", Toast.LENGTH_SHORT).show();
                 }
             }
         });

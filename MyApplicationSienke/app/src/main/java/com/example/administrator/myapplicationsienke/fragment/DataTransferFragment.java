@@ -118,23 +118,22 @@ public class DataTransferFragment extends Fragment {
                     break;
                 case R.id.download:
                     if (!sharedPreferences.getBoolean("have_download", false)) {
-                        if(isFastDoubleClick()){
+                        download.setClickable(false);
+                        /*if(isFastDoubleClick()){
                             Toast.makeText(getActivity(), "您点击太频繁了！", Toast.LENGTH_SHORT).show();
-                        }else {
-                            //开启支线程进行请求任务信息
-                            new Thread() {
-                                @Override
-                                public void run() {
-                                    requireMyTask("SafeCheckPlan.do", "safePlanMember=");
-                                    requireSecurityState("findSecurityState.do "); //安检状态
-                                    requireSecurityContent("findSecurityContent.do");//安检内容
-                                    requireSafetyHidden("findSafetyHidden.do");//安检原因类型
-                                    requireSafetyReason("findSafetyReason.do");//安检原因
-                                    super.run();
-                                }
-                            }.start();
-
-                        }
+                        }*/
+                        //开启支线程进行请求任务信息
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                requireMyTask("SafeCheckPlan.do", "safePlanMember=");
+                                requireSecurityState("findSecurityState.do "); //安检状态
+                                requireSecurityContent("findSecurityContent.do");//安检内容
+                                requireSafetyHidden("findSafetyHidden.do");//安检原因类型
+                                requireSafetyReason("findSafetyReason.do");//安检原因
+                                super.run();
+                            }
+                        }.start();
                     } else {
                         Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
                     }
@@ -888,6 +887,7 @@ public class DataTransferFragment extends Fragment {
                         editor.commit();
                         userProgress = 0;
                         currentUserPercent = 0;
+                        download.setClickable(true);
                     }
                     break;
                 case 10:
