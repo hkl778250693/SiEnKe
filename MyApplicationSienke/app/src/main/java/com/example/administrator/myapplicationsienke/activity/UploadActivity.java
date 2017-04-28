@@ -27,6 +27,7 @@ import com.example.administrator.myapplicationsienke.model.TaskChoose;
 import com.example.administrator.myapplicationsienke.model.TaskChooseViewHolder;
 import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -48,6 +49,7 @@ public class UploadActivity extends Activity {
     private List<TaskChoose> taskChooseList = new ArrayList<>();
     private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
     private HashMap<String, Object> map = new HashMap<String, Object>();
+    private HashMap<String, Object> map1 = new HashMap<String, Object>();
     private ArrayList<String> stringList = new ArrayList<>();//保存任务编号参数
     private Cursor cursor;
     private SQLiteDatabase db;  //数据库
@@ -59,7 +61,8 @@ public class UploadActivity extends Activity {
     private String defaul = "";//默认的全部不勾选
     private TextView selectAll,reverse,selectCancel;
     private HttpUtils httpUtils;
-    private TaskChoose item;
+    private  String securityNumber;
+    private Map<String,File> fileMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +135,6 @@ public class UploadActivity extends Activity {
                 TaskChooseViewHolder holder = (TaskChooseViewHolder) view.getTag();
                 holder.checkBox.toggle();
                 TaskChooseAdapter.getIsCheck().put(position, holder.checkBox.isChecked());
-                item = taskChooseList.get((int) parent.getAdapter().getItemId(position));
             }
         });
     }
@@ -270,14 +272,46 @@ public class UploadActivity extends Activity {
     public void getUserData(String taskId) {
         Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
         while (cursor.moveToNext()) {
-            Map<String,Object> map=new HashMap<String,Object>();
-            map.put("safetyInspectionId",cursor.getString(1));
-            map.put("n_safety_state",Integer.parseInt(cursor.getString(11)));
-            map.put("c_safety_remark",cursor.getString(13));
-            map.put("n_safety_hidden_id",Integer.parseInt(cursor.getString(14)));
-            map.put("n_safety_hidden_reason_id",Integer.parseInt(cursor.getString(15)));
-            httpUtils.postData("http://211.149.190.90/api/login",map);
-            getPhotoData(cursor.getString(1));
+            if(cursor.getString(10).equals("true")){  //只上传安检过的用户数据
+                map1.put("n_safety_inspection_id",cursor.getString(1));
+                Log.i("getUserData=>", "安检ID为：" + cursor.getString(1));
+                securityNumber = cursor.getString(1);
+                Log.i("getUserData=>", "上传的用户数为：" + cursor.getCount());
+                if(!cursor.getString(11).equals("")){
+                    map1.put("n_safety_state",cursor.getString(11));
+                }else {
+                    map1.put("n_safety_state",null);
+                }
+                Log.i("getUserData=>", "安检状态是：" + cursor.getString(11));
+                if(!cursor.getString(13).equals("")){
+                    map1.put("c_safety_remark",cursor.getString(13));
+                }else {
+                    map1.put("c_safety_remark","");
+                }
+                Log.i("getUserData=>", "备注是：" + cursor.getString(13));
+                if(!cursor.getString(14).equals("")){
+                    map1.put("n_safety_hidden_id",cursor.getString(14));
+                }else {
+                    map1.put("n_safety_hidden_id",null);
+                }
+                Log.i("getUserData=>", "隐患类型是：" + cursor.getString(14));
+                if(!cursor.getString(15).equals("")){
+                    map1.put("n_safety_hidden_reason_id",cursor.getString(15));
+                }else {
+                    map1.put("n_safety_hidden_reason_id",null);
+                }
+                Log.i("getUserData=>", "隐患原因ID是：" + cursor.getString(15));
+                new Thread(){
+                    @Override
+                    public void run() {
+                        getPhotoData(securityNumber);
+                        httpUtils.postData("http://88.88.88.31:8080/SMDemo/testFile.do", map1,fileMap);
+                    }
+                }.start();
+
+            }else {
+                break;
+            }
         }
         cursor.close(); //游标关闭
     }
@@ -286,17 +320,11 @@ public class UploadActivity extends Activity {
     public void getPhotoData(String securityId) {
         Cursor cursor = db.rawQuery("select * from security_photo where securityNumber=?", new String[]{securityId});//查询并获得游标
         while (cursor.moveToNext()) {
-            Map<String,Object> map=new HashMap<String,Object>();
-            FileInputStream inputStream = null;
-            try {
-                inputStream = new FileInputStream(cursor.getString(1));
-                Log.i("getPhotoData=>", "上传的照片流为：" + inputStream);
-                map.put("safetyInspectionId",cursor.getString(2));
-                map.put("picture"+cursor.getPosition(),inputStream);
-                httpUtils.uploadImage("http://211.149.190.90/api/uploads",map,inputStream);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+            fileMap = new HashMap<>();
+            File file = null;
+            file = new File(cursor.getString(1));
+            fileMap.put("file"+cursor.getPosition(),file);
+            Log.i("getUserData=>", "上传的照片流为：" + fileMap.size());
         }
         cursor.close(); //游标关闭
     }

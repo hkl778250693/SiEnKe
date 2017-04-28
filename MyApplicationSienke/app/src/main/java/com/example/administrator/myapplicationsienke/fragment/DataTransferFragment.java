@@ -983,6 +983,12 @@ public class DataTransferFragment extends Fragment {
         values.put("userAddress", userObject.optString("userAdress", ""));
         values.put("taskId", userObject.optInt("safetyPlan", 0) + "");
         values.put("ifChecked", "false");
+        values.put("security_content","");
+        values.put("newMeterNumber","");
+        values.put("remarks","");
+        values.put("security_hidden","");
+        values.put("security_hidden_reason","");
+        values.put("photoNumber","");
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
