@@ -84,7 +84,7 @@ public class UserDetailInfoActivity extends Activity {
     private List<PopupwindowListItem> popupwindowListItemList = new ArrayList<>();
     private Cursor cursor1, cursor2, cursor3, cursor4, cursor5;
     private List<PopupwindowListItem> defaultList = new ArrayList<>();
-    private String itemId;//安检隐患类型id
+    private String securityContentItemId,securityHiddenItemId,hiddenReasonItemId;//安检情况类型id,安检隐患类型id,安检隐患原因id
     private EditText newMeterNumb, remarks;
     private String securityContent;
     private String newmeternumber;
@@ -436,6 +436,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
                 securityCheckCase.setText(item.getItemName());
+                securityContentItemId = item.getItemId();
                 if (!(securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格"))) {
                     showHiddenTypeAndReason();
                 } else {
@@ -500,13 +501,13 @@ public class UserDetailInfoActivity extends Activity {
                 PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
                 securityHiddenType.setText(item.getItemName());
                 popupWindow.dismiss();
-                itemId = item.getItemId();
+                securityHiddenItemId = item.getItemId();
                 new Thread() {
                     @Override
                     public void run() {
                         Log.i("getSecurityState=>", " 调用了！");
-                        if (itemId != null) {
-                            getSecurityHiddenReasonDefault(itemId);
+                        if (securityHiddenItemId != null) {
+                            getSecurityHiddenReasonDefault(securityHiddenItemId);
                             if (cursor4.getCount() != 0) {
                                 handler.sendEmptyMessage(11);
                             } else {
@@ -557,6 +558,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
                 securityHiddenReason.setText(item.getItemName());
+                hiddenReasonItemId = item.getItemId();
                 popupWindow.dismiss();
             }
         });
@@ -571,8 +573,8 @@ public class UserDetailInfoActivity extends Activity {
             @Override
             public void run() {
                 Log.i("getSecurityState=>", " 调用了！");
-                if (itemId != null) {
-                    getSecurityHiddenReason(itemId);
+                if (securityHiddenItemId != null) {
+                    getSecurityHiddenReason(securityHiddenItemId);
                     if (cursor3.getCount() != 0) {
                         handler.sendEmptyMessage(3);
                     } else {
@@ -677,6 +679,7 @@ public class UserDetailInfoActivity extends Activity {
                 case 5:
                     cursor1.moveToPosition(0);
                     securityCheckCase.setText(cursor1.getString(2));
+                    securityContentItemId = cursor1.getString(1);
                     if (!securityCheckCase.getText().equals("合格")) {
                         showHiddenTypeAndReason();
                     } else {
@@ -689,6 +692,7 @@ public class UserDetailInfoActivity extends Activity {
                 case 7:
                     cursor2.moveToPosition(0);
                     securityHiddenType.setText(cursor2.getString(2));
+                    securityHiddenItemId = cursor1.getString(1);
                     break;
                 case 8:
                     securityHiddenType.setText("无");
@@ -696,6 +700,7 @@ public class UserDetailInfoActivity extends Activity {
                 case 9:
                     cursor3.moveToPosition(0);
                     securityHiddenReason.setText(cursor3.getString(3));
+                    hiddenReasonItemId = cursor1.getString(1);
                     break;
                 case 10:
                     securityHiddenReason.setText("无");
@@ -831,7 +836,7 @@ public class UserDetailInfoActivity extends Activity {
     }
 
     /**
-     * 将拍的照片路径保存到本地数据库安检图片表
+     * 将拍的照片张数保存到本地数据库安检图片表
      */
     private void updateUserPhoto(String photoNumber) {
         ContentValues values = new ContentValues();
@@ -844,7 +849,7 @@ public class UserDetailInfoActivity extends Activity {
      */
     private void updateUserInfo() {
         ContentValues values = new ContentValues();
-        values.put("security_content", securityCheckCase.getText().toString().trim());
+        values.put("security_content", securityContentItemId);
         if(!newMeterNumb.getText().toString().trim().equals("")){
             values.put("newMeterNumber",newMeterNumb.getText().toString().trim());
             Log.i("insertUserInfo","输入的新表编号是："+newMeterNumb.getText().toString().trim());
@@ -856,8 +861,8 @@ public class UserDetailInfoActivity extends Activity {
         }else {
             values.put("remarks", "");
         }
-        values.put("security_hidden", securityHiddenType.getText().toString().trim());
-        values.put("security_hidden_reason", securityHiddenReason.getText().toString().trim());
+        values.put("security_hidden", securityHiddenItemId);
+        values.put("security_hidden_reason", hiddenReasonItemId);
         db.update("User",values,"securityNumber=?",new String[]{securityId});
     }
 

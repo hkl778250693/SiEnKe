@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.activity.UploadActivity;
+import com.example.administrator.myapplicationsienke.mode.HttpUtils;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 
 import org.json.JSONArray;
@@ -44,7 +45,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2017/3/16 0016.
@@ -76,7 +79,6 @@ public class DataTransferFragment extends Fragment {
     private int userProgress = 0;
     private JSONArray jsonArray;
     private long lastClickTime = 0;
-
 
     @Nullable
     @Override
@@ -951,7 +953,6 @@ public class DataTransferFragment extends Fragment {
             super.handleMessage(msg);
         }
     };
-
     //任务数据存到本地数据库任务表
     private void insertTaskDataBase() {
         ContentValues values = new ContentValues();

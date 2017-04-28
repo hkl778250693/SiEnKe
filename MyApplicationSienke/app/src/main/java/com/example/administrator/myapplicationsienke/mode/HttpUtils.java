@@ -22,7 +22,7 @@ public class HttpUtils {
     public String token;
     public String uid;
 
-    public void uploadImage(String httpUrl, final Map<String, String> map,
+    public void uploadImage(String httpUrl, final Map<String, Object> map,
                             final InputStream inputStream) {
         // TODO Auto-generated method stub
         StringBuilder stringBuilder = new StringBuilder();
@@ -44,7 +44,7 @@ public class HttpUtils {
             //获取输出流
             DataOutputStream ds = new DataOutputStream(
                     connection.getOutputStream());
-            Set<Map.Entry<String, String>> paramEntrySet = map.entrySet();
+            Set<Map.Entry<String, Object>> paramEntrySet = map.entrySet();
             Iterator paramIterator = paramEntrySet.iterator();
             while (paramIterator.hasNext()) {
                 Map.Entry<String, String> entry = (Map.Entry<String, String>) paramIterator.next();
@@ -110,7 +110,7 @@ public class HttpUtils {
     }
 
     //post提交form-data类型的数据name=value
-    public void postData(String httpUrl, Map<String, String> map) {
+    public void postData(String httpUrl, Map<String, Object> map) {
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader in = null;
         String result = "";
@@ -131,7 +131,7 @@ public class HttpUtils {
             connection.connect();//开启连接
             DataOutputStream ds = new DataOutputStream(
                     connection.getOutputStream());//获得输出流的对象
-            Set<Map.Entry<String, String>> paramEntrySet = map.entrySet();//将map转换成set集合
+            Set<Map.Entry<String, Object>> paramEntrySet = map.entrySet();//将map转换成set集合
             Iterator paramIterator = paramEntrySet.iterator();//set集合的迭代器
             while (paramIterator.hasNext()) {//循环取出key和value
                 Map.Entry<String, String> entry = (Map.Entry<String, String>) paramIterator

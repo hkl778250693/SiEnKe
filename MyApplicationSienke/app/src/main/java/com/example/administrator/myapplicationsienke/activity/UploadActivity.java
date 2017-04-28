@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,13 +21,19 @@ import android.widget.Toast;
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.TaskChooseAdapter;
 import com.example.administrator.myapplicationsienke.adapter.UploadListViewAdapter;
+import com.example.administrator.myapplicationsienke.mode.HttpUtils;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
 import com.example.administrator.myapplicationsienke.model.TaskChooseViewHolder;
+import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by Administrator on 2017/3/16.
@@ -39,6 +46,7 @@ public class UploadActivity extends Activity {
     private List<TaskChoose> taskChooseList = new ArrayList<>();
     private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
     private HashMap<String, Object> map = new HashMap<String, Object>();
+    private ArrayList<String> stringList = new ArrayList<>();//保存任务编号参数
     private Cursor cursor;
     private SQLiteDatabase db;  //数据库
     private TaskChooseAdapter adapter;   //适配器
@@ -47,8 +55,9 @@ public class UploadActivity extends Activity {
     private String checkState;
     private SharedPreferences sharedPreferences;
     private String defaul = "";//默认的全部不勾选
-    private int taskTotalUserNumber = 0;
     private TextView selectAll,reverse,selectCancel;
+    private HttpUtils httpUtils;
+    private TaskChoose item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +86,7 @@ public class UploadActivity extends Activity {
         db = helper.getReadableDatabase();
         sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        httpUtils = new HttpUtils();
         //初始化勾选框信息，默认都是以未勾选为单位
         for (int i = 0; i < taskChooseList.size(); i++) {
             defaul = defaul + "0";
@@ -120,6 +130,7 @@ public class UploadActivity extends Activity {
                 TaskChooseViewHolder holder = (TaskChooseViewHolder) view.getTag();
                 holder.checkBox.toggle();
                 TaskChooseAdapter.getIsCheck().put(position, holder.checkBox.isChecked());
+                item = taskChooseList.get((int) parent.getAdapter().getItemId(position));
             }
         });
     }
@@ -133,8 +144,13 @@ public class UploadActivity extends Activity {
                     break;
                 case R.id.up_load:
                     saveTaskInfo(); //保存选中的任务编号信息
-                    Log.i("integers====>", "长度为：" + integers.size());
+                    Log.i("UploadActivity", "长度为：" + integers.size());
                     if (integers.size() !=0) {
+                        for (int j = 0; j < integers.size(); j++) {
+                            getUserData(map.get("taskId" + integers.get(j)).toString());  //根据任务编号去查询用户信息
+                            //stringList.add(map.get("taskId" + integers.get(j)).toString());
+                            Log.i("UploadActivity", "得到的任务编号为：" + map.get("taskId" + integers.get(j)).toString());
+                        }
                         saveCheckStateInfo();//保存选中状态，将信息写入preference保存以备下一次读取使用
                         Toast.makeText(UploadActivity.this, "上传成功！~", Toast.LENGTH_SHORT).show();
                     } else {
@@ -198,8 +214,6 @@ public class UploadActivity extends Activity {
                 Log.i("integers====>", "长度为：" + integers.size());
             }
         }
-        editor.putInt("taskTotalUserNumber", taskTotalUserNumber);
-        Log.i("taskTotalUserNumber=>", "任务总户数为：" + taskTotalUserNumber);
         editor.commit();
     }
 
@@ -250,6 +264,35 @@ public class UploadActivity extends Activity {
         cursor.close();
     }
 
+    //读取下载到本地的用户数据，并上传服务器
+    public void getUserData(String taskId) {
+        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+        while (cursor.moveToNext()) {
+            Map<String,Object> map=new HashMap<String,Object>();
+            map.put("safetyInspectionId",cursor.getString(1));
+            map.put("n_safety_state",Integer.parseInt(cursor.getString(11)));
+            map.put("c_safety_remark",cursor.getString(13));
+            map.put("n_safety_hidden_id",Integer.parseInt(cursor.getString(14)));
+            map.put("n_safety_hidden_reason_id",Integer.parseInt(cursor.getString(15)));
+            httpUtils.postData("http://211.149.190.90/api/login",map);
+        }
+        cursor.close(); //游标关闭
+    }
+
+    //读取下载到本地的图片数据，并上传服务器
+    public void getPhotoData(String securityId) {
+        Cursor cursor = db.rawQuery("select * from security_photo where securityNumber=?", new String[]{securityId});//查询并获得游标
+        while (cursor.moveToNext()) {
+            Map<String,Object> map=new HashMap<String,Object>();
+            InputStream inputStream;
+            Uri photoUri = Uri.parse(cursor.getString(1));
+            photoUri
+            map.put("safetyInspectionId",cursor.getString(1));
+            httpUtils.postData("http://211.149.190.90/api/login",map);
+        }
+        cursor.close(); //游标关闭
+    }
+
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -267,6 +310,19 @@ public class UploadActivity extends Activity {
             super.handleMessage(msg);
         }
     };
+
+    //上传照片
+    public void postImage(){
+        Map<String,Object> map=new HashMap<String,Object>();
+        map.put("safetyInspectionId","");
+        InputStream inputStream=null;
+        try {
+            inputStream=getAssets().open("img.jpg");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        httpUtils.uploadImage("http://211.149.190.90/api/uploads",map,inputStream);
+    }
 
     @Override
     public void onDestroy() {
