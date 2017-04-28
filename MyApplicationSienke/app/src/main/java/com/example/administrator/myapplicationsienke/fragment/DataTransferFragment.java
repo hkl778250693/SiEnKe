@@ -118,7 +118,9 @@ public class DataTransferFragment extends Fragment {
                     break;
                 case R.id.download:
                     if (!sharedPreferences.getBoolean("have_download", false)) {
-                        if(!isFastDoubleClick()){
+                        if(isFastDoubleClick()){
+                            Toast.makeText(getActivity(), "您点击太频繁了！", Toast.LENGTH_SHORT).show();
+                        }else {
                             //开启支线程进行请求任务信息
                             new Thread() {
                                 @Override
@@ -131,8 +133,7 @@ public class DataTransferFragment extends Fragment {
                                     super.run();
                                 }
                             }.start();
-                        }else {
-                            Toast.makeText(getActivity(), "您点击太频繁了！", Toast.LENGTH_SHORT).show();
+
                         }
                     } else {
                         Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
@@ -813,7 +814,7 @@ public class DataTransferFragment extends Fragment {
     private boolean isFastDoubleClick() {
         long time = System.currentTimeMillis();
         long timeDistance = time - lastClickTime;
-        if (timeDistance > 0 && timeDistance < 300) {
+        if (timeDistance > 0 && timeDistance < 500) {
             return true;
         }
         lastClickTime = time;

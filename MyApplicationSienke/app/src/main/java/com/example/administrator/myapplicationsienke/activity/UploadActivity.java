@@ -27,6 +27,8 @@ import com.example.administrator.myapplicationsienke.model.TaskChoose;
 import com.example.administrator.myapplicationsienke.model.TaskChooseViewHolder;
 import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -275,6 +277,7 @@ public class UploadActivity extends Activity {
             map.put("n_safety_hidden_id",Integer.parseInt(cursor.getString(14)));
             map.put("n_safety_hidden_reason_id",Integer.parseInt(cursor.getString(15)));
             httpUtils.postData("http://211.149.190.90/api/login",map);
+            getPhotoData(cursor.getString(1));
         }
         cursor.close(); //游标关闭
     }
@@ -284,11 +287,16 @@ public class UploadActivity extends Activity {
         Cursor cursor = db.rawQuery("select * from security_photo where securityNumber=?", new String[]{securityId});//查询并获得游标
         while (cursor.moveToNext()) {
             Map<String,Object> map=new HashMap<String,Object>();
-            InputStream inputStream;
-            Uri photoUri = Uri.parse(cursor.getString(1));
-            photoUri
-            map.put("safetyInspectionId",cursor.getString(1));
-            httpUtils.postData("http://211.149.190.90/api/login",map);
+            FileInputStream inputStream = null;
+            try {
+                inputStream = new FileInputStream(cursor.getString(1));
+                Log.i("getPhotoData=>", "上传的照片流为：" + inputStream);
+                map.put("safetyInspectionId",cursor.getString(2));
+                map.put("picture"+cursor.getPosition(),inputStream);
+                httpUtils.uploadImage("http://211.149.190.90/api/uploads",map,inputStream);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
         cursor.close(); //游标关闭
     }
@@ -310,19 +318,6 @@ public class UploadActivity extends Activity {
             super.handleMessage(msg);
         }
     };
-
-    //上传照片
-    public void postImage(){
-        Map<String,Object> map=new HashMap<String,Object>();
-        map.put("safetyInspectionId","");
-        InputStream inputStream=null;
-        try {
-            inputStream=getAssets().open("img.jpg");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        httpUtils.uploadImage("http://211.149.190.90/api/uploads",map,inputStream);
-    }
 
     @Override
     public void onDestroy() {
