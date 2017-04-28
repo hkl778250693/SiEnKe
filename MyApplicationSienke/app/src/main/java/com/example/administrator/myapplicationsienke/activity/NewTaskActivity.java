@@ -605,6 +605,7 @@ public class NewTaskActivity extends Activity {
                 case 11:
                     cursor.moveToPosition(0);
                     securityType.setText(cursor.getString(2));
+                    itemId = cursor.getString(1);
                     break;
                 case 12:
                     securityType.setText("无");

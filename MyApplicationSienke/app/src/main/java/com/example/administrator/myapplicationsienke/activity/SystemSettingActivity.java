@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,8 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
+
+import java.io.File;
 
 /**
  * Created by Administrator on 2017/3/21.
@@ -102,6 +105,17 @@ public class SystemSettingActivity extends Activity {
         db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden_reason'");
     }
 
+    private boolean clearPhoto(){
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"SiEnKe_Crop");
+        if (!file.exists()) {
+            return false;
+        }
+        if (file.isDirectory()) {
+            file.delete();
+        }
+        return true;
+    }
+
     //弹出清空数据前提示popupwindow
     public void createClearDataPopup() {
         layoutInflater = LayoutInflater.from(SystemSettingActivity.this);
@@ -126,6 +140,11 @@ public class SystemSettingActivity extends Activity {
                 popupWindow.dismiss();
                 clearData();
                 Toast.makeText(SystemSettingActivity.this,"清除数据成功！",Toast.LENGTH_SHORT).show();
+                if(clearPhoto()){
+                    Toast.makeText(SystemSettingActivity.this,"照片删除成功！",Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(SystemSettingActivity.this,"照片删除失败！",Toast.LENGTH_SHORT).show();
+                }
             }
         });
         popupWindow.update();

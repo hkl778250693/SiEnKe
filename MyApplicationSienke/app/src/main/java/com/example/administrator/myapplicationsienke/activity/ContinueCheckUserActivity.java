@@ -118,6 +118,7 @@ public class ContinueCheckUserActivity extends Activity {
                 Intent intent = new Intent(ContinueCheckUserActivity.this, UserDetailInfoActivity.class);
                 intent.putExtra("position",position);
                 intent.putExtra("user_number",item.getUserId());
+                intent.putExtra("security_id",item.getSecurityNumber());
                 intent.putExtra("user_name",item.getUserName());
                 intent.putExtra("meter_number",item.getNumber());
                 intent.putExtra("user_phone_number",item.getPhoneNumber());
