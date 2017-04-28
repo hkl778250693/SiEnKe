@@ -110,6 +110,7 @@ public class NoCheckUserListActivity extends Activity {
                 intent.putExtra("position",position);
                 intent.putExtra("user_number",item.getUserId());
                 intent.putExtra("user_name",item.getUserName());
+                intent.putExtra("security_id",item.getSecurityNumber());
                 intent.putExtra("meter_number",item.getNumber());
                 intent.putExtra("user_phone_number",item.getPhoneNumber());
                 intent.putExtra("user_address",item.getAdress());

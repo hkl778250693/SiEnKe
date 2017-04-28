@@ -75,6 +75,7 @@ public class DataTransferFragment extends Fragment {
     private int currentPercent = 0;
     private int userProgress = 0;
     private JSONArray jsonArray;
+    private long lastClickTime = 0;
 
 
     @Nullable
@@ -115,18 +116,22 @@ public class DataTransferFragment extends Fragment {
                     break;
                 case R.id.download:
                     if (!sharedPreferences.getBoolean("have_download", false)) {
-                        //开启支线程进行请求任务信息
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                requireMyTask("SafeCheckPlan.do", "safePlanMember=");
-                                requireSecurityState("findSecurityState.do "); //安检状态
-                                requireSecurityContent("findSecurityContent.do");//安检内容
-                                requireSafetyHidden("findSafetyHidden.do");//安检原因类型
-                                requireSafetyReason("findSafetyReason.do");//安检原因
-                                super.run();
-                            }
-                        }.start();
+                        if(!isFastDoubleClick()){
+                            //开启支线程进行请求任务信息
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    requireMyTask("SafeCheckPlan.do", "safePlanMember=");
+                                    requireSecurityState("findSecurityState.do "); //安检状态
+                                    requireSecurityContent("findSecurityContent.do");//安检内容
+                                    requireSafetyHidden("findSafetyHidden.do");//安检原因类型
+                                    requireSafetyReason("findSafetyReason.do");//安检原因
+                                    super.run();
+                                }
+                            }.start();
+                        }else {
+                            Toast.makeText(getActivity(), "您点击太频繁了！", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
                         Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
                     }
@@ -194,7 +199,6 @@ public class DataTransferFragment extends Fragment {
         downloadProgress = (ProgressBar) popupwindowView.findViewById(R.id.download_progress);
         progressName = (TextView) popupwindowView.findViewById(R.id.progress_name);
         progressPercent = (TextView) popupwindowView.findViewById(R.id.progress_percent);
-        downloadProgress.setMax(10 * jsonArray.length());
         progressName.setText("任务正在下载，请稍后...");
         finishBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -800,6 +804,20 @@ public class DataTransferFragment extends Fragment {
         }.start();
     }
 
+    /**
+     * 防止重复点击
+     * @return
+     */
+    private boolean isFastDoubleClick() {
+        long time = System.currentTimeMillis();
+        long timeDistance = time - lastClickTime;
+        if (timeDistance > 0 && timeDistance < 300) {
+            return true;
+        }
+        lastClickTime = time;
+        return false;
+    }
+
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -809,6 +827,7 @@ public class DataTransferFragment extends Fragment {
                         JSONObject jsonObject = new JSONObject(taskResult);
                         jsonArray = jsonObject.getJSONArray("rows");
                         showPopupwindow();
+                        downloadProgress.setMax(10 * jsonArray.length());
                         taskNumbList.clear();
                         for (int j = 0; j < jsonArray.length(); j++) {             //获取到任务的个数，用于后面下载相应的用户数据
                             taskObject = jsonArray.getJSONObject(j);
