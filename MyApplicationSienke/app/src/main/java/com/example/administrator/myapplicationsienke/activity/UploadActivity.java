@@ -24,14 +24,12 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.UploadListViewAdapter;
 import com.example.administrator.myapplicationsienke.mode.HttpUtils;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.UploadListViewItem;
 import com.example.administrator.myapplicationsienke.model.UploadViewHolder;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;

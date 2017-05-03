@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.TaskChooseAdapter;
-import com.example.administrator.myapplicationsienke.fragment.DataTransferFragment;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
 import com.example.administrator.myapplicationsienke.model.TaskChooseViewHolder;
