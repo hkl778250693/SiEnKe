@@ -22,8 +22,7 @@ import org.json.JSONObject;
 import android.util.Log;
 
 public class HttpUtils {
-    public String token;
-    public String uid;
+    public String result;  //返回的结果
 
     public void uploadImage(String httpUrl, final Map<String, Object> map) {
         // TODO Auto-generated method stub
@@ -115,7 +114,6 @@ public class HttpUtils {
     public void postData(String httpUrl, Map<String, Object> map,Map<String,File> fileMap) {
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader in = null;
-        String result = "";
         String end = "\r\n";//结束符【换行】
         String twoHyphens = "--";//分隔符开头字符
         String boundary = "SJDASJODAODASSD";//
@@ -128,19 +126,32 @@ public class HttpUtils {
             connection.setUseCaches(false);//设置不缓存
             connection.setConnectTimeout(10000); // 连接超时为10秒
             connection.setRequestMethod("POST");//设置请求方式
-            // connection.setRequestProperty("Connection", "keep-alive");
+            //connection.setRequestProperty("Connection", "keep-alive");
+            //connection.setRequestProperty("Charset", "UTF-8");
             connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);// 设置请求数据类型并设置boundary部分；
             connection.connect();//开启连接
             DataOutputStream ds = new DataOutputStream(connection.getOutputStream());//获得输出流的对象
 //            Iterator paramIterator = map.keySet().iterator();//set集合的迭代器
-            Log.i("postData", "上传的安检ID值为：" + map.get("n_safety_inspection_id"));
-            for (String str : map.keySet()) {//循环取出key和value
-                Object value = map.get(str);//取得key值
+            Set<Map.Entry<String, Object>> paramEntrySet = map.entrySet();
+            Iterator paramIterator = paramEntrySet.iterator();
+            while (paramIterator.hasNext()) {
+                Map.Entry<String, Object> entry = (Map.Entry<String, Object>) paramIterator.next();
+                String key = entry.getKey();
+                Object value = entry.getValue();
                 ds.writeBytes(twoHyphens + boundary + end);//--SJDASJODAODASSD
-                ds.writeBytes("Content-Disposition: form-data; " + "name=\"" + URLEncoder.encode(str, "UTF-8") + "\"" + end + end +  URLEncoder.encode(value.toString(), "UTF-8"));//Content-Disposition: form-data; name="key"
-                Log.i("postData", "上传的key值为：" + str);
+                ds.writeBytes("Content-Disposition: form-data;accept-charset=\"utf-8\"; " + "name=\"" + key + "\"" + end + end +  URLEncoder.encode(value.toString(), "UTF-8"));//Content-Disposition: form-data; name="key"
+                Log.i("postData", "上传的key值为：" + key);
+                Log.i("postData", "上传的备注信息为：" + URLEncoder.encode(value.toString(), "UTF-8"));
                 ds.writeBytes(end);
             }
+            /*for (String str : map.keySet()) {//循环取出key和value
+                Object value = map.get(str);//取得value值
+                ds.writeBytes(twoHyphens + boundary + end);//--SJDASJODAODASSD
+                ds.writeBytes("Content-Disposition: form-data; " + "name=\"" + URLEncoder.encode(str, "UTF-8") + "\"" + end + end +  value.toString());//Content-Disposition: form-data; name="key"
+                Log.i("postData", "上传的key值为：" + str);
+                Log.i("postData", "上传的备注信息为：" + value.toString());
+                ds.writeBytes(end);
+            }*/
             for(String str:fileMap.keySet()){
                 File file = fileMap.get(str);//取得key值
                 ds.writeBytes(twoHyphens + boundary + end);//--SJDASJODAODASSD
@@ -153,13 +164,14 @@ public class HttpUtils {
                     ds.write(bytes, 0, len);
                 }
                 is.close();
+                Log.i("postData", "上传的图片key值为：" + str);
                 ds.writeBytes(end);
             }
             ds.writeBytes(twoHyphens + boundary + twoHyphens + end);//--SJDASJODAODASSD
             ds.flush();//刷新数据
+            ds.close();
             // 定义BufferedReader输入流来读取URL的响应
-            in = new BufferedReader(new InputStreamReader(
-                    connection.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             int statusCode = connection.getResponseCode();//获得响应状态码
             if (statusCode == HttpURLConnection.HTTP_OK) {
                 char[] buf = new char[1024];
@@ -175,17 +187,7 @@ public class HttpUtils {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        Log.i("Post", "result===========>" + stringBuilder.toString());
-        /*try {
-            JSONObject jsonObject = new JSONObject(stringBuilder.toString());
-            String message = jsonObject.optString("message", "");
-            token = jsonObject.optString("token", "");
-            uid = jsonObject.optString("uid", "");
-            Log.i("Post", "message=" + message);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
+        result = stringBuilder.toString();
+        Log.i("Post", "result===========>" + result);
     }
-
 }

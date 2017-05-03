@@ -109,6 +109,7 @@ public class DataTransferFragment extends Fragment {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.upload:
+                    upload.setClickable(false);
                     if(sharedPreferences.getBoolean("have_download",false)){
                         createSavePopupwindow();
                     }else {
@@ -167,6 +168,7 @@ public class DataTransferFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
+                upload.setClickable(true);
             }
         });
         saveRb.setOnClickListener(new View.OnClickListener() {
@@ -175,6 +177,7 @@ public class DataTransferFragment extends Fragment {
                 popupWindow.dismiss();
                 Intent intent = new Intent(getActivity(), UploadActivity.class);
                 startActivity(intent);
+                upload.setClickable(true);
             }
         });
         popupWindow.update();
@@ -185,6 +188,7 @@ public class DataTransferFragment extends Fragment {
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
+                upload.setClickable(true);
                 backgroundAlpha(1.0F);
             }
         });
@@ -206,6 +210,7 @@ public class DataTransferFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 downloadProgress.setProgress(0);
+                download.setClickable(true);
                 popupWindow.dismiss();
             }
         });
@@ -988,7 +993,9 @@ public class DataTransferFragment extends Fragment {
         values.put("remarks","");
         values.put("security_hidden","");
         values.put("security_hidden_reason","");
-        values.put("photoNumber","");
+        values.put("photoNumber","0");
+        values.put("ifUpload","false");
+        values.put("currentTime","");
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象

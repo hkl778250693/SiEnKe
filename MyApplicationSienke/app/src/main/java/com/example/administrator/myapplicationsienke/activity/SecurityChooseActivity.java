@@ -128,6 +128,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.security_check_go:
+                    security_check_go.setClickable(false);
                     createPopupwindow();
                     Log.i("createPopupwindow===>", "true");
                     break;
@@ -165,7 +166,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                 }
             }
         });*/
-
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -174,6 +174,7 @@ public class SecurityChooseActivity extends FragmentActivity {
                         Intent intent = new Intent(SecurityChooseActivity.this, SystemSettingActivity.class);
                         startActivity(intent);
                         popupWindow.dismiss();
+                        security_check_go.setClickable(true);
                         break;
                 }
             }
@@ -182,6 +183,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         quite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                security_check_go.setClickable(true);
                 System.exit(0);
             }
         });
@@ -195,6 +197,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
+                security_check_go.setClickable(true);
                 backgroundAlpha(1.0F);
             }
         });

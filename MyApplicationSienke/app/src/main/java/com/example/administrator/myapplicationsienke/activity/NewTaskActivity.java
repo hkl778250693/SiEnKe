@@ -171,10 +171,13 @@ public class NewTaskActivity extends Activity {
                     NewTaskActivity.this.finish();
                     break;
                 case R.id.newplan_add_btn:
+                    newPlanAddBtn.setClickable(false);
                     Intent intent1 = new Intent(NewTaskActivity.this, NewTaskDetailActivity.class);
                     startActivityForResult(intent1, 100);
+                    newPlanAddBtn.setClickable(true);
                     break;
                 case R.id.save_btn:
+                    save_btn.setClickable(false);
                     if (parclebleList.size() != 0) {
                         new Thread() {
                             @Override
@@ -194,7 +197,7 @@ public class NewTaskActivity extends Activity {
                     new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            startDate.setText(year + " / " + (monthOfYear + 1) + " / " + dayOfMonth);
+                            startDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                         }
                     }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
                     break;
@@ -203,7 +206,7 @@ public class NewTaskActivity extends Activity {
                     new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            endDate.setText(year + " / " + (monthOfYear + 1) + " / " + dayOfMonth);
+                            endDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                         }
                     }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
                     break;
@@ -495,6 +498,7 @@ public class NewTaskActivity extends Activity {
             public void onClick(View v) {
                 progressBar.setProgress(0);
                 popupWindow.dismiss();
+                save_btn.setClickable(true);
                 NewTaskActivity.this.finish();
             }
         });

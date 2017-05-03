@@ -14,7 +14,7 @@ public class MySqliteHelper extends SQLiteOpenHelper {
 
     //用户表
     final String CREATE_TABLE_SQL_USER = "CREATE TABLE User" +
-            "(user_id integer primary key AUTOINCREMENT,securityNumber varchar(200),userName varchar(200),meterNumber varchar(200),userPhone varchar(200),securityType varchar(200),oldUserId varchar(200),newUserId varchar(200),userAddress  varchar(200),taskId varchar(200),ifChecked varchar(200),security_content varchar(200),newMeterNumber varchar(200),remarks varchar(200),security_hidden varchar(200),security_hidden_reason varchar(200),photoNumber varchar(200),ifUpload varchar(200))";
+            "(user_id integer primary key AUTOINCREMENT,securityNumber varchar(200),userName varchar(200),meterNumber varchar(200),userPhone varchar(200),securityType varchar(200),oldUserId varchar(200),newUserId varchar(200),userAddress  varchar(200),taskId varchar(200),ifChecked varchar(200),security_content varchar(200),newMeterNumber varchar(200),remarks varchar(200),security_hidden varchar(200),security_hidden_reason varchar(200),photoNumber varchar(200),ifUpload varchar(200),currentTime varchar(200))";
 
     //任务表
     final String CREATE_TABLE_SQL_TASK = "CREATE TABLE Task " +
@@ -24,7 +24,7 @@ public class MySqliteHelper extends SQLiteOpenHelper {
     final String CREATE_TABLE_SQL_SECURITY_PHOTO_INFO = "CREATE TABLE security_photo " +
             "(id integer primary key AUTOINCREMENT,photoPath varchar(200),securityNumber varchar(200))";
 
-    //安检状态表
+    //安检状态表（安检类型）
     final String CREATE_TABLE_SQL_SECURITY_STATE = "CREATE TABLE SecurityState " +
             "(id integer primary key AUTOINCREMENT,securityId varchar(200),securityName varchar(200))";
 

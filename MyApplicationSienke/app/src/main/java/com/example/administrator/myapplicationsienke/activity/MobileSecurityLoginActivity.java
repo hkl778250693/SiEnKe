@@ -120,6 +120,7 @@ public class MobileSecurityLoginActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.logon_btn:
+                    logonBtn.setClickable(false);
                     if (editMobileUser.getText().toString().equals("") && editmobilePsw.getText().toString().equals("")) {
                         Toast.makeText(MobileSecurityLoginActivity.this, "用户名或密码不能为空", Toast.LENGTH_LONG).show();
                     } else if (editMobileUser.getText().toString().equals("")) {
@@ -137,7 +138,9 @@ public class MobileSecurityLoginActivity extends Activity {
                     }
                     break;
                 case R.id.cancel_btn:
+                    cancel_btn.setClickable(false);
                     System.exit(0);
+                    cancel_btn.setClickable(true);
                     break;
             }
         }
@@ -181,7 +184,7 @@ public class MobileSecurityLoginActivity extends Activity {
                         Log.i("data==========>","data="+data);
                         // 设置请求的头
                         //urlConnection.setRequestProperty("Content-Length", String.valueOf(data.getBytes().length));
-                        urlConnection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                        //urlConnection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
                         //urlConnection.setRequestProperty("Origin", "http://"+ ip + port);
                         Log.i("data==========>", "data=" + data);
                         // 设置请求的头
@@ -267,12 +270,15 @@ public class MobileSecurityLoginActivity extends Activity {
                     Toast.makeText(MobileSecurityLoginActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MobileSecurityLoginActivity.this, SecurityChooseActivity.class);
                     startActivity(intent);
+                    logonBtn.setClickable(true);
                     finish();
                     break;
                 case 2:
+                    logonBtn.setClickable(true);
                     Toast.makeText(MobileSecurityLoginActivity.this, "账号或密码错误!", Toast.LENGTH_LONG).show();
                     break;
                 case 3:
+                    logonBtn.setClickable(true);
                     Toast.makeText(MobileSecurityLoginActivity.this, "网络请求异常!", Toast.LENGTH_LONG).show();
                     break;
             }

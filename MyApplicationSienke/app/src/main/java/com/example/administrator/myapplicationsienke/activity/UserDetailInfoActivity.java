@@ -1,10 +1,12 @@
 package com.example.administrator.myapplicationsienke.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -17,6 +19,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -46,7 +50,9 @@ import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -75,16 +81,15 @@ public class UserDetailInfoActivity extends Activity {
     private TextView userNumber, userName, meterNumber, userAddress, checkType, userPhoneNumber;
     private GridviewImageAdapter adapter;
     private PopupwindowListAdapter padapter;
-    private List<Bitmap> bitmaps = new ArrayList<>();
     private String cropPhotoPath;  //裁剪的图片路径
     private ArrayList<String> cropPathLists = new ArrayList<>();  //裁剪的图片路径集合
     private ArrayList<String> cropPathLists_back = new ArrayList<>();  //大图页面返回的图片路径集合
     private int currentPosition = 0;
     private SQLiteDatabase db;  //数据库
     private List<PopupwindowListItem> popupwindowListItemList = new ArrayList<>();
-    private Cursor cursor1, cursor2, cursor3, cursor4, cursor5,cursor6,cursor7,cursor8;
+    private Cursor cursor1, cursor2, cursor3, cursor4, cursor5, cursor6, cursor7, cursor8;
     private List<PopupwindowListItem> defaultList = new ArrayList<>();
-    private String securityContentItemId,securityHiddenItemId,hiddenReasonItemId;//安检情况类型id,安检隐患类型id,安检隐患原因id
+    private String securityContentItemId, securityHiddenItemId, hiddenReasonItemId;//安检情况类型id,安检隐患类型id,安检隐患原因id
     private EditText newMeterNumb, remarks;
     private String securityContent;
     private String newmeternumber;
@@ -98,6 +103,10 @@ public class UserDetailInfoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_detail_info);
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            //申请WRITE_EXTERNAL_STORAGE权限
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1);
+        }
         bindView();//绑定控件
         defaultSetting();//初始化设置
         setViewClickListener();//点击事件
@@ -181,21 +190,63 @@ public class UserDetailInfoActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.back:
-                    if (cropPathLists.size() != 0) {
-                        for (int i = 0; i < cropPathLists.size(); i++) {
-                            deletePicture(new File(cropPathLists.get(i)));
+                    if (!querySecurityState(securityId)) {  //如果安检状态为true，再次进入安检详情页的时候，如果在原来的基础上新增图片或者更换图片，只要没点击保存按钮，则不记录本次的更改
+                        if (cropPathLists.size() != 0) {
+                            for (int i = 0; i < cropPathLists.size(); i++) {
+                                deletePicture(new File(cropPathLists.get(i)));
+                            }
                         }
                     }
                     finish();
                     break;
                 case R.id.security_check_case:
                     createSecurityCasePopupwindow();
+                    //弹出框显示就开启线程去加载安检情况所有列表数据
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            getSecurityCheckCase();
+                            if (cursor1.getCount() != 0) {
+                                handler.sendEmptyMessage(3);
+                            } else {
+                                handler.sendEmptyMessage(4);
+                            }
+
+                        }
+                    }.start();
                     break;
                 case R.id.security_hidden_type:
                     createSecurityHiddenTypePopupwindow();
+                    //弹出框显示就开启线程去加载安全隐患所有列表数据
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            getSecurityHiddenType();
+                            if (cursor2.getCount() != 0) {
+                                handler.sendEmptyMessage(3);
+                            } else {
+                                handler.sendEmptyMessage(16);
+                            }
+
+                        }
+                    }.start();
                     break;
                 case R.id.security_hidden_reason:
                     createSecurityHiddenReasonPopupwindow();
+                    //弹出框显示就开启线程去加载安全隐患原因对应的列表数据
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            if (securityHiddenItemId != null) {
+                                getSecurityHiddenReason(securityHiddenItemId);
+                                if (cursor3.getCount() != 0) {
+                                    handler.sendEmptyMessage(3);
+                                } else {
+                                    handler.sendEmptyMessage(17);
+                                }
+                            }
+                        }
+                    }.start();
                     break;
                 case R.id.save_btn:  //保存
                     createSavePopupwindow();
@@ -210,14 +261,6 @@ public class UserDetailInfoActivity extends Activity {
         editor = sharedPreferences.edit();
         MySqliteHelper helper = new MySqliteHelper(UserDetailInfoActivity.this, 1);
         db = helper.getWritableDatabase();
-
-        securityCheckCase.setText("安检合格");
-        securityHiddenType.setText("常规安检");
-        securityHiddenReason.setText("户内立管内");
-        if (hiddenTypeRoot.getVisibility() == View.VISIBLE && hiddenReasonRoot.getVisibility() == View.VISIBLE) {
-            hiddenTypeRoot.setVisibility(View.GONE);
-            hiddenReasonRoot.setVisibility(View.GONE);
-        }
 
         //获取上一个页面传过来的用户ID
         Intent intent = getIntent();
@@ -265,36 +308,18 @@ public class UserDetailInfoActivity extends Activity {
         new Thread() {
             @Override
             public void run() {
-                if (querySecurityState(securityId)) {
-                    querySecurityContent(securityId);
-                    Log.i("UserDetailInfoActivity","显示上次数据！");
+                if (querySecurityState(securityId)) {   //根据安检ID查询用户是否处于安检状态，如果是安检状态，则显示上次安检所记录的内容，否则显示默认的内容
+                    queryUserSecurityContent(securityId);  //根据安检ID查询用户上次安检情况信息(查用户表)
+                    Log.i("UserDetailInfoActivity", "显示上次数据！");
                     //显示上次安全情况
-                    new Thread(){
+                    new Thread() {
                         @Override
                         public void run() {
-                            getPreviewSecurityCheckCase(securityContent);
-                            if(cursor6.getCount() != 0){
-                                handler.sendEmptyMessage(13);
-                            }
-                        }
-                    }.start();
-                    //显示上次安全隐患类型
-                    new Thread(){
-                        @Override
-                        public void run() {
-                            getPreviewSecurityHiddenType(securityHidden);
-                            if(cursor7.getCount() != 0){
-                                handler.sendEmptyMessage(14);
-                            }
-                        }
-                    }.start();
-                    //显示上次安全隐患原因
-                    new Thread(){
-                        @Override
-                        public void run() {
-                            getPreviewSecurityHiddenReason(hiddenReason);
-                            if(cursor8.getCount() != 0){
-                                handler.sendEmptyMessage(15);
+                            if (securityContent != null) {
+                                getPreviewSecurityCheckCase(securityContent);
+                                if (cursor6.getCount() != 0) {
+                                    handler.sendEmptyMessage(13);
+                                }
                             }
                         }
                     }.start();
@@ -304,8 +329,8 @@ public class UserDetailInfoActivity extends Activity {
                     if (!remarksContent.equals("")) {
                         remarks.setText(remarksContent);
                     }
-                    if (!photoNumber.equals("")) {
-                        new Thread(){
+                    if (!photoNumber.equals("0")) {
+                        new Thread() {
                             @Override
                             public void run() {
                                 querySecurityPhoto(securityId);
@@ -314,7 +339,7 @@ public class UserDetailInfoActivity extends Activity {
                         }.start();
                     }
                 } else {
-                    Log.i("UserDetailInfoActivity","显示默认数据！");
+                    Log.i("UserDetailInfoActivity", "显示默认数据！");
                     //显示默认安全情况
                     new Thread() {
                         @Override
@@ -368,8 +393,10 @@ public class UserDetailInfoActivity extends Activity {
         takePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                takePhoto.setClickable(false);
                 popupWindow.dismiss();
                 openCamera();//拍照
+                takePhoto.setClickable(true);
             }
         });
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -413,15 +440,14 @@ public class UserDetailInfoActivity extends Activity {
             public void onClick(View v) {
                 updateUserInfo();
                 if (cropPathLists.size() != 0) {
-                    db.delete("security_photo",null,null);  //删除security_photo表中的所有数据
+                    db.delete("security_photo", "securityNumber=?", new String[]{securityId});  //删除security_photo表中的当前用户的照片数据
                     //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
-                    db.execSQL("update sqlite_sequence set seq=0 where name='security_photo'");
+                    Log.i("createSavePopupwindow", "删除的图片的安检ID为：" + securityId);
+                    //db.execSQL("update sqlite_sequence set seq=0 where name='security_photo'");
                     for (int i = 0; i < cropPathLists.size(); i++) {
                         insertSecurityPhoto(cropPathLists.get(i));
                     }
                     updateUserPhoto(String.valueOf(cropPathLists.size()));
-                } else {
-                    updateUserPhoto(String.valueOf(0));
                 }
                 Intent intent = new Intent();
                 setResult(Activity.RESULT_OK, intent);
@@ -453,20 +479,19 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow = new PopupWindow(securityCaseView, securityCheckCase.getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
         listView = (ListView) securityCaseView.findViewById(R.id.listview);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {           //listview点击事件
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
-                securityCheckCase.setText(item.getItemName());
+                securityCheckCase.setText(item.getItemName());  //点击之后，设置对应的名称
                 popupWindow.dismiss();
-                securityContentItemId = item.getItemId();
-                Log.i("createSecurityCasePopu", "选中的安检情况ID"+securityContentItemId);
+                securityContentItemId = item.getItemId();    //获得当前用户点击的安检情况itemID
+                Log.i("createSecurityCasePopu", "选中的安检情况ID" + securityContentItemId);
                 if (!(securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格"))) {
                     showHiddenTypeAndReason();
                 } else {
                     noShowHiddenTypeAndReason();
                 }
-
             }
         });
         popupWindow.setFocusable(true);
@@ -476,18 +501,6 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityCheckCase, 0, 0);
-        new Thread() {
-            @Override
-            public void run() {
-                getSecurityCheckCase();
-                if (cursor1.getCount() != 0) {
-                    handler.sendEmptyMessage(3);
-                } else {
-                    handler.sendEmptyMessage(4);
-                }
-
-            }
-        }.start();
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -525,12 +538,11 @@ public class UserDetailInfoActivity extends Activity {
                 PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
                 securityHiddenType.setText(item.getItemName());
                 popupWindow.dismiss();
-                securityHiddenItemId = item.getItemId();
+                securityHiddenItemId = item.getItemId();   //获得当前用户点击的安全隐患itemID
                 new Thread() {
                     @Override
                     public void run() {
-                        Log.i("getSecurityState=>", " 调用了！");
-                        if (securityHiddenItemId != null) {
+                        if (securityHiddenItemId != null) {   //根据隐患类型ID查询并显示对应的隐患原因
                             getSecurityHiddenReasonDefault(securityHiddenItemId);
                             if (cursor4.getCount() != 0) {
                                 handler.sendEmptyMessage(11);
@@ -549,19 +561,6 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityHiddenType, 0, 0);
-        new Thread() {
-            @Override
-            public void run() {
-                Log.i("getSecurityState=>", " 调用了！");
-                getSecurityHiddenType();
-                if (cursor2.getCount() != 0) {
-                    handler.sendEmptyMessage(3);
-                } else {
-                    handler.sendEmptyMessage(4);
-                }
-
-            }
-        }.start();
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -582,7 +581,7 @@ public class UserDetailInfoActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
                 securityHiddenReason.setText(item.getItemName());
-                hiddenReasonItemId = item.getItemId();
+                hiddenReasonItemId = item.getItemId();   //获得当前用户点击的安全隐患原因itemID
                 popupWindow.dismiss();
             }
         });
@@ -593,27 +592,6 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setAnimationStyle(R.style.Popupwindow);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityHiddenReason, 0, 0);
-        new Thread() {
-            @Override
-            public void run() {
-                Log.i("getSecurityState=>", " 调用了！");
-                if (securityHiddenItemId != null) {
-                    getSecurityHiddenReason(securityHiddenItemId);
-                    if (cursor3.getCount() != 0) {
-                        handler.sendEmptyMessage(3);
-                    } else {
-                        handler.sendEmptyMessage(4);
-                    }
-                } else {
-                    getSecurityHiddenReason("8");
-                    if (cursor3.getCount() != 0) {
-                        handler.sendEmptyMessage(3);
-                    } else {
-                        handler.sendEmptyMessage(4);
-                    }
-                }
-            }
-        }.start();
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -694,6 +672,7 @@ public class UserDetailInfoActivity extends Activity {
                     defaultList.clear();
                     securityCheckCase.setText("无");
                     PopupwindowListItem item = new PopupwindowListItem();
+                    item.setItemId("");
                     item.setItemName("无");
                     defaultList.add(item);
                     padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this, defaultList);
@@ -703,8 +682,10 @@ public class UserDetailInfoActivity extends Activity {
                 case 5:
                     cursor1.moveToPosition(0);
                     securityCheckCase.setText(cursor1.getString(2));
-                    securityContentItemId = cursor1.getString(1);
-                    if (!securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格")) {
+                    securityContentItemId = cursor1.getString(1);//当用户安检时什么都不选择，直接用默认的安检信息
+                    /*editor.putString("securityContentItemIdDefault", securityContentItemId);
+                    editor.apply();*/
+                    if (!(securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格"))) {
                         showHiddenTypeAndReason();
                     } else {
                         noShowHiddenTypeAndReason();
@@ -740,20 +721,69 @@ public class UserDetailInfoActivity extends Activity {
                     break;
                 case 13:
                     cursor6.moveToPosition(0);
+                    securityContentItemId = cursor6.getString(1);//当用户安检时什么都不选择，直接用上次的安检情况ID
                     securityCheckCase.setText(cursor6.getString(2));
-                    if (!securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格")) {
+                    if (!(securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格"))) {
                         showHiddenTypeAndReason();
+                        //显示上次安全隐患类型
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                if (securityHidden != null) {
+                                    getPreviewSecurityHiddenType(securityHidden);
+                                }
+                                if (cursor7.getCount() != 0) {
+                                    handler.sendEmptyMessage(14);
+                                }
+                            }
+                        }.start();
+                        //显示上次安全隐患原因
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                if (hiddenReason != null) {
+                                    getPreviewSecurityHiddenReason(hiddenReason);
+                                }
+                                if (cursor8.getCount() != 0) {
+                                    handler.sendEmptyMessage(15);
+                                }
+                            }
+                        }.start();
                     } else {
                         noShowHiddenTypeAndReason();
                     }
                     break;
                 case 14:
                     cursor7.moveToPosition(0);
+                    securityHiddenItemId = cursor7.getString(1);
                     securityHiddenType.setText(cursor7.getString(2));
                     break;
                 case 15:
                     cursor8.moveToPosition(0);
+                    hiddenReasonItemId = cursor8.getString(1);
                     securityHiddenReason.setText(cursor8.getString(3));
+                    break;
+                case 16:
+                    defaultList.clear();
+                    securityHiddenType.setText("无");
+                    PopupwindowListItem item1 = new PopupwindowListItem();
+                    item1.setItemId("");
+                    item1.setItemName("无");
+                    defaultList.add(item1);
+                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this, defaultList);
+                    padapter.notifyDataSetChanged();
+                    listView.setAdapter(padapter);
+                    break;
+                case 17:
+                    defaultList.clear();
+                    securityHiddenReason.setText("无");
+                    PopupwindowListItem item2 = new PopupwindowListItem();
+                    item2.setItemId("");
+                    item2.setItemName("无");
+                    defaultList.add(item2);
+                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this, defaultList);
+                    padapter.notifyDataSetChanged();
+                    listView.setAdapter(padapter);
                     break;
             }
             super.handleMessage(msg);
@@ -771,18 +801,17 @@ public class UserDetailInfoActivity extends Activity {
         }
         while (cursor1.moveToNext()) {
             PopupwindowListItem item = new PopupwindowListItem();
-            item.setItemName(cursor1.getString(2));
             item.setItemId(cursor1.getString(1));
+            item.setItemName(cursor1.getString(2));
             popupwindowListItemList.add(item);
         }
-        Log.i("getSecurityState=>", " 安检状态个数为：" + popupwindowListItemList.size());
+        Log.i("getSecurityCheckCase", " 安检情况个数为：" + popupwindowListItemList.size());
     }
 
     //读取上次安全情况状态信息
-    public void getPreviewSecurityCheckCase(String securityContentItemId) {
-        cursor6 = db.rawQuery("select * from security_content where securityId=?", new String[]{securityContentItemId});//查询并获得游标
-        Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor6.getCount());
-        //如果游标为空，则显示默认数据
+    public void getPreviewSecurityCheckCase(String securityContent) {
+        cursor6 = db.rawQuery("select * from security_content where securityId=?", new String[]{securityContent});//查询并获得游标
+        //如果游标为空，则返回空
         if (cursor6.getCount() == 0) {
             return;
         }
@@ -797,24 +826,22 @@ public class UserDetailInfoActivity extends Activity {
     public void getSecurityHiddenType() {
         popupwindowListItemList.clear();
         cursor2 = db.query("security_hidden", null, null, null, null, null, null);//查询并获得游标
-        Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor2.getCount());
-        //如果游标为空，则显示默认数据
+        //如果游标为空，则返回空
         if (cursor2.getCount() == 0) {
             return;
         }
         while (cursor2.moveToNext()) {
             PopupwindowListItem item = new PopupwindowListItem();
-            item.setItemName(cursor2.getString(2));
             item.setItemId(cursor2.getString(1));
+            item.setItemName(cursor2.getString(2));
             popupwindowListItemList.add(item);
         }
-        Log.i("getSecurityState=>", " 安全隐患个数为：" + popupwindowListItemList.size());
+        Log.i("getSecurityHiddenType", " 安全隐患个数为：" + popupwindowListItemList.size());
     }
 
     //读取上次安全隐患类型信息
     public void getPreviewSecurityHiddenType(String securityHiddenItemId) {
         cursor7 = db.rawQuery("select * from security_hidden where n_safety_hidden_id=?", new String[]{securityHiddenItemId});//查询并获得游标
-        Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor7.getCount());
         //如果游标为空，则显示默认数据
         if (cursor7.getCount() == 0) {
             return;
@@ -830,7 +857,7 @@ public class UserDetailInfoActivity extends Activity {
     public void getSecurityHiddenReason(String itemId) {
         popupwindowListItemList.clear();
         cursor3 = db.rawQuery("select * from security_hidden_reason where n_safety_hidden_id=?", new String[]{itemId});//查询并获得游标
-        //如果游标为空，则显示默认数据
+        //如果游标为空，则返回空
         if (cursor3.getCount() == 0) {
             return;
         }
@@ -840,8 +867,7 @@ public class UserDetailInfoActivity extends Activity {
             item.setItemName(cursor3.getString(3));
             popupwindowListItemList.add(item);
         }
-
-        Log.i("getSecurityState=>", " 安全隐患原因个数为：" + popupwindowListItemList.size());
+        Log.i("getSecurityHiddenReason", " 安全隐患原因个数为：" + popupwindowListItemList.size());
     }
 
     //读取安全隐患原因默认信息
@@ -853,13 +879,14 @@ public class UserDetailInfoActivity extends Activity {
         }
         while (cursor4.moveToNext()) {
             PopupwindowListItem item = new PopupwindowListItem();
+            item.setItemId(cursor4.getString(1));
             item.setItemName(cursor4.getString(3));
         }
     }
 
     //读取上次安全隐患原因信息
     public void getPreviewSecurityHiddenReason(String itemId) {
-        cursor8 = db.rawQuery("select * from security_hidden_reason where n_safety_hidden_id=?", new String[]{itemId});//查询并获得游标
+        cursor8 = db.rawQuery("select * from security_hidden_reason where n_safety_hidden_reason_id=?", new String[]{itemId});//查询并获得游标
         //如果游标为空，则显示默认数据
         if (cursor8.getCount() == 0) {
             return;
@@ -888,7 +915,8 @@ public class UserDetailInfoActivity extends Activity {
             // outputX outputY 是裁剪图片宽高
             intent.putExtra("outputX", 500);
             intent.putExtra("outputY", 650);
-            intent.putExtra("return-data", false);
+            intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+            intent.putExtra("noFaceDetection", true);//取消人脸识别功能
             // 当图片的宽高不足时，会出现黑边，去除黑边
             intent.putExtra("scale", true);
             intent.putExtra("scaleUpIfNeeded", true);
@@ -896,6 +924,7 @@ public class UserDetailInfoActivity extends Activity {
             cropPhotoUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);
             Log.i("startCropPhoto", "图片裁剪的uri = " + cropPhotoUri);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, cropPhotoUri);
+            intent.putExtra("return-data", false);//设置为不返回数据
             cropPhotoPath = cropPhotoUri.getPath();
             startActivityForResult(intent, CROP_SMALL_PICTURE);
         }
@@ -928,7 +957,7 @@ public class UserDetailInfoActivity extends Activity {
     private void updateUserPhoto(String photoNumber) {
         ContentValues values = new ContentValues();
         values.put("photoNumber", photoNumber);
-        db.update("User",values,"securityNumber=?",new String[]{securityId});
+        db.update("User", values, "securityNumber=?", new String[]{securityId});
     }
 
     /**
@@ -936,21 +965,44 @@ public class UserDetailInfoActivity extends Activity {
      */
     private void updateUserInfo() {
         ContentValues values = new ContentValues();
-        values.put("security_content", securityContentItemId);
-        Log.i("insertUserInfo","安检情况ID是："+securityContentItemId);
-        if(!newMeterNumb.getText().toString().trim().equals("")){
-            values.put("newMeterNumber",newMeterNumb.getText().toString().trim());
-            Log.i("insertUserInfo","输入的新表编号是："+newMeterNumb.getText().toString().trim());
+        if (securityContentItemId != null) {
+            values.put("security_content", securityContentItemId);
+            Log.i("insertUserInfo", "安检情况ID是：" + securityContentItemId);
+        } else {
+            values.put("security_content", "");
+            Log.i("insertUserInfo", "安检情况ID空的情况：" + securityContentItemId);
         }
-        if(!remarks.getText().toString().trim().equals("")){
+        if (!newMeterNumb.getText().toString().trim().equals("")) {
+            values.put("newMeterNumber", newMeterNumb.getText().toString().trim());
+            Log.i("insertUserInfo", "输入的新表编号是：" + newMeterNumb.getText().toString().trim());
+        }
+        if (!remarks.getText().toString().trim().equals("")) {
             values.put("remarks", remarks.getText().toString().trim());
-            Log.i("insertUserInfo","备注是："+remarks.getText().toString().trim());
+            Log.i("insertUserInfo", "备注是：" + remarks.getText().toString().trim());
         }
-        values.put("security_hidden", securityHiddenItemId);
-        Log.i("insertUserInfo","隐患类型ID是："+securityHiddenItemId);
-        values.put("security_hidden_reason", hiddenReasonItemId);
-        Log.i("insertUserInfo","隐患原因ID是："+hiddenReasonItemId);
-        db.update("User",values,"securityNumber=?",new String[]{securityId});
+        if (!(securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格"))) { // 如果是合格或者复检合格，则插入空的隐患类型和原因
+            //判断隐患类型是否通过点击列表选择
+            if (securityHiddenItemId != null) {
+                values.put("security_hidden", securityHiddenItemId);
+                Log.i("insertUserInfo", "隐患类型ID是：" + securityHiddenItemId);
+            } else {
+                values.put("security_hidden", "");
+                Log.i("insertUserInfo", "隐患类型ID空的情况：" + securityHiddenItemId);
+            }
+            //判断隐患原因是否通过点击列表选择
+            if (hiddenReasonItemId != null) {
+                values.put("security_hidden_reason", hiddenReasonItemId);
+                Log.i("insertUserInfo", "隐患原因ID是：" + hiddenReasonItemId);
+            } else {
+                values.put("security_hidden_reason", "");
+                Log.i("insertUserInfo", "隐患原因ID空的情况：" + hiddenReasonItemId);
+            }
+        } else {
+            values.put("security_hidden", "");
+            values.put("security_hidden_reason", "");
+        }
+        values.put("currentTime",getCurrentTime());
+        db.update("User", values, "securityNumber=?", new String[]{securityId});
     }
 
     /**
@@ -970,32 +1022,23 @@ public class UserDetailInfoActivity extends Activity {
     /**
      * 根据安检ID查询用户上次安检情况信息
      */
-    private void querySecurityContent(String securityId) {
+    private void queryUserSecurityContent(String securityId) {
         Cursor cursor = db.rawQuery("select * from User where securityNumber=?", new String[]{securityId});//查询并获得游标
         while (cursor.moveToNext()) {
-            Log.i("querySecurityContent","上次安检信息查询进来了，数据条数为："+cursor.getCount());
-            Log.i("querySecurityContent","上次安检用户为："+cursor.getString(2));
-            Log.i("querySecurityContent","上次安检情况为："+cursor.getString(11));
-            securityContent = cursor.getString(11);
-            Log.i("querySecurityContent","上次安检输入表编号为："+cursor.getString(12));
-            if(!cursor.getString(12).equals("")){
-                newmeternumber = cursor.getString(12);
-            }else {
-                newmeternumber = "";
-            }
-            Log.i("querySecurityContent","上次安检备注信息为："+cursor.getString(13));
-            if(!cursor.getString(13).equals("")){
-                remarksContent = cursor.getString(13);
-            }else {
-                remarksContent = "";
-            }
+            Log.i("querySecurityContent", "上次安检信息查询进来了，数据条数为：" + cursor.getCount());
+            Log.i("querySecurityContent", "上次安检用户为：" + cursor.getString(2));
+            securityContent = cursor.getString(11);   //获取上次安检情况的ID
+            Log.i("querySecurityContent", "上次安检情况为：" + cursor.getString(11));
+            newmeternumber = cursor.getString(12); //设置上次输入的表编号，有就有，无就无
+            Log.i("querySecurityContent", "上次安检输入表编号为：" + cursor.getString(12));
+            remarksContent = cursor.getString(13);  //设置上次输入的备注，有就有，无就无
+            Log.i("querySecurityContent", "上次安检备注信息为：" + cursor.getString(13));
             securityHidden = cursor.getString(14);
-            Log.i("querySecurityContent","上次隐患类型为："+cursor.getString(14));
+            Log.i("querySecurityContent", "上次隐患类型为：" + cursor.getString(14));
             hiddenReason = cursor.getString(15);
-            Log.i("querySecurityContent","上次隐患原因为："+cursor.getString(15));
-            if(!cursor.getString(16).equals("")){
-                photoNumber = cursor.getString(16);
-            }
+            Log.i("querySecurityContent", "上次隐患原因为：" + cursor.getString(15));
+            photoNumber = cursor.getString(16);
+            Log.i("querySecurityContent", "上次拍的照片数量为：" + cursor.getString(16));
         }
         cursor.close();
     }
@@ -1008,6 +1051,7 @@ public class UserDetailInfoActivity extends Activity {
         while (cursor5.moveToNext()) {
             cropPathLists.add(cursor5.getString(1));
         }
+        Log.i("querySecurityPhoto", "上次照片数量为：" + cropPathLists.size());
     }
 
     /**
@@ -1042,6 +1086,17 @@ public class UserDetailInfoActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 获取当前时间
+     * @return
+     */
+    private String getCurrentTime() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date curDate = new Date(System.currentTimeMillis());
+        String currentTime = dateFormat.format(curDate);
+        return currentTime;
     }
 
     @Override

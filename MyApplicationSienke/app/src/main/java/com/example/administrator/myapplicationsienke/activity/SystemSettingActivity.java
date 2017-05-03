@@ -123,7 +123,7 @@ public class SystemSettingActivity extends Activity {
                     childFiles[i].delete(); // 把每个文件 用这个方法进行迭代
                 }
             }
-            file.delete();
+            //file.delete();
             return true;
         } else {
             Log.i("clearPhoto=>", "文件不存在！");
