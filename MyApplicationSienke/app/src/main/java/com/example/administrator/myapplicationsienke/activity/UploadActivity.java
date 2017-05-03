@@ -163,32 +163,48 @@ public class UploadActivity extends Activity {
                     if (integers.size() != 0) {
                         upLoad.setClickable(false);
                         showPopupwindow();  // 显示上传进度提示
-                        uploadProgress.setMax(maxProgress * 10);
-                        for (int j = 0; j < integers.size(); j++) {
-                            getUserDataAndPost(map.get("taskId" + integers.get(j)).toString());  //根据任务编号去查询用户信息
-                            //stringList.add(map.get("taskId" + integers.get(j)).toString());
-                            Log.i("UploadActivity", "得到的任务编号为：" + map.get("taskId" + integers.get(j)).toString());
-                        }
-                        if (uploadNumber != 0) {
-                            if (uploadProgress.getProgress() == maxProgress * 10) {
-                                Log.i("uploadProgress", "上传的进度为：" + uploadProgress.getProgress());
-                                progressPercent.setText("100");
-                                Message msg = new Message();
-                                msg.what = 4;
-                                msg.arg1 = uploadNumber;
-                                msg.arg2 = noCheckNumber;
-                                handler.sendMessage(msg);
+                        new Thread(){
+                            @Override
+                            public void run() {
+                                for (int j = 0; j < integers.size(); j++) {
+                                    getUploadUserTotalNumber(map.get("taskId" + integers.get(j)).toString());  //根据任务编号获得需要上传的所有用户数量，并作为最大进度
+                                }
+                                Log.i("getUploadUserTotalNumb", "最大进度为：" + maxProgress);
+                                uploadProgress.setMax(maxProgress * 10);
+                                for (int j = 0; j < integers.size(); j++) {
+                                    getUserDataAndPost(map.get("taskId" + integers.get(j)).toString());  //根据任务编号去查询用户信息
+                                    //stringList.add(map.get("taskId" + integers.get(j)).toString());
+                                    Log.i("UploadActivity", "得到的任务编号为：" + map.get("taskId" + integers.get(j)).toString());
+                                }
+                                Log.i("getUploadUserTotalNumb", "上传成功的用户数量为：" + uploadNumber);
+                                new Thread(){
+                                    @Override
+                                    public void run() {
+                                        if (uploadNumber != 0) {
+                                            if (uploadProgress.getProgress() == maxProgress * 10) {
+                                                Log.i("uploadProgress", "上传的进度为：" + uploadProgress.getProgress());
+                                                progressPercent.setText("100");
+                                                Message msg = new Message();
+                                                msg.what = 4;
+                                                msg.arg1 = uploadNumber;
+                                                msg.arg2 = noCheckNumber;
+                                                handler.sendMessage(msg);
+                                            }
+                                        } else {
+                                            Log.i("up_load==========", "点击上传时记录的未安检户数为：" + noCheckNumber);
+                                            if (noCheckNumber == 0) {   //说明当前勾选的任务用户数据已经全部上传
+                                                handler.sendEmptyMessage(6);
+                                            } else {
+                                                Message msg = new Message();
+                                                msg.what = 7;
+                                                msg.arg1 = noCheckNumber;
+                                                handler.sendMessage(msg);
+                                            }
+                                        }
+                                    }
+                                }.start();
                             }
-                        } else {
-                            if (noCheckNumber == 0) {
-                                handler.sendEmptyMessage(6);
-                            } else {
-                                Message msg = new Message();
-                                msg.what = 7;
-                                msg.arg1 = noCheckNumber;
-                                handler.sendMessage(msg);
-                            }
-                        }
+                        }.start();
                         saveCheckStateInfo();//保存选中状态，将信息写入preference保存以备下一次读取使用
                     } else {
                         Toast.makeText(UploadActivity.this, "您还没有选择任务哦~", Toast.LENGTH_SHORT).show();
@@ -245,8 +261,6 @@ public class UploadActivity extends Activity {
         for (int i = 0; i < count; i++) {
             if (UploadListViewAdapter.getIsCheck().get(i)) {
                 UploadListViewItem item = uploadListViewItemList.get((int) adapter.getItemId(i));
-                maxProgress += Integer.parseInt(item.getTotalUserNumber());
-                Log.i("saveTaskInfo====>", "最大进度为：" + maxProgress);
                 map.put("taskId" + i, item.getTaskNumber());
                 Log.i("saveTaskInfo=========>", "这次被勾选第" + i + "个，任务编号为：" + item.getTaskNumber());
                 integers.add(i);
@@ -305,65 +319,72 @@ public class UploadActivity extends Activity {
 
     //读取本地安检用户数据，并上传服务器
     public void getUserDataAndPost(final String taskId) {
-        new Thread() {
-            @Override
-            public void run() {
-                Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
-                map1 = new HashMap<String, Object>();
-                while (cursor.moveToNext()) {
-                    if (cursor.getString(10).equals("true")) {  //判断是否为安检过的，未安检的不上传
-                        if (cursor.getString(17).equals("false")) { //判断是否为未上传，上传的用户数据不再上传
-                            map1.put("n_safety_inspection_id", cursor.getString(1));
-                            Log.i("getUserData=>", "安检ID为：" + cursor.getString(1));
-                            securityNumber = cursor.getString(1);
-                            Log.i("getUserData=>", "上传的用户数为：" + cursor.getCount());
-                            if (!cursor.getString(11).equals("")) {
-                                map1.put("n_safety_state", cursor.getString(11));
-                            } else {
-                                map1.put("n_safety_state", null);
-                            }
-                            Log.i("getUserData=>", "安检状态是：" + cursor.getString(11));
-                            if (!cursor.getString(13).equals("")) {
-                                map1.put("c_safety_remark", cursor.getString(13));
-                            } else {
-                                map1.put("c_safety_remark", "");
-                            }
-                            Log.i("getUserData=>", "备注是：" + cursor.getString(13));
-                            if (!cursor.getString(14).equals("")) {
-                                map1.put("n_safety_hidden_id", cursor.getString(14));
-                            } else {
-                                map1.put("n_safety_hidden_id", null);
-                            }
-                            Log.i("getUserData=>", "隐患类型是：" + cursor.getString(14));
-                            if (!cursor.getString(15).equals("")) {
-                                map1.put("n_safety_hidden_reason_id", cursor.getString(15));
-                            } else {
-                                map1.put("n_safety_hidden_reason_id", null);
-                            }
-                            Log.i("getUserData=>", "隐患原因ID是：" + cursor.getString(15));
-                            if (!cursor.getString(18).equals("")) {
-                                map1.put("d_safety_inspection_date", cursor.getString(18));
-                            }
-                            Log.i("getUserData=>", "安检的时间是：" + cursor.getString(18));
-                            getPhotoData(securityNumber);
-                            httpUtils.postData("http://88.88.88.31:8080/SMDemo/updateInspection.do", map1, fileMap);
-                            if ("保存成功".equals(httpUtils.result)) {
-                                updateUserUploadState(securityNumber);   //如果返回保存成功则将用户表的上传状态改为true
-                                uploadNumber++;
-                                handler.sendEmptyMessage(3);
-                            } else if ("保存失败".equals(httpUtils.result) || "".equals(httpUtils.result)) {
-                                Log.i("UploadActivity=>", "保存失败！");
-                                handler.sendEmptyMessage(5);
-                                break;
-                            }
-                        }
+        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+        map1 = new HashMap<String, Object>();
+        while (cursor.moveToNext()) {
+            if (cursor.getString(10).equals("true")) {  //判断是否为安检过的，未安检的不上传
+                if (cursor.getString(17).equals("false")) { //判断是否为未上传，上传的用户数据不再上传
+                    map1.put("n_safety_inspection_id", cursor.getString(1));
+                    Log.i("getUserData=>", "安检ID为：" + cursor.getString(1));
+                    securityNumber = cursor.getString(1);
+                    Log.i("getUserData=>", "上传的用户数为：" + cursor.getCount());
+                    if (!cursor.getString(11).equals("")) {
+                        map1.put("n_safety_state", cursor.getString(11));
                     } else {
-                        noCheckNumber++;
+                        map1.put("n_safety_state", null);
+                    }
+                    Log.i("getUserData=>", "安检状态是：" + cursor.getString(11));
+                    if (!cursor.getString(13).equals("")) {
+                        map1.put("c_safety_remark", cursor.getString(13));
+                    } else {
+                        map1.put("c_safety_remark", "");
+                    }
+                    Log.i("getUserData=>", "备注是：" + cursor.getString(13));
+                    if (!cursor.getString(14).equals("")) {
+                        map1.put("n_safety_hidden_id", cursor.getString(14));
+                    } else {
+                        map1.put("n_safety_hidden_id", null);
+                    }
+                    Log.i("getUserData=>", "隐患类型是：" + cursor.getString(14));
+                    if (!cursor.getString(15).equals("")) {
+                        map1.put("n_safety_hidden_reason_id", cursor.getString(15));
+                    } else {
+                        map1.put("n_safety_hidden_reason_id", null);
+                    }
+                    Log.i("getUserData=>", "隐患原因ID是：" + cursor.getString(15));
+                    if (!cursor.getString(18).equals("")) {
+                        map1.put("d_safety_inspection_date", cursor.getString(18));
+                    }
+                    Log.i("getUserData=>", "安检的时间是：" + cursor.getString(18));
+                    getPhotoData(securityNumber);
+                    httpUtils.postData("http://88.88.88.31:8080/SMDemo/updateInspection.do", map1, fileMap);
+                    if ("保存成功".equals(httpUtils.result)) {
+                        updateUserUploadState(securityNumber);   //如果返回保存成功则将用户表的上传状态改为true
+                        uploadNumber++;
+                        handler.sendEmptyMessage(3);
+                    } else if ("保存失败".equals(httpUtils.result) || "".equals(httpUtils.result)) {
+                        Log.i("UploadActivity=>", "保存失败！");
+                        handler.sendEmptyMessage(5);
+                        break;
                     }
                 }
-                cursor.close(); //游标关闭
+            } else {
+                noCheckNumber++;
+                Log.i("getUserDataAndPost====", "点击上传时记录的未安检户数为：" + noCheckNumber);
             }
-        }.start();
+        }
+        cursor.close(); //游标关闭
+    }
+
+    //读取本地安检过的并且未上传的用户数据总数
+    public void getUploadUserTotalNumber(final String taskId) {
+        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+        while (cursor.moveToNext()) {
+            if (cursor.getString(10).equals("true") && cursor.getString(17).equals("false")) {  //当检测到是安检过，并且未上传的时候进来
+                maxProgress ++;
+            }
+        }
+        cursor.close(); //游标关闭
     }
 
     /**
@@ -375,7 +396,7 @@ public class UploadActivity extends Activity {
         db.update("User", values, "securityNumber=?", new String[]{securityNumber});
     }
 
-    //show下载popupwindow
+    //show上传popupwindow
     public void showPopupwindow() {
         layoutInflater = LayoutInflater.from(UploadActivity.this);
         popupwindowView = layoutInflater.inflate(R.layout.popupwindow_upload_progressbar, null);
@@ -395,13 +416,13 @@ public class UploadActivity extends Activity {
                 popupWindow.dismiss();
             }
         });
-        popupWindow.setFocusable(true);
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
         backgroundAlpha(0.8F);   //背景变暗
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
+                upLoad.setClickable(true);
                 backgroundAlpha(1.0F);
             }
         });
@@ -451,6 +472,7 @@ public class UploadActivity extends Activity {
                     //设置进度值和百分比
                     uploadProgress.setProgress(currentProgress);
                     progressPercent.setText(String.valueOf(currentPercent));
+                    Log.i("handleMessage", "当前的进度为：" + currentProgress+"当前的进度百分比为："+currentPercent);
                     break;
                 case 4:
                     String uploadResult;
@@ -489,11 +511,11 @@ public class UploadActivity extends Activity {
                     uploadNumber = 0;
                     break;
                 case 7:
-                    String uploadResult1 = "当前勾选任务用户还有" + msg.arg1 + "个用户没安检哦！请您安检以后继续上传！";
+                    String uploadResult1 = "当前勾选任务用户还有" + msg.arg1 + "个用户未安检哦！请您安检以后继续上传！";
                     progressName.setText(uploadResult1);
                     linearlayoutUpload.setVisibility(View.GONE);
                     uploadProgress.setVisibility(View.GONE);
-                    uploadFailed.setImageResource(R.mipmap.smile);
+                    uploadFailed.setImageResource(R.mipmap.defeated);
                     uploadFailed.setVisibility(View.VISIBLE);
                     finishBtn.setVisibility(View.VISIBLE);
                     noCheckNumber = 0;

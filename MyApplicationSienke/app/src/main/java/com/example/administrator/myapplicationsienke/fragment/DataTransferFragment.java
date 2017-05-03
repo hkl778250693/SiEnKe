@@ -214,7 +214,6 @@ public class DataTransferFragment extends Fragment {
                 popupWindow.dismiss();
             }
         });
-        popupWindow.setFocusable(true);
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
         backgroundAlpha(0.8F);   //背景变暗
