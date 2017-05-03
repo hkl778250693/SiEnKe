@@ -8,8 +8,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -41,7 +39,6 @@ import com.example.administrator.myapplicationsienke.mode.MyPhotoUtils;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.mode.Tools;
 import com.example.administrator.myapplicationsienke.model.PopupwindowListItem;
-import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
 import java.io.File;
 import java.io.FileOutputStream;
