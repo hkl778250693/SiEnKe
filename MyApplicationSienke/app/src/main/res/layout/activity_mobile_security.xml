@@ -82,7 +82,7 @@
             android:layout_alignParentLeft="true">
             <CheckBox
                 android:id="@+id/remind_me"
-                android:background="@drawable/check_box_selector"
+                android:background="@drawable/check_box_selector1"
                 android:button="@null"
                 android:layout_width="24dp"
                 android:layout_height="24dp"/>
