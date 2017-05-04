@@ -357,7 +357,7 @@ public class UploadActivity extends Activity {
                     }
                     Log.i("getUserData=>", "安检的时间是：" + cursor.getString(18));
                     getPhotoData(securityNumber);
-                    httpUtils.postData("http://88.88.88.31:8080/SMDemo/updateInspection.do", map1, fileMap);
+                    httpUtils.postData("http://88.88.88.66:8088/SMDemo/updateInspection.do", map1, fileMap);
                     if ("保存成功".equals(httpUtils.result)) {
                         updateUserUploadState(securityNumber);   //如果返回保存成功则将用户表的上传状态改为true
                         uploadNumber++;

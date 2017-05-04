@@ -122,10 +122,13 @@ public class MobileSecurityLoginActivity extends Activity {
                 case R.id.logon_btn:
                     logonBtn.setClickable(false);
                     if (editMobileUser.getText().toString().equals("") && editmobilePsw.getText().toString().equals("")) {
+                        logonBtn.setClickable(true);
                         Toast.makeText(MobileSecurityLoginActivity.this, "用户名或密码不能为空", Toast.LENGTH_LONG).show();
                     } else if (editMobileUser.getText().toString().equals("")) {
+                        logonBtn.setClickable(true);
                         Toast.makeText(MobileSecurityLoginActivity.this, "请输入用户名", Toast.LENGTH_LONG).show();
                     } else if (editmobilePsw.getText().toString().equals("")) {
+                        logonBtn.setClickable(true);
                         Toast.makeText(MobileSecurityLoginActivity.this, "请输入密码", Toast.LENGTH_LONG).show();
                     }
                     if (!editMobileUser.getText().toString().equals("") && !editmobilePsw.getText().toString().equals("")) {

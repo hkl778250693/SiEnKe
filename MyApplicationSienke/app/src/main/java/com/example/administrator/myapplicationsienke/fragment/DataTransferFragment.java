@@ -3,6 +3,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
@@ -30,6 +31,7 @@ import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.activity.UploadActivity;
 import com.example.administrator.myapplicationsienke.mode.HttpUtils;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
+import com.example.administrator.myapplicationsienke.model.TaskChoose;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -846,9 +848,11 @@ public class DataTransferFragment extends Fragment {
                     }
                     break;
                 case 2:
+                    download.setClickable(true);
                     Toast.makeText(getActivity(), "没有任务下载哦！", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
+                    download.setClickable(true);
                     Toast.makeText(getActivity(), "网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
                 case 4:
@@ -864,6 +868,7 @@ public class DataTransferFragment extends Fragment {
                     break;
                 case 6:
                     popupWindow.dismiss();
+                    download.setClickable(true);
                     Toast.makeText(getActivity(), "用户信息请求网络超时！", Toast.LENGTH_SHORT).show();
                     break;
                 case 7:
@@ -902,11 +907,13 @@ public class DataTransferFragment extends Fragment {
                             stateObject = jsonArray.getJSONObject(j);
                             insertSecurityState();
                         }
+                        download.setClickable(true);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
                 case 11:
+                    download.setClickable(true);
                     Toast.makeText(getActivity(), "没有任务状态信息！", Toast.LENGTH_SHORT).show();
                     break;
                 case 12:
@@ -917,11 +924,13 @@ public class DataTransferFragment extends Fragment {
                             contentObject = jsonArray.getJSONObject(j);
                             insertSecurityContent();
                         }
+                        download.setClickable(true);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
                 case 13:
+                    download.setClickable(true);
                     Toast.makeText(getActivity(), "没有安检内容信息！", Toast.LENGTH_SHORT).show();
                     break;
                 case 14:
@@ -932,11 +941,13 @@ public class DataTransferFragment extends Fragment {
                             hiddenObject = jsonArray.getJSONObject(j);
                             insertSecurityHidden();
                         }
+                        download.setClickable(true);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
                 case 15:
+                    download.setClickable(true);
                     Toast.makeText(getActivity(), "没有安全隐患信息！", Toast.LENGTH_SHORT).show();
                     break;
                 case 16:
@@ -947,17 +958,39 @@ public class DataTransferFragment extends Fragment {
                             reasonObject = jsonArray.getJSONObject(j);
                             insertSecurityHiddenReason();
                         }
+                        download.setClickable(true);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
                 case 17:
+                    download.setClickable(true);
                     Toast.makeText(getActivity(), "没有安全隐患原因信息！", Toast.LENGTH_SHORT).show();
                     break;
             }
             super.handleMessage(msg);
         }
     };
+
+    //读取下载到本地的任务数据
+    public void getTaskData() {
+        Cursor cursor = db.query("Task", null, null, null, null, null, null);//查询并获得游标
+        //如果游标为空，则显示没有数据图片
+        if (cursor.getCount() == 0) {
+            return;
+        }
+        while (cursor.moveToNext()) {
+            TaskChoose taskChoose = new TaskChoose();
+            taskChoose.setTaskName(cursor.getString(1));
+            taskChoose.setTaskNumber(cursor.getString(2));
+            taskChoose.setCheckType(cursor.getString(3));
+            taskChoose.setTotalUserNumber(cursor.getString(4));
+            taskChoose.setEndTime(cursor.getString(5));
+        }
+        //cursor游标操作完成以后,一定要关闭
+        cursor.close();
+    }
+
     //任务数据存到本地数据库任务表
     private void insertTaskDataBase() {
         ContentValues values = new ContentValues();

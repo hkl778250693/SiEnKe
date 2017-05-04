@@ -58,8 +58,10 @@ public class MyGalleryAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        file = new File(photoPathLists.get(position));
-        Glide.with(context).load(file).diskCacheStrategy(DiskCacheStrategy.NONE).into(viewHolder.imageView);
+        if(photoPathLists.get(position) != null){
+            file = new File(photoPathLists.get(position));
+            Glide.with(context).load(file).diskCacheStrategy(DiskCacheStrategy.NONE).into(viewHolder.imageView);
+        }
         return convertView;
     }
 
