@@ -173,7 +173,7 @@ public class UserListActivity extends Activity {
                 case R.id.back:
                     for (int i = 0; i < task_total_numb; i++) {
                         getContinueCheckPosition(stringList.get(i)); //获取继续安检的item位置
-                        if (sharedPreferences.getString("continuePosition", "").equals(continueposition)) {
+                        if (!sharedPreferences.getString("continuePosition", "").equals("")) {
                             break;
                         }
                     }

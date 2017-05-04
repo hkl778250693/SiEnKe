@@ -145,6 +145,13 @@ public class UserDetailInfoActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 currentPosition = position;
+                if (!adapter.getDeleteShow() && (adapter.getCount() - 1 != position)) {
+                    Intent intent = new Intent(UserDetailInfoActivity.this, MyPhotoGalleryActivity.class);
+                    intent.putExtra("currentPosition", currentPosition);
+                    intent.putStringArrayListExtra("cropPathLists", cropPathLists);
+                    Log.i("UserDetailInfoActivity", "点击图片跳转进来到预览详情页面的图片数量为：" + cropPathLists.size());
+                    startActivityForResult(intent, 500);
+                }
                 // 如果单击时删除按钮处在显示状态，则隐藏它
                 if (adapter.getDeleteShow()) {
                     adapter.setDeleteShow(false);
@@ -156,13 +163,6 @@ public class UserDetailInfoActivity extends Activity {
                             createPhotoPopupwindow();
                         }
                     }
-                }
-                if (!adapter.getDeleteShow() && adapter.getCount() - 1 != position) {
-                    Intent intent = new Intent(UserDetailInfoActivity.this, MyPhotoGalleryActivity.class);
-                    intent.putExtra("currentPosition", currentPosition);
-                    intent.putStringArrayListExtra("cropPathLists", cropPathLists);
-                    Log.i("UserDetailInfoActivity", "点击图片跳转进来到预览详情页面的图片数量为：" + cropPathLists.size());
-                    startActivityForResult(intent, 500);
                 }
             }
         });
@@ -1094,6 +1094,16 @@ public class UserDetailInfoActivity extends Activity {
         Date curDate = new Date(System.currentTimeMillis());
         String currentTime = dateFormat.format(curDate);
         return currentTime;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override

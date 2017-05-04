@@ -45,11 +45,13 @@ public class GridviewImageAdapter extends BaseAdapter {
     public int getCount() {
         // 数据集合加一，在该位置上添加加号
         return gridviewImageList == null ? 0 : gridviewImageList.size() + 1;
+        //return gridviewImageList.size() + 1;
     }
 
     @Override
     public Object getItem(int position) {
         return gridviewImageList == null ? null : gridviewImageList.get(position);
+        //return gridviewImageList.get(position);
     }
 
     @Override
@@ -70,7 +72,15 @@ public class GridviewImageAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (gridviewImageList != null && gridviewImageList.size() > position) {
+        if (gridviewImageList.size() == position) {
+            if(gridviewImageList.size() != 9){
+                viewHolder.delete.setVisibility(View.GONE);
+                Glide.with(context).load(R.mipmap.camera).into(viewHolder.imageView);
+            }else {
+                viewHolder.delete.setVisibility(View.GONE);
+                Glide.with(context).load(R.mipmap.forbidden_camera).into(viewHolder.imageView);
+            }
+        }else {
             // 正常显示
             // 判断是否需要显示删除按钮
             if(getDeleteShow()){
@@ -78,16 +88,12 @@ public class GridviewImageAdapter extends BaseAdapter {
             }else {
                 viewHolder.delete.setVisibility(View.GONE);
             }
-            file = new File(gridviewImageList.get(position));
-            Glide.with(context).load(file).into(viewHolder.imageView);
-            Log.i("GridviewImageAdapter","此时的照片路径为："+gridviewImageList.get(position));
-        }else {
-            if(gridviewImageList.size() != 9){
-                viewHolder.delete.setVisibility(View.GONE);
-                Glide.with(context).load(R.mipmap.camera).into(viewHolder.imageView);
-            }else {
-                viewHolder.delete.setVisibility(View.GONE);
-                Glide.with(context).load(R.mipmap.forbidden_camera).into(viewHolder.imageView);
+            if(gridviewImageList.get(position) != null){
+                file = new File(gridviewImageList.get(position));
+                if(file != null){
+                    Glide.with(context).load(file).into(viewHolder.imageView);
+                }
+                Log.i("GridviewImageAdapter","此时的照片路径为："+gridviewImageList.get(position));
             }
         }
 
