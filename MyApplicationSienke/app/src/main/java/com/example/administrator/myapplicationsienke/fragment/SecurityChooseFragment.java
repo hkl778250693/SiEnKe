@@ -3,7 +3,6 @@ package com.example.administrator.myapplicationsienke.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,10 +20,7 @@ import com.example.administrator.myapplicationsienke.activity.NoCheckUserListAct
 import com.example.administrator.myapplicationsienke.activity.SecurityStatisticsActivity;
 import com.example.administrator.myapplicationsienke.activity.TaskChooseActivity;
 import com.example.administrator.myapplicationsienke.activity.UserListActivity;
-import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.mode.Tools;
-
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -109,10 +105,11 @@ public class SecurityChooseFragment extends Fragment {
                     startActivity(intent2);
                     break;
                 case R.id.new_task:
-                    if(Tools.NetIsAvilable(getActivity())){
+
+                    if (Tools.NetIsAvilable(getActivity())) {
                         Intent intent3 = new Intent(getActivity(), NewTaskActivity.class);
                         startActivity(intent3);
-                    }else {
+                    } else {
                         Toast.makeText(getActivity(), "网络未连接，请打开网络！", Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -132,8 +129,8 @@ public class SecurityChooseFragment extends Fragment {
     };
 
     public void transferParams(Bundle bundle) {
-        Iterator iterator = sharedPreferences.getStringSet("stringSet",null).iterator();
-        while (iterator.hasNext()){
+        Iterator iterator = sharedPreferences.getStringSet("stringSet", null).iterator();
+        while (iterator.hasNext()) {
             transferStringList.add(iterator.next().toString());
         }
         bundle.putStringArrayList("taskId", transferStringList);
@@ -145,4 +142,6 @@ public class SecurityChooseFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
     }
+
+
 }

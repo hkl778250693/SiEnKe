@@ -33,8 +33,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import static android.app.PendingIntent.getActivity;
-
 /**
  * Created by Administrator on 2017/3/14.
  */
