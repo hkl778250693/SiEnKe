@@ -69,12 +69,12 @@ public class UserDetailInfoActivity extends Activity {
     private PopupWindow popupWindow;
     int sdkVersion = Build.VERSION.SDK_INT;  //当前SDK版本
     private int TYPE_FILE_CROP_IMAGE = 2;
-    protected static Uri tempUri, cropPhotoUri;
+    protected static Uri tempUri;
     protected static final int TAKE_PHOTO = 100;//拍照
     protected static final int CROP_SMALL_PICTURE = 300;  //裁剪成小图片
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private String securityId, UserNumber, UserName, MeterNumber, UserAddress, CheckType, UserPhoneNumber;
+    private String securityId, UserNumber, UserName, MeterNumber, UserAddress, CheckType, UserPhoneNumber,ifChecked;
     private TextView userNumber, userName, meterNumber, userAddress, checkType, userPhoneNumber;
     private GridviewImageAdapter adapter;
     private PopupwindowListAdapter padapter;
@@ -269,6 +269,7 @@ public class UserDetailInfoActivity extends Activity {
             UserAddress = intent.getStringExtra("user_address");
             CheckType = intent.getStringExtra("check_type");
             UserPhoneNumber = intent.getStringExtra("user_phone_number");
+            ifChecked = intent.getStringExtra("if_checked");
 
             if (!UserNumber.equals("null")) {
                 userNumber.setText(UserNumber);
@@ -448,10 +449,6 @@ public class UserDetailInfoActivity extends Activity {
                 }
                 Intent intent = new Intent();
                 setResult(Activity.RESULT_OK, intent);
-                if (!(securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格"))) {
-                    editor.putInt("problem_number", sharedPreferences.getInt("problem_number", 0) + 1);  //保存到sharedPreferences
-                    editor.commit();
-                }
                 popupWindow.dismiss();
                 finish();
             }
@@ -607,10 +604,17 @@ public class UserDetailInfoActivity extends Activity {
     //调用相机
     public void openCamera() {
         Intent openCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        openCameraIntent.putExtra("autofocus", true); // 自动对焦
+        openCameraIntent.putExtra("fullScreen", false); // 全屏
+        openCameraIntent.putExtra("showActionIcons", false);
+        openCameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        openCameraIntent.putExtra(MediaStore.Images.Media.ORIENTATION, 0);
         // 指定照片保存路径（SD卡），temp.jpg为一个临时文件，每次拍照后这个图片都会被替换
-        tempUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "temp.jpg"));
+        MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_CROP_IMAGE, securityId);
+        tempUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);
+        //tempUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory()+"/SiEnKe_Crop/temp.jpg"));
         openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);
-        Log.i("openCamera===>", "保存的地址为" + tempUri);
+        Log.i("openCamera===>", "临时保存的地址为" + tempUri.getPath());
         startActivityForResult(openCameraIntent, TAKE_PHOTO);
     }
 
@@ -628,8 +632,15 @@ public class UserDetailInfoActivity extends Activity {
                     }
                     break;
                 case CROP_SMALL_PICTURE:
-                    Log.i("CROP_SMALL_PICTURE===>", "有数据返回！");
+                    if (tempUri != null) {
+                        File file = new File(tempUri.getPath());
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                    }
+                    tempUri = null;
                     cropPathLists.add(cropPhotoPath);
+                    Log.i("CROP_SMALL_PICTURE===>", "图片集合长度为："+cropPathLists.size()+"路径为"+cropPhotoPath);
                     handler.sendEmptyMessage(1);
                     break;
                 case 500:
@@ -906,23 +917,30 @@ public class UserDetailInfoActivity extends Activity {
             intent.setDataAndType(uri, "image/*");
             // 设置裁剪
             intent.putExtra("crop", "true");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             // aspectX aspectY 是宽高的比例
             intent.putExtra("aspectX", 1);
             intent.putExtra("aspectY", 1.3);
             // outputX outputY 是裁剪图片宽高
             intent.putExtra("outputX", 500);
             intent.putExtra("outputY", 650);
-            intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
             intent.putExtra("noFaceDetection", true);//取消人脸识别功能
             // 当图片的宽高不足时，会出现黑边，去除黑边
             intent.putExtra("scale", true);
             intent.putExtra("scaleUpIfNeeded", true);
+            intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+            intent.putExtra("return-data", false);//设置为不返回数据
             MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_CROP_IMAGE, securityId);
-            cropPhotoUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);
+            Uri cropPhotoUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);
             Log.i("startCropPhoto", "图片裁剪的uri = " + cropPhotoUri);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, cropPhotoUri);
-            intent.putExtra("return-data", false);//设置为不返回数据
+            /*if(cropPhotoUri.getPath().contains("sdcard0")){
+                cropPhotoPath = cropPhotoUri.getPath().replace("0/Pictures","/0/Pictures");
+            }else {
+                cropPhotoPath = cropPhotoUri.getPath();
+            }*/
             cropPhotoPath = cropPhotoUri.getPath();
+            Log.i("startCropPhoto", "图片裁剪的地址为："+cropPhotoPath);
             startActivityForResult(intent, CROP_SMALL_PICTURE);
         }
     }
@@ -977,7 +995,7 @@ public class UserDetailInfoActivity extends Activity {
             values.put("remarks", remarks.getText().toString().trim());
             Log.i("insertUserInfo", "备注是：" + remarks.getText().toString().trim());
         }
-        if (!(securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格"))) { // 如果是合格或者复检合格，则插入空的隐患类型和原因
+        if (!(securityCheckCase.getText().toString().equals("合格") || securityCheckCase.getText().toString().equals("复检合格"))) { // 如果是合格或者复检合格，则插入空的隐患类型和原因
             //判断隐患类型是否通过点击列表选择
             if (securityHiddenItemId != null) {
                 values.put("security_hidden", securityHiddenItemId);
@@ -994,9 +1012,11 @@ public class UserDetailInfoActivity extends Activity {
                 values.put("security_hidden_reason", "");
                 Log.i("insertUserInfo", "隐患原因ID空的情况：" + hiddenReasonItemId);
             }
+            values.put("ifPass","false");
         } else {
             values.put("security_hidden", "");
             values.put("security_hidden_reason", "");
+            values.put("ifPass","true");
         }
         values.put("currentTime",getCurrentTime());
         db.update("User", values, "securityNumber=?", new String[]{securityId});
@@ -1096,7 +1116,7 @@ public class UserDetailInfoActivity extends Activity {
         return currentTime;
     }
 
-    @Override
+    /*@Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
     }
@@ -1104,7 +1124,7 @@ public class UserDetailInfoActivity extends Activity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-    }
+    }*/
 
     @Override
     protected void onDestroy() {

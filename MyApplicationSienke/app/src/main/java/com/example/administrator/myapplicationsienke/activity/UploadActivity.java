@@ -169,8 +169,7 @@ public class UploadActivity extends Activity {
                                 for (int j = 0; j < integers.size(); j++) {
                                     getUploadUserTotalNumber(map.get("taskId" + integers.get(j)).toString());  //根据任务编号获得需要上传的所有用户数量，并作为最大进度
                                 }
-                                Log.i("getUploadUserTotalNumb", "最大进度为：" + maxProgress);
-                                uploadProgress.setMax(maxProgress * 10);
+                                handler.sendEmptyMessage(8);
                                 for (int j = 0; j < integers.size(); j++) {
                                     getUserDataAndPost(map.get("taskId" + integers.get(j)).toString());  //根据任务编号去查询用户信息
                                     //stringList.add(map.get("taskId" + integers.get(j)).toString());
@@ -183,7 +182,6 @@ public class UploadActivity extends Activity {
                                         if (uploadNumber != 0) {
                                             if (uploadProgress.getProgress() == maxProgress * 10) {
                                                 Log.i("uploadProgress", "上传的进度为：" + uploadProgress.getProgress());
-                                                progressPercent.setText("100");
                                                 Message msg = new Message();
                                                 msg.what = 4;
                                                 msg.arg1 = uploadNumber;
@@ -475,6 +473,7 @@ public class UploadActivity extends Activity {
                     Log.i("handleMessage", "当前的进度为：" + currentProgress+"当前的进度百分比为："+currentPercent);
                     break;
                 case 4:
+                    progressPercent.setText("100");
                     String uploadResult;
                     if (msg.arg2 == 0) {
                         uploadResult = "数据上传完成！共上传了" + msg.arg1 + "个用户数据";
@@ -521,6 +520,10 @@ public class UploadActivity extends Activity {
                     noCheckNumber = 0;
                     uploadNumber = 0;
                     break;
+                case 8:
+                    Log.i("getUploadUserTotalNumb", "最大进度为：" + maxProgress);
+                    uploadProgress.setMax(maxProgress * 10);
+                    break;
             }
             super.handleMessage(msg);
         }
@@ -531,5 +534,9 @@ public class UploadActivity extends Activity {
         super.onDestroy();
         //释放和数据库的连接
         db.close();
+        if(popupWindow != null){
+            popupWindow.dismiss();
+            popupWindow = null;
+        }
     }
 }

@@ -128,6 +128,7 @@ public class UserListActivity extends Activity {
                 intent.putExtra("user_phone_number",item.getPhoneNumber());
                 intent.putExtra("user_address",item.getAdress());
                 intent.putExtra("check_type",item.getSecurityType());
+                intent.putExtra("if_checked",item.getIfChecked());
                 startActivityForResult(intent, currentPosition);
             }
         });
@@ -281,9 +282,11 @@ public class UserListActivity extends Activity {
             if (cursor.getString(10).equals("true")) {
                 Log.i("UserList=cursor", "安检状态为true");
                 userListviewItem.setIfEdit(R.mipmap.userlist_gray);
+                userListviewItem.setIfChecked("已检");
             } else {
                 Log.i("UserList=cursor", "安检状态为false");
                 userListviewItem.setIfEdit(R.mipmap.userlist_red);
+                userListviewItem.setIfChecked("未检");
             }
             userListviewItemList.add(userListviewItem);
             Log.i("UserListActivityget=", "用户列表的长度为：" + userListviewItemList.size());

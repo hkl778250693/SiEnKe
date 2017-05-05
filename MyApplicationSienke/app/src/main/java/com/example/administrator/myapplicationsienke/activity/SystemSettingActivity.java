@@ -107,7 +107,7 @@ public class SystemSettingActivity extends Activity {
     }
 
     private boolean clearPhoto() {
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "///SiEnKe_Crop///");
+        File file = new File(Environment.getExternalStorageDirectory() + "/SiEnKe_Crop/");
         if (file.exists()) { // 判断文件是否存在
             if (file.isFile()) { // 判断是否是文件
                 Log.i("clearPhoto=>", "删除的照片文件夹路径为：" + file.getPath());

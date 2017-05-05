@@ -240,6 +240,7 @@ public class NoCheckUserListActivity extends Activity {
                 item.setAdress(cursor.getString(8));
                 Log.i("NoCheckUserListActivity", "安检状态为false");
                 item.setIfEdit(R.mipmap.userlist_red);
+                item.setIfChecked("未检");
                 noCheckUserItemList.add(item);
             }
         }

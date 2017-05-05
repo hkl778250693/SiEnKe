@@ -85,6 +85,7 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
             viewHolder.user_id = (TextView) convertView.findViewById(R.id.user_id);
             viewHolder.address = (TextView) convertView.findViewById(R.id.address);
             viewHolder.if_edit = (ImageView) convertView.findViewById(R.id.if_edit);
+            viewHolder.ifChecked = (TextView) convertView.findViewById(R.id.if_checked);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -126,6 +127,7 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
             viewHolder.address.setText("无");
         }
         viewHolder.if_edit.setImageResource(userListviewItem.getIfEdit());
+        viewHolder.ifChecked.setText(userListviewItem.getIfChecked());
 
         if (userListviewList != null) {
             if (searchContent != null) {
@@ -176,7 +178,8 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
         TextView security_type;   //安检类型
         TextView user_id;  //用户编号
         TextView address;   //地址
-        ImageView if_edit;   //是否编辑
+        ImageView if_edit;   //是否编辑（图片）
+        TextView ifChecked;  //文字
     }
 
     //当ListView调用setTextFilter()方法的时候，便会调用该方法

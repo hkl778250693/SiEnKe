@@ -347,7 +347,7 @@
                 android:paddingRight="16dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="70dp"
                     android:layout_height="wrap_content"
                     android:text="表编号："
                     android:textColor="@color/text_black"
@@ -374,12 +374,12 @@
                 android:orientation="horizontal"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:layout_marginTop="5dp">
+                android:layout_marginTop="7dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="70dp"
                     android:layout_height="wrap_content"
-                    android:text="备注："
+                    android:text="@string/remarks"
                     android:textColor="@color/text_black"
                     android:textSize="14sp"/>
 
@@ -402,7 +402,6 @@
                 android:id="@+id/hidden_type_root"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="7dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="7dp"
@@ -471,7 +470,7 @@
                 android:orientation="horizontal"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:paddingTop="16dp"
+                android:paddingTop="10dp"
                 android:gravity="center_vertical">
 
                 <TextView
@@ -498,7 +497,7 @@
                 android:padding="10dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="10dp"
                 android:gravity="center_horizontal">
                 <com.example.administrator.myapplicationsienke.mode.MyGridview
                     android:id="@+id/gridview"

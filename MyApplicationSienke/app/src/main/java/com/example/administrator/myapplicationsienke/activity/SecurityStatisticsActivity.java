@@ -34,6 +34,8 @@ public class SecurityStatisticsActivity extends Activity {
     private int task_total_numb = 0;
     private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
     private int checkedUserNumber = 0;  //已检户数
+    private int partProblemNumber = 0;  //按任务分区存在问题户数
+    private int totalProblemNumber = 0;  // 存在问题总户数
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,10 +67,19 @@ public class SecurityStatisticsActivity extends Activity {
         editor = sharedPreferences.edit();
         userStatisticsBtn.setChecked(true);
         getTaskParams();
-        for (int i = 0; i < task_total_numb; i++) {
-            getCheckedNumber(stringList.get(i)); //获取已检用户户数
-        }
-        getTotalUserNumber();
+        new Thread(){
+            @Override
+            public void run() {
+                for (int i = 0; i < task_total_numb; i++) {
+                    getCheckedNumber(stringList.get(i)); //获取已检用户户数
+                }
+                for (int i = 0; i < task_total_numb; i++) {
+                    getPartProblemNumber(stringList.get(i)); //获取存在问题户数
+                }
+                getTotalProblemNumber();
+                getTotalUserNumber();
+            }
+        }.start();
     }
 
     //点击事件
@@ -106,6 +117,7 @@ public class SecurityStatisticsActivity extends Activity {
         }
     }
 
+    //获取已安检户数
     public void getCheckedNumber(String taskId){
         Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
         //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
@@ -118,6 +130,38 @@ public class SecurityStatisticsActivity extends Activity {
                 Log.i("getCheckedNumber===>", "已安检" + checkedUserNumber + "户");
             }
         }
+        cursor.close(); //游标关闭
+    }
+
+    //按任务分区获取存在问题户数
+    public void getPartProblemNumber(String taskId){
+        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+        //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
+        if (cursor.getCount() == 0) {
+            return;
+        }
+        while (cursor.moveToNext()) {
+            if (cursor.getString(19).equals("false")) {
+                partProblemNumber++;
+            }
+        }
+        Log.i("getCheckedNumber===>", "部分存在问题" + partProblemNumber + "户");
+        cursor.close(); //游标关闭
+    }
+
+    //按任务分区获取存在问题户数
+    public void getTotalProblemNumber(){
+        Cursor  cursor = db.query("User", null, null, null, null, null, null);//查询并获得游标
+        //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
+        if (cursor.getCount() == 0) {
+            return;
+        }
+        while (cursor.moveToNext()) {
+            if (cursor.getString(19).equals("false")) {
+                totalProblemNumber++;
+            }
+        }
+        Log.i("getCheckedNumber===>", "总的存在问题" + totalProblemNumber + "户");
         cursor.close(); //游标关闭
     }
 
@@ -151,9 +195,9 @@ public class SecurityStatisticsActivity extends Activity {
         } else {
             finishRate.setText("0.0");
         }
-        if (sharedPreferences.getInt("problem_number", 0) != 0) {
-            Log.i("getTotalUserNumber===>", "存在问题的户数=" + sharedPreferences.getInt("problem_number", 0) + "户");
-            problemCheckedNumber.setText(String.valueOf(sharedPreferences.getInt("problem_number", 0)));
+        if (totalProblemNumber != 0) {
+            Log.i("getTotalUserNumber===>", "存在问题的户数=" + totalProblemNumber + "户");
+            problemCheckedNumber.setText(String.valueOf(totalProblemNumber));
         } else {
             problemCheckedNumber.setText("0");
         }
@@ -190,9 +234,9 @@ public class SecurityStatisticsActivity extends Activity {
         } else {
             finishRate.setText("0.0");
         }
-        if (sharedPreferences.getInt("problem_number", 0) != 0) {
-            Log.i("getTaskUserNumber===>", "存在问题的户数=" + sharedPreferences.getInt("problem_number", 0) + "户");
-            problemCheckedNumber.setText(String.valueOf(sharedPreferences.getInt("problem_number", 0)));
+        if (partProblemNumber != 0) {
+            Log.i("getTaskUserNumber===>", "存在问题的户数=" + partProblemNumber + "户");
+            problemCheckedNumber.setText(String.valueOf(partProblemNumber));
         } else {
             problemCheckedNumber.setText("0");
         }

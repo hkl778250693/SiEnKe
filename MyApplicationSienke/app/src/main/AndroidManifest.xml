@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.MobileSecurityLoginActivity">
+        <activity android:name=".activity.MobileSecurityLoginActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,32 +27,32 @@
         </activity>
 
         //移动查询
-        <activity android:name=".activity.QueryActivity"/>
-        <activity android:name=".activity.CostListviewActivity"/>
-        <activity android:name=".activity.CostDetailActivity"/>
-        <activity android:name=".activity.BusinessManageActivity"/>
-        <activity android:name=".activity.BusinessManageLoginActivity"/>
-        <activity android:name=".activity.BusinessCheckActivity"/>
-        <activity android:name=".activity.MoreSettingsActivity"/>
+        <activity android:name=".activity.QueryActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.CostListviewActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.CostDetailActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.BusinessManageActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.BusinessManageLoginActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.BusinessCheckActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.MoreSettingsActivity" android:screenOrientation="portrait"/>
 
         //安检
-        <activity android:name=".activity.SecurityChooseActivity" />
-        <activity android:name=".activity.CheckUserListActivity"/>
-        <activity android:name=".activity.NewTaskActivity"/>
-        <activity android:name=".activity.NoCheckUserListActivity"/>
-        <activity android:name=".activity.TaskChooseActivity"/>
-        <activity android:name=".activity.SecurityStatisticsActivity"/>
-        <activity android:name=".activity.UserDetailInfoActivity"/>
-        <activity android:name=".activity.UserListActivity"/>
-        <activity android:name=".activity.UploadActivity"/>
-        <activity android:name=".activity.DownloadActivity"/>
-        <activity android:name=".activity.FileManageActivity"/>
-        <activity android:name=".activity.IpSettingActivity"/>
-        <activity android:name=".activity.SystemSettingActivity"/>
-        <activity android:name=".activity.NewTaskDetailActivity"/>
-        <activity android:name=".activity.ContinueCheckUserActivity"/>
-        <activity android:name=".activity.EdiTextListViewActivity"/>
-        <activity android:name=".activity.MyPhotoGalleryActivity"/>
+        <activity android:name=".activity.SecurityChooseActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.CheckUserListActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.NewTaskActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.NoCheckUserListActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.TaskChooseActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.SecurityStatisticsActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.UserDetailInfoActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.UserListActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.UploadActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.DownloadActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.FileManageActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.IpSettingActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.SystemSettingActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.NewTaskDetailActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.ContinueCheckUserActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.EdiTextListViewActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.MyPhotoGalleryActivity" android:screenOrientation="portrait"/>
 
     </application>
 

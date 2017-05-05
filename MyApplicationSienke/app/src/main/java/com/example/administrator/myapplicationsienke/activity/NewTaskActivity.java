@@ -88,7 +88,6 @@ public class NewTaskActivity extends Activity {
     private int currentPercent = 0;
     private Calendar c; //日历
     private List<PopupwindowListItem> popupwindowListItemList = new ArrayList<>();
-    private List<PopupwindowListItem> defaultList = new ArrayList<>();
     private Cursor cursor;
     private PopupwindowListAdapter adapter;
     private String itemId;
@@ -597,12 +596,13 @@ public class NewTaskActivity extends Activity {
                     listView.setAdapter(adapter);
                     break;
                 case 10:
-                    defaultList.clear();
+                    popupwindowListItemList.clear();
                     securityType.setText("无");
                     PopupwindowListItem item = new PopupwindowListItem();
+                    item.setItemId("00");
                     item.setItemName("无");
-                    defaultList.add(item);
-                    adapter = new PopupwindowListAdapter(NewTaskActivity.this,defaultList);
+                    popupwindowListItemList.add(item);
+                    adapter = new PopupwindowListAdapter(NewTaskActivity.this,popupwindowListItemList);
                     adapter.notifyDataSetChanged();
                     listView.setAdapter(adapter);
                     break;

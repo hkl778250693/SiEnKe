@@ -88,12 +88,12 @@ public class GridviewImageAdapter extends BaseAdapter {
             }else {
                 viewHolder.delete.setVisibility(View.GONE);
             }
+            Log.i("GridviewImageAdapter","此时的照片路径为："+gridviewImageList.get(position));
             if(gridviewImageList.get(position) != null){
                 file = new File(gridviewImageList.get(position));
                 if(file != null){
                     Glide.with(context).load(file).into(viewHolder.imageView);
                 }
-                Log.i("GridviewImageAdapter","此时的照片路径为："+gridviewImageList.get(position));
             }
         }
 

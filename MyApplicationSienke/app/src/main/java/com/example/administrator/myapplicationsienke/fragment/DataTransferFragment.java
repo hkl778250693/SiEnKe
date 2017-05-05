@@ -120,8 +120,8 @@ public class DataTransferFragment extends Fragment {
                     }
                     break;
                 case R.id.download:
+                    download.setClickable(false);
                     if (!sharedPreferences.getBoolean("have_download", false)) {
-                        download.setClickable(false);
                         /*if(isFastDoubleClick()){
                             Toast.makeText(getActivity(), "您点击太频繁了！", Toast.LENGTH_SHORT).show();
                         }*/
@@ -138,6 +138,7 @@ public class DataTransferFragment extends Fragment {
                             }
                         }.start();
                     } else {
+                        download.setClickable(true);
                         Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -1028,6 +1029,7 @@ public class DataTransferFragment extends Fragment {
         values.put("photoNumber","0");
         values.put("ifUpload","false");
         values.put("currentTime","");
+        values.put("ifPass","true");
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
@@ -1072,5 +1074,9 @@ public class DataTransferFragment extends Fragment {
         super.onDestroy();
         //释放和数据库的连接
         db.close();
+        if(popupWindow != null){
+            popupWindow.dismiss();
+            popupWindow = null;
+        }
     }
 }

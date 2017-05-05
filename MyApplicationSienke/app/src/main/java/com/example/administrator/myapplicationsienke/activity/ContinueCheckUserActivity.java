@@ -312,9 +312,11 @@ public class ContinueCheckUserActivity extends Activity {
             if(cursor.getString(10).equals("true")){
                 Log.i("ContinueCheckActivity", "安检状态为true");
                 userListviewItem.setIfEdit(R.mipmap.userlist_gray);
+                userListviewItem.setIfChecked("已检");
             }else {
                 Log.i("ContinueCheckActivity", "安检状态为false");
                 userListviewItem.setIfEdit(R.mipmap.userlist_red);
+                userListviewItem.setIfChecked("未检");
             }
             userListviewItemList.add(userListviewItem);
             Log.i("ContinueCheckActivity", "用户列表的长度为：" + userListviewItemList.size());
