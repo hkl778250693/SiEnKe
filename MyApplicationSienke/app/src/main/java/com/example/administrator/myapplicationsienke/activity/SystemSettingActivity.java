@@ -93,17 +93,9 @@ public class SystemSettingActivity extends Activity {
         editor.apply();
         db.delete("User", null, null);  //删除User表中的所有数据（官方推荐方法）
         db.delete("Task", null, null);  //删除Task表中的所有数据
-        db.delete("SecurityState", null, null);  //删除SecurityState表中的所有数据
-        db.delete("security_content", null, null);  //删除security_content表中的所有数据
-        db.delete("security_hidden", null, null);  //删除security_hidden表中的所有数据
-        db.delete("security_hidden_reason", null, null);  //删除security_hidden_reason表中的所有数据
         //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
         db.execSQL("update sqlite_sequence set seq=0 where name='User'");
         db.execSQL("update sqlite_sequence set seq=0 where name='Task'");
-        db.execSQL("update sqlite_sequence set seq=0 where name='SecurityState'");
-        db.execSQL("update sqlite_sequence set seq=0 where name='security_content'");
-        db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden'");
-        db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden_reason'");
     }
 
     private boolean clearPhoto() {
