@@ -8,8 +8,6 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -19,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,7 +31,6 @@ import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.NewTaskListviewAdapter;
 import com.example.administrator.myapplicationsienke.model.NewTaskListviewItem;
 import com.example.administrator.myapplicationsienke.model.NewTaskViewHolder;
-import com.example.administrator.myapplicationsienke.model.TaskChoose;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +46,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**

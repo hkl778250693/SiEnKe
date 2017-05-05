@@ -1,11 +1,11 @@
 package com.example.administrator.myapplicationsienke.fragment;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,7 +29,6 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.activity.UploadActivity;
-import com.example.administrator.myapplicationsienke.mode.HttpUtils;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
 
@@ -47,9 +46,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2017/3/16 0016.
@@ -61,7 +58,7 @@ public class DataTransferFragment extends Fragment {
     private Button finishBtn;
     private RadioButton cancelRb, saveRb;
     private ImageView downFailed;
-    private String taskResult, userResult, stateResult, contentResult, hiddenResult, reasonResult; //网络请求结果
+    private String taskResult, userResult; //网络请求结果
     private SharedPreferences sharedPreferences, sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private String ip, port;  //接口ip地址   端口
@@ -69,8 +66,7 @@ public class DataTransferFragment extends Fragment {
     public int asyncResponseCode = 0;
     private LayoutInflater layoutInflater;
     private PopupWindow popupWindow;
-    private AnimationDrawable animationDrawable;
-    private JSONObject taskObject, userObject, stateObject, contentObject, hiddenObject, reasonObject;
+    private JSONObject taskObject, userObject;
     private SQLiteDatabase db;  //数据库
     private int totalCount = 0;  //总户数
     private List<String> taskNumbList = new ArrayList<>();
@@ -112,9 +108,9 @@ public class DataTransferFragment extends Fragment {
             switch (v.getId()) {
                 case R.id.upload:
                     upload.setClickable(false);
-                    if(sharedPreferences.getBoolean("have_download",false)){
+                    if (sharedPreferences.getBoolean("have_download", false)) {
                         createSavePopupwindow();
-                    }else {
+                    } else {
                         Intent intent = new Intent(getActivity(), UploadActivity.class);
                         startActivity(intent);
                     }
@@ -130,10 +126,6 @@ public class DataTransferFragment extends Fragment {
                             @Override
                             public void run() {
                                 requireMyTask("SafeCheckPlan.do", "safePlanMember=");
-                                requireSecurityState("findSecurityState.do "); //安检状态
-                                requireSecurityContent("findSecurityContent.do");//安检内容
-                                requireSafetyHidden("findSafetyHidden.do");//安检原因类型
-                                requireSafetyReason("findSafetyReason.do");//安检原因
                                 super.run();
                             }
                         }.start();
@@ -315,307 +307,6 @@ public class DataTransferFragment extends Fragment {
             }
         }.start();
     }
-
-    //请求安检状态网络数据
-    private void requireSecurityState(final String method) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    URL url;
-                    HttpURLConnection httpURLConnection;
-                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
-                    if (!sharedPreferences.getString("security_ip", "").equals("")) {
-                        ip = sharedPreferences.getString("security_ip", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
-                    } else {
-                        ip = "88.88.88.66:";
-                    }
-                    if (!sharedPreferences.getString("security_port", "").equals("")) {
-                        port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
-                    } else {
-                        port = "8088";
-                    }
-                    String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
-                    url = new URL(httpUrl);
-                    Log.i("url=============>", url + "");
-                    httpURLConnection = (HttpURLConnection) url.openConnection();
-                    httpURLConnection.setRequestMethod("GET");
-                    httpURLConnection.setRequestProperty("Accept-Encoding", "identity");
-                    httpURLConnection.setRequestProperty("Content-Type", "applicaton/json;charset=UTF-8");
-                    httpURLConnection.setConnectTimeout(6000);
-                    httpURLConnection.setReadTimeout(6000);
-                    httpURLConnection.connect();
-                    //传回的数据解析成String
-                    if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
-                        InputStream inputStream = httpURLConnection.getInputStream();
-                        Log.i("start_inputStream==>", "" + inputStream);
-                        Log.i("mid_inputStream==>", "" + inputStream);
-                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
-                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                        StringBuilder stringBuilder = new StringBuilder();
-                        String str;
-                        while ((str = bufferedReader.readLine()) != null) {
-                            stringBuilder.append(str);
-                        }
-                        Log.i("end_inputStream==>", "" + inputStream);
-                        stateResult = stringBuilder.toString();
-                        Log.i("taskResult=====>", stateResult);
-                        JSONObject jsonObject = new JSONObject(stateResult);
-                        if (!jsonObject.optString("total", "").equals("0")) {
-                            handler.sendEmptyMessage(10);
-                        } else {
-                            handler.sendEmptyMessage(11);
-                        }
-                    } else {
-                        try {
-                            Thread.sleep(3000);
-                            handler.sendEmptyMessage(3);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    Log.i("IOException==========>", "网络请求异常!");
-                    handler.sendEmptyMessage(3);
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    //请求安检内容网络数据
-    private void requireSecurityContent(final String method) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    URL url;
-                    HttpURLConnection httpURLConnection;
-                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
-                    if (!sharedPreferences.getString("security_ip", "").equals("")) {
-                        ip = sharedPreferences.getString("security_ip", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
-                    } else {
-                        ip = "88.88.88.66:";
-                    }
-                    if (!sharedPreferences.getString("security_port", "").equals("")) {
-                        port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
-                    } else {
-                        port = "8088";
-                    }
-                    String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
-                    url = new URL(httpUrl);
-                    Log.i("url=============>", url + "");
-                    httpURLConnection = (HttpURLConnection) url.openConnection();
-                    httpURLConnection.setRequestMethod("GET");
-                    httpURLConnection.setRequestProperty("Accept-Encoding", "identity");
-                    httpURLConnection.setRequestProperty("Content-Type", "applicaton/json;charset=UTF-8");
-                    httpURLConnection.setConnectTimeout(6000);
-                    httpURLConnection.setReadTimeout(6000);
-                    httpURLConnection.connect();
-                    //传回的数据解析成String
-                    if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
-                        InputStream inputStream = httpURLConnection.getInputStream();
-                        Log.i("start_inputStream==>", "" + inputStream);
-                        Log.i("mid_inputStream==>", "" + inputStream);
-                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
-                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                        StringBuilder stringBuilder = new StringBuilder();
-                        String str;
-                        while ((str = bufferedReader.readLine()) != null) {
-                            stringBuilder.append(str);
-                        }
-                        Log.i("end_inputStream==>", "" + inputStream);
-                        contentResult = stringBuilder.toString();
-                        Log.i("taskResult=====>", contentResult);
-                        JSONObject jsonObject = new JSONObject(contentResult);
-                        if (!jsonObject.optString("total", "").equals("0")) {
-                            handler.sendEmptyMessage(12);
-                        } else {
-                            handler.sendEmptyMessage(13);
-                        }
-                    } else {
-                        try {
-                            Thread.sleep(3000);
-                            handler.sendEmptyMessage(3);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    Log.i("IOException==========>", "网络请求异常!");
-                    handler.sendEmptyMessage(3);
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    //请求安检隐患类型网络数据
-    private void requireSafetyHidden(final String method) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    URL url;
-                    HttpURLConnection httpURLConnection;
-                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
-                    if (!sharedPreferences.getString("security_ip", "").equals("")) {
-                        ip = sharedPreferences.getString("security_ip", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
-                    } else {
-                        ip = "88.88.88.66:";
-                    }
-                    if (!sharedPreferences.getString("security_port", "").equals("")) {
-                        port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
-                    } else {
-                        port = "8088";
-                    }
-                    String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
-                    url = new URL(httpUrl);
-                    Log.i("url=============>", url + "");
-                    httpURLConnection = (HttpURLConnection) url.openConnection();
-                    httpURLConnection.setRequestMethod("GET");
-                    httpURLConnection.setRequestProperty("Accept-Encoding", "identity");
-                    httpURLConnection.setRequestProperty("Content-Type", "applicaton/json;charset=UTF-8");
-                    httpURLConnection.setConnectTimeout(6000);
-                    httpURLConnection.setReadTimeout(6000);
-                    httpURLConnection.connect();
-                    //传回的数据解析成String
-                    if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
-                        InputStream inputStream = httpURLConnection.getInputStream();
-                        Log.i("start_inputStream==>", "" + inputStream);
-                        Log.i("mid_inputStream==>", "" + inputStream);
-                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
-                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                        StringBuilder stringBuilder = new StringBuilder();
-                        String str;
-                        while ((str = bufferedReader.readLine()) != null) {
-                            stringBuilder.append(str);
-                        }
-                        Log.i("end_inputStream==>", "" + inputStream);
-                        hiddenResult = stringBuilder.toString();
-                        Log.i("taskResult=====>", hiddenResult);
-                        JSONObject jsonObject = new JSONObject(hiddenResult);
-                        if (!jsonObject.optString("total", "").equals("0")) {
-                            handler.sendEmptyMessage(14);
-                        } else {
-                            handler.sendEmptyMessage(15);
-                        }
-                    } else {
-                        try {
-                            Thread.sleep(3000);
-                            handler.sendEmptyMessage(3);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    Log.i("IOException==========>", "网络请求异常!");
-                    handler.sendEmptyMessage(3);
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    //请求安检隐患原因网络数据
-    private void requireSafetyReason(final String method) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    URL url;
-                    HttpURLConnection httpURLConnection;
-                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
-                    if (!sharedPreferences.getString("security_ip", "").equals("")) {
-                        ip = sharedPreferences.getString("security_ip", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
-                    } else {
-                        ip = "88.88.88.66:";
-                    }
-                    if (!sharedPreferences.getString("security_port", "").equals("")) {
-                        port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
-                    } else {
-                        port = "8088";
-                    }
-                    String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
-                    url = new URL(httpUrl);
-                    Log.i("url=============>", url + "");
-                    httpURLConnection = (HttpURLConnection) url.openConnection();
-                    httpURLConnection.setRequestMethod("GET");
-                    httpURLConnection.setRequestProperty("Accept-Encoding", "identity");
-                    httpURLConnection.setRequestProperty("Content-Type", "applicaton/json;charset=UTF-8");
-                    httpURLConnection.setConnectTimeout(6000);
-                    httpURLConnection.setReadTimeout(6000);
-                    httpURLConnection.connect();
-                    //传回的数据解析成String
-                    if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
-                        InputStream inputStream = httpURLConnection.getInputStream();
-                        Log.i("start_inputStream==>", "" + inputStream);
-                        Log.i("mid_inputStream==>", "" + inputStream);
-                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
-                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                        StringBuilder stringBuilder = new StringBuilder();
-                        String str;
-                        while ((str = bufferedReader.readLine()) != null) {
-                            stringBuilder.append(str);
-                        }
-                        Log.i("end_inputStream==>", "" + inputStream);
-                        reasonResult = stringBuilder.toString();
-                        Log.i("taskResult=====>", reasonResult);
-                        JSONObject jsonObject = new JSONObject(reasonResult);
-                        if (!jsonObject.optString("total", "").equals("0")) {
-                            handler.sendEmptyMessage(16);
-                        } else {
-                            handler.sendEmptyMessage(17);
-                        }
-                    } else {
-                        try {
-                            Thread.sleep(3000);
-                            handler.sendEmptyMessage(3);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    Log.i("IOException==========>", "网络请求异常!");
-                    handler.sendEmptyMessage(3);
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
 
     //自定义异步任务
     //启动任务的参数，进度参数，结果参数
@@ -815,6 +506,7 @@ public class DataTransferFragment extends Fragment {
 
     /**
      * 防止重复点击
+     *
      * @return
      */
     private boolean isFastDoubleClick() {
@@ -900,74 +592,6 @@ public class DataTransferFragment extends Fragment {
                         download.setClickable(true);
                     }
                     break;
-                case 10:
-                    try {
-                        JSONObject jsonObject = new JSONObject(stateResult);
-                        JSONArray jsonArray = jsonObject.getJSONArray("rows");
-                        for (int j = 0; j < jsonArray.length(); j++) {
-                            stateObject = jsonArray.getJSONObject(j);
-                            insertSecurityState();
-                        }
-                        download.setClickable(true);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case 11:
-                    download.setClickable(true);
-                    Toast.makeText(getActivity(), "没有任务状态信息！", Toast.LENGTH_SHORT).show();
-                    break;
-                case 12:
-                    try {
-                        JSONObject jsonObject = new JSONObject(contentResult);
-                        JSONArray jsonArray = jsonObject.getJSONArray("rows");
-                        for (int j = 0; j < jsonArray.length(); j++) {
-                            contentObject = jsonArray.getJSONObject(j);
-                            insertSecurityContent();
-                        }
-                        download.setClickable(true);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case 13:
-                    download.setClickable(true);
-                    Toast.makeText(getActivity(), "没有安检内容信息！", Toast.LENGTH_SHORT).show();
-                    break;
-                case 14:
-                    try {
-                        JSONObject jsonObject = new JSONObject(hiddenResult);
-                        JSONArray jsonArray = jsonObject.getJSONArray("rows");
-                        for (int j = 0; j < jsonArray.length(); j++) {
-                            hiddenObject = jsonArray.getJSONObject(j);
-                            insertSecurityHidden();
-                        }
-                        download.setClickable(true);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case 15:
-                    download.setClickable(true);
-                    Toast.makeText(getActivity(), "没有安全隐患信息！", Toast.LENGTH_SHORT).show();
-                    break;
-                case 16:
-                    try {
-                        JSONObject jsonObject = new JSONObject(reasonResult);
-                        JSONArray jsonArray = jsonObject.getJSONArray("rows");
-                        for (int j = 0; j < jsonArray.length(); j++) {
-                            reasonObject = jsonArray.getJSONObject(j);
-                            insertSecurityHiddenReason();
-                        }
-                        download.setClickable(true);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case 17:
-                    download.setClickable(true);
-                    Toast.makeText(getActivity(), "没有安全隐患原因信息！", Toast.LENGTH_SHORT).show();
-                    break;
             }
             super.handleMessage(msg);
         }
@@ -1030,43 +654,18 @@ public class DataTransferFragment extends Fragment {
         values.put("ifUpload","false");
         values.put("currentTime","");
         values.put("ifPass","true");
+        values.put("security_content", "");
+        values.put("newMeterNumber", "");
+        values.put("remarks", "");
+        values.put("security_hidden", "");
+        values.put("security_hidden_reason", "");
+        values.put("photoNumber", "0");
+        values.put("ifUpload", "false");
+        values.put("currentTime", "");
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
         db.insert("User", null, values);
-    }
-
-    //安检状态数据存到本地数据库安检状态表
-    private void insertSecurityState() {
-        ContentValues values = new ContentValues();
-        values.put("securityId", stateObject.optInt("securityId", 0) + "");
-        values.put("securityName", stateObject.optString("securityName", ""));
-        db.insert("SecurityState", null, values);
-    }
-
-    //安检内容数据存到本地数据库安检内容表
-    private void insertSecurityContent() {
-        ContentValues values = new ContentValues();
-        values.put("securityId", contentObject.optInt("securityId", 0) + "");
-        values.put("securityName", contentObject.optString("securityName", ""));
-        db.insert("security_content", null, values);
-    }
-
-    //安检隐患类型数据存到本地数据库安检内容表
-    private void insertSecurityHidden() {
-        ContentValues values = new ContentValues();
-        values.put("n_safety_hidden_id", hiddenObject.optInt("n_safety_hidden_id", 0) + "");
-        values.put("n_safety_hidden_name", hiddenObject.optString("n_safety_hidden_name", ""));
-        db.insert("security_hidden", null, values);
-    }
-
-    //安检隐患原因数据存到本地数据库安检内容表
-    private void insertSecurityHiddenReason() {
-        ContentValues values = new ContentValues();
-        values.put("n_safety_hidden_reason_id", reasonObject.optInt("n_safety_hidden_reason_id", 0) + "");
-        values.put("n_safety_hidden_id", reasonObject.optInt("n_safety_hidden_id", 0) + "");
-        values.put("n_safety_hidden_reason_name", reasonObject.optString("n_safety_hidden_reason_name", ""));
-        db.insert("security_hidden_reason", null, values);
     }
 
     @Override

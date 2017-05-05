@@ -26,7 +26,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +34,6 @@ import com.example.administrator.myapplicationsienke.adapter.PopupwindowListAdap
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.NewTaskListviewItem;
 import com.example.administrator.myapplicationsienke.model.PopupwindowListItem;
-import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;

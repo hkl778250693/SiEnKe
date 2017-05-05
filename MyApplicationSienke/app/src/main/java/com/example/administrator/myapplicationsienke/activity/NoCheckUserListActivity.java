@@ -23,7 +23,6 @@ import android.widget.TextView;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.NoCheckUserAdapter;
-import com.example.administrator.myapplicationsienke.adapter.UserListviewAdapter;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.UserListviewItem;
 
@@ -43,7 +42,6 @@ public class NoCheckUserListActivity extends Activity {
     private MySqliteHelper helper; //数据库帮助类
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private Cursor cursor;
     private EditText etSearch;//搜索框
     private TextView noData;
     private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
