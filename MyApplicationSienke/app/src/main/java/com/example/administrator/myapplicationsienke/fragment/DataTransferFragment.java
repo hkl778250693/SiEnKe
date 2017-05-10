@@ -113,10 +113,12 @@ public class DataTransferFragment extends Fragment {
                     } else {
                         Intent intent = new Intent(getActivity(), UploadActivity.class);
                         startActivity(intent);
+                        upload.setClickable(true);
                     }
                     break;
                 case R.id.download:
                     download.setClickable(false);
+                    showPopupwindow();
                     if (!sharedPreferences.getBoolean("have_download", false)) {
                         /*if(isFastDoubleClick()){
                             Toast.makeText(getActivity(), "您点击太频繁了！", Toast.LENGTH_SHORT).show();
@@ -176,9 +178,9 @@ public class DataTransferFragment extends Fragment {
             }
         });
         popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.white_transparent));
         popupWindow.setAnimationStyle(R.style.camera);
-        backgroundAlpha(0.8F);   //背景变暗
+        backgroundAlpha(0.6F);   //背景变暗
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
@@ -209,9 +211,9 @@ public class DataTransferFragment extends Fragment {
                 popupWindow.dismiss();
             }
         });
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.white_transparent));
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
-        backgroundAlpha(0.8F);   //背景变暗
+        backgroundAlpha(0.6F);   //背景变暗
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -224,6 +226,11 @@ public class DataTransferFragment extends Fragment {
     public void backgroundAlpha(float bgAlpha) {
         WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
         lp.alpha = bgAlpha; //0.0-1.0
+        if (bgAlpha == 1) {
+            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//不移除该Flag的话,在有视频的页面上的视频会出现黑屏的bug
+        } else {
+            getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//此行代码主要是解决在华为手机上半透明效果无效的bug
+        }
         getActivity().getWindow().setAttributes(lp);
     }
 
@@ -527,7 +534,6 @@ public class DataTransferFragment extends Fragment {
                     try {
                         JSONObject jsonObject = new JSONObject(taskResult);
                         jsonArray = jsonObject.getJSONArray("rows");
-                        showPopupwindow();
                         downloadProgress.setMax(10 * jsonArray.length());
                         taskNumbList.clear();
                         for (int j = 0; j < jsonArray.length(); j++) {             //获取到任务的个数，用于后面下载相应的用户数据
@@ -542,10 +548,12 @@ public class DataTransferFragment extends Fragment {
                     break;
                 case 2:
                     download.setClickable(true);
+                    popupWindow.dismiss();
                     Toast.makeText(getActivity(), "没有任务下载哦！", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
                     download.setClickable(true);
+                    popupWindow.dismiss();
                     Toast.makeText(getActivity(), "网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
                 case 4:
@@ -653,7 +661,7 @@ public class DataTransferFragment extends Fragment {
         values.put("photoNumber","0");
         values.put("ifUpload","false");
         values.put("currentTime","");
-        values.put("ifPass","true");
+        values.put("ifPass","");
         values.put("security_content", "");
         values.put("newMeterNumber", "");
         values.put("remarks", "");
@@ -678,4 +686,5 @@ public class DataTransferFragment extends Fragment {
             popupWindow = null;
         }
     }
+
 }

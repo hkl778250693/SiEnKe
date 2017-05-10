@@ -18,7 +18,7 @@
         android:id="@+id/item_name"
         android:layout_width="match_parent"
         android:layout_height="35dp"
-        android:background="@drawable/button_white_bg_take_photo_selector"
+        android:background="@drawable/spinner_selector"
         android:button="@null"
         android:gravity="center"
         android:text="常规安检"

@@ -18,7 +18,7 @@ import com.example.administrator.myapplicationsienke.R;
  */
 public class GuideActivity extends Activity {
     private TextView companyName;
-    SharedPreferences sharedPreferences = null;
+    private SharedPreferences sharedPreferences = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -99,7 +99,7 @@ public class SystemSettingActivity extends Activity {
     }
 
     private boolean clearPhoto() {
-        File file = new File(Environment.getExternalStorageDirectory() + "/SiEnKe_Crop/");
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) , "SiEnKe_Crop");
         if (file.exists()) { // 判断文件是否存在
             if (file.isFile()) { // 判断是否是文件
                 Log.i("clearPhoto=>", "删除的照片文件夹路径为：" + file.getPath());
@@ -150,14 +150,16 @@ public class SystemSettingActivity extends Activity {
                 if (clearPhoto()) {
                     Toast.makeText(SystemSettingActivity.this, "照片删除成功！", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(SystemSettingActivity.this, "照片删除失败！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SystemSettingActivity.this, "没有照片可删！", Toast.LENGTH_SHORT).show();
                 }
+                editor.putBoolean("clear_data",true);
+                editor.apply();
             }
         });
         popupWindow.update();
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
         popupWindow.setAnimationStyle(R.style.camera);
-        backgroundAlpha(0.8F);   //背景变暗
+        backgroundAlpha(0.6F);   //背景变暗
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
@@ -171,6 +173,11 @@ public class SystemSettingActivity extends Activity {
     public void backgroundAlpha(float bgAlpha) {
         WindowManager.LayoutParams lp = SystemSettingActivity.this.getWindow().getAttributes();
         lp.alpha = bgAlpha; //0.0-1.0
+        if (bgAlpha == 1) {
+            SystemSettingActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//不移除该Flag的话,在有视频的页面上的视频会出现黑屏的bug
+        } else {
+            SystemSettingActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//此行代码主要是解决在华为手机上半透明效果无效的bug
+        }
         SystemSettingActivity.this.getWindow().setAttributes(lp);
     }
 

@@ -52,15 +52,15 @@ import java.util.List;
  * Created by Administrator on 2017/4/5.
  */
 public class NewTaskDetailActivity extends Activity {
-    private View view;
+    private View view,saveView;
     private ImageView back,editDelete;
     private ListView listView;
     private TextView filter, save, no_data;
     private EditText etSearch;//搜索框
-    private TextView searchBtn;
+    private TextView searchBtn,tips;
     private PopupWindow popupWindow;
     private View securityCaseView;
-    private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck;
+    private RadioButton notSecurityCheck, passSecurityCheck, notPassSecurityCheck,cancelRb,saveRb;
     private LayoutInflater inflater;  //转换器
     private List<NewTaskListviewItem> newTaskListviewItemList = new ArrayList<>();
     private String ip, port;  //接口ip地址   端口
@@ -139,23 +139,17 @@ public class NewTaskDetailActivity extends Activity {
                     if(TextUtils.isEmpty(s.toString().trim())){
                         newTaskListviewItemList.clear();
                         newTaskListviewAdapter.notifyDataSetChanged();
-                        if (editDelete.getVisibility() == View.VISIBLE) {
-                            editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
-                        }
+                        editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
+                        newTaskSelectLayout.setVisibility(View.GONE);
+                        no_data.setVisibility(View.VISIBLE);
                     }else {
-                        if (editDelete.getVisibility() == View.GONE) {
-                            editDelete.setVisibility(View.VISIBLE);  //反之则显示
-                        }
+                        editDelete.setVisibility(View.VISIBLE);  //反之则显示
                     }
                 }else {
                     if(TextUtils.isEmpty(s.toString().trim())){
-                        if (editDelete.getVisibility() == View.VISIBLE) {
-                            editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
-                        }
+                        editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
                     }else {
-                        if (editDelete.getVisibility() == View.GONE) {
-                            editDelete.setVisibility(View.VISIBLE);  //反之则显示
-                        }
+                        editDelete.setVisibility(View.VISIBLE);  //反之则显示
                     }
                 }
             }
@@ -184,25 +178,29 @@ public class NewTaskDetailActivity extends Activity {
                     NewTaskDetailActivity.this.finish();
                     break;
                 case R.id.filter:
-                    createSecurityCasePopupwindow();
+                    createfilterPopupwindow();  //筛选框
                     break;
                 case R.id.save:
-                    saveTaskInfo();//保存选中的任务编号信息
-                    if (parclebleList.size() != 0) {
-                        Toast.makeText(NewTaskDetailActivity.this, "添加用户成功！", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent();
-                        intent.putParcelableArrayListExtra("parclebleList", parclebleList);
-                        Log.i("NewTaskDetailActivity", "parclebleList长度为：" + parclebleList.size());
-                        setResult(Activity.RESULT_OK, intent);
-                        finish();
-                    } else {
-                        Toast.makeText(NewTaskDetailActivity.this, "没有选中用户哦！", Toast.LENGTH_SHORT).show();
+                    save.setClickable(false);
+                    Log.i("NewTaskDetailActivity", "显示的数量为：" +newTaskListviewItemList.size());
+                    if(newTaskListviewItemList.size() != 0){
+                        saveTaskInfo();//保存选中的任务编号信息
+                        if (parclebleList.size() != 0) {
+                            createSavePopupwindow();
+                        } else {
+                            Toast.makeText(NewTaskDetailActivity.this, "添加用户才能保存哦！", Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        Toast.makeText(NewTaskDetailActivity.this, "请您添加用户！", Toast.LENGTH_SHORT).show();
                     }
+                    save.setClickable(true);
                     break;
                 case R.id.search_btn:
+                    no_data.setVisibility(View.GONE);
                     if(newTaskListviewItemList.size() != 0){
                         newTaskListviewItemList.clear();
                         newTaskListviewAdapter.notifyDataSetChanged();
+                        newTaskSelectLayout.setVisibility(View.GONE);
                     }
                     if (filter.getText().equals("姓名")) {
                         if(etSearch.getText().length() >= 2){
@@ -264,19 +262,15 @@ public class NewTaskDetailActivity extends Activity {
                     if(newTaskListviewItemList.size() != 0){
                         newTaskListviewItemList.clear();
                         newTaskListviewAdapter.notifyDataSetChanged();
+                        newTaskSelectLayout.setVisibility(View.GONE);
+                        editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
                         etSearch.setText("");
-                        if (editDelete.getVisibility() == View.VISIBLE) {
-                            editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
-                        }
                     }else {
                         etSearch.setText("");
-                        if (editDelete.getVisibility() == View.VISIBLE) {
-                            editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
-                        }
-                        if(newTaskSelectLayout.getVisibility() == View.VISIBLE){
-                            newTaskSelectLayout.setVisibility(View.GONE);
-                        }
+                        editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
+                        newTaskSelectLayout.setVisibility(View.GONE);
                     }
+                    no_data.setVisibility(View.VISIBLE);
                     break;
                 case R.id.select_all:
                     selectAll();
@@ -338,28 +332,30 @@ public class NewTaskDetailActivity extends Activity {
     public void showPopupwindow() {
         layoutInflater = LayoutInflater.from(NewTaskDetailActivity.this);
         view = layoutInflater.inflate(R.layout.popupwindow_query_loading, null);
-        popupWindow = new PopupWindow(view, 350, 350);
+        popupWindow = new PopupWindow(view,LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         frameAnimation = (ImageView) view.findViewById(R.id.frame_animation);
+        popupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NEEDED);
+        popupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.loading_shape));
         popupWindow.setAnimationStyle(R.style.dialog);
         popupWindow.update();
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
-        backgroundAlpha(0.8F);   //背景变暗
+        backgroundAlpha(0.6F);   //背景变暗
+        //开始加载动画
+        startFrameAnimation();
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
                 backgroundAlpha(1.0F);
             }
         });
-        //开始加载动画
-        startFrameAnimation();
     }
 
-    //popupwindow
-    public void createSecurityCasePopupwindow() {
+    //筛选框popupwindow
+    public void createfilterPopupwindow() {
         inflater = LayoutInflater.from(NewTaskDetailActivity.this);
         securityCaseView = inflater.inflate(R.layout.popupwindow_userlist_choose, null);
-        popupWindow = new PopupWindow(securityCaseView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(securityCaseView, filter.getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
         //绑定控件ID
         notSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.not_security_check);
         passSecurityCheck = (RadioButton) securityCaseView.findViewById(R.id.pass_security_check);
@@ -400,8 +396,52 @@ public class NewTaskDetailActivity extends Activity {
         popupWindow.update();
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
-        backgroundAlpha(0.8F);   //背景变暗
+        backgroundAlpha(0.6F);   //背景变暗
         popupWindow.showAsDropDown(filter, 0, 0);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                backgroundAlpha(1.0F);
+            }
+        });
+    }
+
+    //弹出保存前提示popupwindow
+    public void createSavePopupwindow() {
+        layoutInflater = LayoutInflater.from(NewTaskDetailActivity.this);
+        saveView = layoutInflater.inflate(R.layout.popupwindow_user_detail_info_save, null);
+        popupWindow = new PopupWindow(saveView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        //绑定控件ID
+        tips = (TextView) saveView.findViewById(R.id.tips);
+        cancelRb = (RadioButton) saveView.findViewById(R.id.cancel_rb);
+        saveRb = (RadioButton) saveView.findViewById(R.id.save_rb);
+        //设置点击事件
+        tips.setText("您已添加了"+parclebleList.size()+"个用户，还继续添加吗？");
+        cancelRb.setText("继续添加");
+        saveRb.setText("完成添加");
+        cancelRb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+        saveRb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(NewTaskDetailActivity.this, "成功添加了"+parclebleList.size()+"个用户！", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent();
+                intent.putParcelableArrayListExtra("parclebleList", parclebleList);
+                Log.i("NewTaskDetailActivity", "parclebleList长度为：" + parclebleList.size());
+                setResult(Activity.RESULT_OK, intent);
+                finish();
+                popupWindow.dismiss();
+            }
+        });
+        popupWindow.update();
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.white_transparent));
+        popupWindow.setAnimationStyle(R.style.camera);
+        popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
+        backgroundAlpha(0.6F);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -412,9 +452,14 @@ public class NewTaskDetailActivity extends Activity {
 
     //设置背景透明度
     public void backgroundAlpha(float bgAlpha) {
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        WindowManager.LayoutParams lp = NewTaskDetailActivity.this.getWindow().getAttributes();
         lp.alpha = bgAlpha; //0.0-1.0
-        getWindow().setAttributes(lp);
+        if (bgAlpha == 1) {
+            NewTaskDetailActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//不移除该Flag的话,在有视频的页面上的视频会出现黑屏的bug
+        } else {
+            NewTaskDetailActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//此行代码主要是解决在华为手机上半透明效果无效的bug
+        }
+        NewTaskDetailActivity.this.getWindow().setAttributes(lp);
     }
 
     //开始帧动画

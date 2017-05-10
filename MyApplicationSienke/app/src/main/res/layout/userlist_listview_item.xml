@@ -220,10 +220,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="未检"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="15dp"
             android:layout_centerHorizontal="true"
+            android:layout_alignTop="@id/if_edit"
             android:textSize="12sp"
             android:textColor="@android:color/white"/>
+        <TextView
+            android:id="@+id/if_upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:layout_alignBottom="@id/if_edit"
+            android:layout_marginBottom="15dp"
+            android:layout_centerHorizontal="true"
+            android:textSize="12sp"
+            android:textColor="@color/theme_colors"/>
     </RelativeLayout>
 
 </LinearLayout>

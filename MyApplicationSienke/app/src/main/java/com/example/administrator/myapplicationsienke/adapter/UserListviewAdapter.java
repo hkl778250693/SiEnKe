@@ -86,6 +86,7 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
             viewHolder.address = (TextView) convertView.findViewById(R.id.address);
             viewHolder.if_edit = (ImageView) convertView.findViewById(R.id.if_edit);
             viewHolder.ifChecked = (TextView) convertView.findViewById(R.id.if_checked);
+            viewHolder.ifUpload = (TextView) convertView.findViewById(R.id.if_upload);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -109,6 +110,7 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
         if (!userListviewItem.getPhoneNumber().equals("null")) {
             viewHolder.phone_number.setText(userListviewItem.getPhoneNumber());
         } else {
+            Log.i("UserListviewAdapter", "电话号码为："+userListviewItem.getPhoneNumber());
             viewHolder.phone_number.setText("无");
         }
         if(!userListviewItem.getSecurityType().equals("null")){
@@ -128,6 +130,7 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
         }
         viewHolder.if_edit.setImageResource(userListviewItem.getIfEdit());
         viewHolder.ifChecked.setText(userListviewItem.getIfChecked());
+        viewHolder.ifUpload.setText(userListviewItem.getIfUpload());
 
         if (userListviewList != null) {
             if (searchContent != null) {
@@ -180,6 +183,7 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
         TextView address;   //地址
         ImageView if_edit;   //是否编辑（图片）
         TextView ifChecked;  //文字
+        TextView ifUpload;   //是否上传
     }
 
     //当ListView调用setTextFilter()方法的时候，便会调用该方法

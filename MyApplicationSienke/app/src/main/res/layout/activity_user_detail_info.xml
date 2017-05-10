@@ -9,6 +9,7 @@
     android:focusableInTouchMode="true">
 
     <RelativeLayout
+        android:id="@+id/root_relative"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/theme_colors">
@@ -359,7 +360,7 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:background="@drawable/linearlayout_shape"
-                    android:hint="请输入表编号(非必须)"
+                    android:hint="请输入表编号(选填)"
                     android:textColor="@color/text_gray"
                     android:textSize="12sp"
                     android:paddingTop="6dp"
@@ -389,7 +390,7 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:background="@drawable/linearlayout_shape"
-                    android:hint="备注信息(非必须)"
+                    android:hint="备注信息(选填)"
                     android:textColor="@color/text_gray"
                     android:textSize="12sp"
                     android:paddingTop="6dp"

@@ -33,11 +33,12 @@ public class MyPhotoUtils {
         Log.i("MyPhotoUtils", "有SD卡");
         File mediaStorageDir = null;
         if(fileType == TYPE_FILE_CROP_IMAGE){
-            mediaStorageDir = new File(Environment.getExternalStorageDirectory(),"SiEnKe_Crop");
-            //mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"SiEnKe_Crop");
+            //mediaStorageDir = new File(Environment.getExternalStorageDirectory(),"SiEnKe_Crop");
+            mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"SiEnKe_Crop");
         }
 
-        if (mediaStorageDir != null && !mediaStorageDir.exists()) {
+        if (!mediaStorageDir.exists()) {
+            mediaStorageDir.mkdirs();
             if (!mediaStorageDir.mkdirs()) {
                 Log.i("MyPictures", "创建图片存储路径目录失败");
                 Log.i("MyPictures", "mediaStorageDir : " + mediaStorageDir.getPath());

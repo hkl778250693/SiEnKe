@@ -13,6 +13,7 @@ public class UserListviewItem {
     private String securityNumber;       //安检编号
     private int ifEdit;                  //是否编辑(图片)
     private String ifChecked;            //文字
+    private String ifUpload;             //是否上传
 
     public String getUserName() {
         return userName;
@@ -84,5 +85,13 @@ public class UserListviewItem {
 
     public void setIfChecked(String ifChecked) {
         this.ifChecked = ifChecked;
+    }
+
+    public String getIfUpload() {
+        return ifUpload;
+    }
+
+    public void setIfUpload(String ifUpload) {
+        this.ifUpload = ifUpload;
     }
 }

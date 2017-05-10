@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,10 +12,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -52,18 +53,21 @@ import java.util.Set;
  */
 public class SecurityChooseActivity extends FragmentActivity {
     private RadioButton file, settings, quite; //文件管理 系统设置 退出应用
+    private boolean isFirst;   //是否第一次近日app
     private LayoutInflater inflater; //转换器
-    private View popupwindowView;
-    private PopupWindow popupWindow;
+    private View popupwindowView,quiteView;
+    private Button cancelRb,saveRb;
+    private LinearLayout rootLinearlayout;
+    private PopupWindow popupWindow,quitePopup;
     private ImageView security_check_go;
     private RadioButton optionRbt;  //选项按钮
-    private TextView name, userName;
+    private TextView name, userName,tips;
     private RadioButton dataTransferRbt;  //数据传输按钮
     private List<Fragment> fragmentList;
     private ViewPager viewPager;
     private SecurityCheckViewPagerAdapter adapter;
     private long exitTime = 0;//退出程序
-    private SharedPreferences sharedPreferences, sharedPreferences_login;
+    private SharedPreferences sharedPreferences, sharedPreferences_login,sharedPreferences_login_copy;
     private SharedPreferences.Editor editor;
     private Bundle params;
     private Set<String> stringSet = new HashSet<>();//保存字符串参数
@@ -79,10 +83,58 @@ public class SecurityChooseActivity extends FragmentActivity {
     //强制竖屏
     @Override
     protected void onResume() {
-        if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
         super.onResume();
+        Log.i("SecurityChooseActivity", "onResume");
+        if(sharedPreferences.getBoolean("clear_data",false)){
+            Log.i("SecurityChooseActivity", "onResume进来了，重新下载数据！");
+            db.delete("SecurityState", null, null);  //删除SecurityState表中的所有数据
+            db.delete("security_content", null, null);  //删除security_content表中的所有数据
+            db.delete("security_hidden", null, null);  //删除security_hidden表中的所有数据
+            db.delete("security_hidden_reason", null, null);  //删除security_hidden_reason表中的所有数据
+            //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
+            db.execSQL("update sqlite_sequence set seq=0 where name='SecurityState'");
+            db.execSQL("update sqlite_sequence set seq=0 where name='security_content'");
+            db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden'");
+            db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden_reason'");
+
+            //开启支线程进行请求任务信息
+            new Thread() {
+                @Override
+                public void run() {
+                    requireSecurityState("findSecurityState.do "); //安检状态
+                    requireSecurityContent("findSecurityContent.do");//安检内容
+                    requireSafetyHidden("findSafetyHidden.do");//安检原因类型
+                    requireSafetyReason("findSafetyReason.do");//安检原因
+                    super.run();
+                }
+            }.start();
+            editor.putBoolean("clear_data",false);
+            editor.apply();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("SecurityChooseActivity", "onPause");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i("SecurityChooseActivity", "onStart");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("SecurityChooseActivity", "onStop");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.i("SecurityChooseActivity", "onRestart" );
     }
 
     @Override
@@ -94,6 +146,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         defaultSetting();//初始化设置
         setViewPager();//设置viewPager
         setViewClickListener();//点击事件
+        Log.i("SecurityChooseActivity", "onCreate" );
     }
 
     //绑定控件
@@ -104,6 +157,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         viewPager = (ViewPager) findViewById(R.id.security_viewpager);
         name = (TextView) findViewById(R.id.name);
         userName = (TextView) findViewById(R.id.user_name);
+        rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
     }
 
     //点击事件
@@ -148,6 +202,7 @@ public class SecurityChooseActivity extends FragmentActivity {
                     security_check_go.setClickable(false);
                     createPopupwindow();
                     Log.i("createPopupwindow===>", "true");
+                    security_check_go.setClickable(true);
                     break;
                 case R.id.option_rbt:
                     viewPager.setCurrentItem(0);
@@ -161,7 +216,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         }
     };
 
-    //popupwindow
+    //系统设置popupwindow
     public void createPopupwindow() {
         inflater = LayoutInflater.from(SecurityChooseActivity.this);
         popupwindowView = inflater.inflate(R.layout.popup_window_security, null);
@@ -191,7 +246,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                         Intent intent = new Intent(SecurityChooseActivity.this, SystemSettingActivity.class);
                         startActivity(intent);
                         popupWindow.dismiss();
-                        security_check_go.setClickable(true);
                         break;
                 }
             }
@@ -200,32 +254,78 @@ public class SecurityChooseActivity extends FragmentActivity {
         quite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                security_check_go.setClickable(true);
-                System.exit(0);
+                //System.exit(0);
+                popupWindow.dismiss();
+                showQuitePopup();
             }
         });
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.home_page_more_shape));
         popupWindow.setAnimationStyle(R.style.mypopwindow_anim_style);
-        backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(security_check_go, 0, 0);
+        backgroundAlpha(0.6F);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                security_check_go.setClickable(true);
                 backgroundAlpha(1.0F);
             }
         });
+    }
 
+    //弹出退出登录前提示popupwindow
+    public void showQuitePopup() {
+        inflater = LayoutInflater.from(SecurityChooseActivity.this);
+        quiteView = inflater.inflate(R.layout.popupwindow_user_detail_info_save, null);
+        quitePopup = new PopupWindow(quiteView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        //绑定控件ID
+        tips = (TextView) quiteView.findViewById(R.id.tips);
+        cancelRb = (RadioButton) quiteView.findViewById(R.id.cancel_rb);
+        saveRb = (RadioButton) quiteView.findViewById(R.id.save_rb);
+        //设置点击事件
+        tips.setText("退出后不会删除历史数据，下次登录依然可以使用本账号！(注意：切换账号后则清空历史数据)");
+        saveRb.setTextColor(getResources().getColor(R.color.red));
+        saveRb.setText("退出登录");
+        cancelRb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quitePopup.dismiss();
+            }
+        });
+        saveRb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quitePopup.dismiss();
+                Intent intent = new Intent(SecurityChooseActivity.this, MobileSecurityLoginActivity.class);
+                startActivity(intent);
+                sharedPreferences_login.edit().clear().apply();
+                finish();
+            }
+        });
+        quitePopup.update();
+        quitePopup.setBackgroundDrawable(getResources().getDrawable(R.color.white_transparent));
+        quitePopup.setAnimationStyle(R.style.camera);
+        quitePopup.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
+        backgroundAlpha(0.6F);   //背景变暗
+        quitePopup.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                backgroundAlpha(1.0F);
+            }
+        });
     }
 
     //设置背景透明度
     public void backgroundAlpha(float bgAlpha) {
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        WindowManager.LayoutParams lp = SecurityChooseActivity.this.getWindow().getAttributes();
         lp.alpha = bgAlpha; //0.0-1.0
-        getWindow().setAttributes(lp);
+        if (bgAlpha == 1) {
+            SecurityChooseActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//不移除该Flag的话,在有视频的页面上的视频会出现黑屏的bug
+        } else {
+            SecurityChooseActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//此行代码主要是解决在华为手机上半透明效果无效的bug
+        }
+        SecurityChooseActivity.this.getWindow().setAttributes(lp);
     }
 
     //初始化设置
@@ -235,12 +335,38 @@ public class SecurityChooseActivity extends FragmentActivity {
         db = helper.getWritableDatabase();
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
         sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences_login_copy = getSharedPreferences("login_info_copy", Context.MODE_PRIVATE); //退出登录以后需要这个备份记录是否更换账号
         editor = sharedPreferences.edit();
+        isFirst = sharedPreferences.getBoolean("FIRST",true);
+        if(isFirst){
+            Log.i("SecurityChooseActivity", "第一次进入APP");
+            editor.putBoolean("FIRST",false);
+            editor.apply();
+            db.delete("SecurityState", null, null);  //删除SecurityState表中的所有数据
+            db.delete("security_content", null, null);  //删除security_content表中的所有数据
+            db.delete("security_hidden", null, null);  //删除security_hidden表中的所有数据
+            db.delete("security_hidden_reason", null, null);  //删除security_hidden_reason表中的所有数据
+            //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
+            db.execSQL("update sqlite_sequence set seq=0 where name='SecurityState'");
+            db.execSQL("update sqlite_sequence set seq=0 where name='security_content'");
+            db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden'");
+            db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden_reason'");
+            //开启支线程进行请求任务信息
+            new Thread() {
+                @Override
+                public void run() {
+                    requireSecurityState("findSecurityState.do "); //安检状态
+                    requireSecurityContent("findSecurityContent.do");//安检内容
+                    requireSafetyHidden("findSafetyHidden.do");//安检原因类型
+                    requireSafetyReason("findSafetyReason.do");//安检原因
+                    super.run();
+                }
+            }.start();
+        }
         userName.setText(sharedPreferences_login.getString("user_name", "")); //设置登录用户的名称
-        editor.putInt("problem_number", sharedPreferences.getInt("problem_number", 0));
-        editor.apply();
-        Log.i("user_exchanged", "用户是否改变" + sharedPreferences_login.getBoolean("user_exchanged", false));
-        if (sharedPreferences_login.getBoolean("user_exchanged", false)) {
+        Log.i("user_exchanged", "用户是否改变" + sharedPreferences_login_copy.getBoolean("user_exchanged", false));
+        if (sharedPreferences_login_copy.getBoolean("user_exchanged", false)) {
+            Log.i("user_exchanged", "用户改变了" );
             editor.clear();
             editor.apply();
             db.delete("User", null, null);  //删除User表中的所有数据（官方推荐方法）
@@ -249,27 +375,6 @@ public class SecurityChooseActivity extends FragmentActivity {
             db.execSQL("update sqlite_sequence set seq=0 where name='User'");
             db.execSQL("update sqlite_sequence set seq=0 where name='Task'");
         }
-        db.delete("SecurityState", null, null);  //删除SecurityState表中的所有数据
-        db.delete("security_content", null, null);  //删除security_content表中的所有数据
-        db.delete("security_hidden", null, null);  //删除security_hidden表中的所有数据
-        db.delete("security_hidden_reason", null, null);  //删除security_hidden_reason表中的所有数据
-        //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
-        db.execSQL("update sqlite_sequence set seq=0 where name='SecurityState'");
-        db.execSQL("update sqlite_sequence set seq=0 where name='security_content'");
-        db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden'");
-        db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden_reason'");
-
-        //开启支线程进行请求任务信息
-        new Thread() {
-            @Override
-            public void run() {
-                requireSecurityState("findSecurityState.do "); //安检状态
-                requireSecurityContent("findSecurityContent.do");//安检内容
-                requireSafetyHidden("findSafetyHidden.do");//安检原因类型
-                requireSafetyReason("findSafetyReason.do");//安检原因
-                super.run();
-            }
-        }.start();
     }
 
     @Override
@@ -365,16 +470,13 @@ public class SecurityChooseActivity extends FragmentActivity {
                 try {
                     URL url;
                     HttpURLConnection httpURLConnection;
-                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         ip = "88.88.88.66:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         port = "8088";
                     }
@@ -410,12 +512,7 @@ public class SecurityChooseActivity extends FragmentActivity {
                             handler.sendEmptyMessage(3);
                         }
                     } else {
-                        try {
-                            Thread.sleep(3000);
-                            handler.sendEmptyMessage(1);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        handler.sendEmptyMessage(1);
                     }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -440,16 +537,13 @@ public class SecurityChooseActivity extends FragmentActivity {
                 try {
                     URL url;
                     HttpURLConnection httpURLConnection;
-                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         ip = "88.88.88.66:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         port = "8088";
                     }
@@ -484,13 +578,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                         } else {
                             handler.sendEmptyMessage(5);
                         }
-                    } else {
-                        try {
-                            Thread.sleep(3000);
-                            handler.sendEmptyMessage(1);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                     }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -515,16 +602,13 @@ public class SecurityChooseActivity extends FragmentActivity {
                 try {
                     URL url;
                     HttpURLConnection httpURLConnection;
-                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         ip = "88.88.88.66:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         port = "8088";
                     }
@@ -559,13 +643,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                         } else {
                             handler.sendEmptyMessage(7);
                         }
-                    } else {
-                        try {
-                            Thread.sleep(3000);
-                            handler.sendEmptyMessage(1);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                     }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -590,16 +667,13 @@ public class SecurityChooseActivity extends FragmentActivity {
                 try {
                     URL url;
                     HttpURLConnection httpURLConnection;
-                    Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         ip = "88.88.88.66:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         port = "8088";
                     }
@@ -634,13 +708,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                         } else {
                             handler.sendEmptyMessage(9);
                         }
-                    } else {
-                        try {
-                            Thread.sleep(3000);
-                            handler.sendEmptyMessage(1);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                     }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -662,7 +729,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    Toast.makeText(SecurityChooseActivity.this, "网络请求超时！", Toast.LENGTH_SHORT).show();
+                    Log.i("SecurityChooseActivity", "网络请求超时！");
                     break;
                 case 2:
                     try {
@@ -677,7 +744,7 @@ public class SecurityChooseActivity extends FragmentActivity {
                     }
                     break;
                 case 3:
-                    Toast.makeText(SecurityChooseActivity.this, "没有任务状态信息！", Toast.LENGTH_SHORT).show();
+                    Log.i("SecurityChooseActivity", "没有任务状态信息！");
                     break;
                 case 4:
                     try {
@@ -692,7 +759,7 @@ public class SecurityChooseActivity extends FragmentActivity {
                     }
                     break;
                 case 5:
-                    Toast.makeText(SecurityChooseActivity.this, "没有安检内容信息！", Toast.LENGTH_SHORT).show();
+                    Log.i("SecurityChooseActivity", "没有安检内容信息！");
                     break;
                 case 6:
                     try {
@@ -707,7 +774,7 @@ public class SecurityChooseActivity extends FragmentActivity {
                     }
                     break;
                 case 7:
-                    Toast.makeText(SecurityChooseActivity.this, "没有安全隐患信息！", Toast.LENGTH_SHORT).show();
+                    Log.i("SecurityChooseActivity", "没有安全隐患信息！");
                     break;
                 case 8:
                     try {
@@ -722,7 +789,7 @@ public class SecurityChooseActivity extends FragmentActivity {
                     }
                     break;
                 case 9:
-                    Toast.makeText(SecurityChooseActivity.this, "没有安全隐患原因信息！", Toast.LENGTH_SHORT).show();
+                    Log.i("SecurityChooseActivity", "没有安全隐患原因信息！");
                     break;
             }
             super.handleMessage(msg);

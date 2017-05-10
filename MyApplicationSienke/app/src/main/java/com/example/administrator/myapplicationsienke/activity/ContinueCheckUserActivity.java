@@ -49,7 +49,7 @@ public class ContinueCheckUserActivity extends Activity {
     private UserListviewItem item;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private String continuePosition = "";  //继续安检位置
+    private int continuePosition = 0;  //继续安检位置
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,23 +67,19 @@ public class ContinueCheckUserActivity extends Activity {
                         getUserData(stringList.get(i));//读取继续安检用户数据
                     }
                     handler.sendEmptyMessage(1);
-                    handler.sendEmptyMessage(0);
+                    for (int i = 0; i < task_total_numb; i++) {
+                        getContinueCheckPosition(stringList.get(i)); //获取继续安检的item位置
+                        if (continuePosition != 0) {
+                            handler.sendEmptyMessage(0);
+                            break;
+                        }
+                    }
                 }else {
                     handler.sendEmptyMessage(2);
                 }
-                super.run();
             }
         }.start();
         setOnClickListener();//点击事件
-    }
-
-    //强制竖屏
-    @Override
-    protected void onResume() {
-        if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-        super.onResume();
     }
 
     //绑定控件ID
@@ -103,7 +99,6 @@ public class ContinueCheckUserActivity extends Activity {
         db = helper.getWritableDatabase();
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        continuePosition = sharedPreferences.getString("continuePosition","");
     }
 
     //点击事件
@@ -116,15 +111,17 @@ public class ContinueCheckUserActivity extends Activity {
                 item = userListviewItemList.get((int) parent.getAdapter().getItemId(position));
                 currentPosition = position;
                 Intent intent = new Intent(ContinueCheckUserActivity.this, UserDetailInfoActivity.class);
-                intent.putExtra("position",position);
-                intent.putExtra("user_number",item.getUserId());
+                intent.putExtra("position", currentPosition);
                 intent.putExtra("security_id",item.getSecurityNumber());
+                intent.putExtra("user_number",item.getUserId());
                 intent.putExtra("user_name",item.getUserName());
                 intent.putExtra("meter_number",item.getNumber());
                 intent.putExtra("user_phone_number",item.getPhoneNumber());
                 intent.putExtra("user_address",item.getAdress());
                 intent.putExtra("check_type",item.getSecurityType());
-                startActivityForResult(intent,currentPosition);
+                intent.putExtra("if_checked",item.getIfChecked());
+                intent.putExtra("if_upload",item.getIfUpload());
+                startActivityForResult(intent, currentPosition);
             }
         });
 
@@ -139,26 +136,22 @@ public class ContinueCheckUserActivity extends Activity {
                 Log.i("UserListActivity", "onTextChanged进来了" );
                 if(TextUtils.isEmpty(s.toString().trim())){
                     listView.clearTextFilter();    //搜索文本为空时，清除ListView的过滤
-                    if(userListviewAdapter != null){
-                        userListviewAdapter.getFilter().filter("");
-                    }
                     new Thread(){
                         @Override
                         public void run() {
+                            if(userListviewAdapter != null){
+                                userListviewAdapter.getFilter().filter("");
+                            }
                             handler.sendEmptyMessage(0);
                         }
                     }.start();
-                    if (editDelete.getVisibility() == View.VISIBLE) {
-                        editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
-                    }
+                    editDelete.setVisibility(View.GONE);  //当输入框为空时，叉叉消失
                 }else {
                     if(userListviewAdapter != null){
                         userListviewAdapter.getFilter().filter(s);
                     }
                     //listView.setFilterText(s.toString().trim());  //设置过滤关键字
-                    if (editDelete.getVisibility() == View.GONE) {
-                        editDelete.setVisibility(View.VISIBLE);  //反之则显示
-                    }
+                    editDelete.setVisibility(View.VISIBLE);  //反之则显示
                 }
             }
 
@@ -182,12 +175,7 @@ public class ContinueCheckUserActivity extends Activity {
                     if(userListviewAdapter != null){
                         userListviewAdapter.getFilter().filter("");
                     }
-                    new Thread(){
-                        @Override
-                        public void run() {
-                            handler.sendEmptyMessage(3);
-                        }
-                    }.start();
+                    handler.sendEmptyMessage(0);
                     break;
             }
         }
@@ -198,10 +186,11 @@ public class ContinueCheckUserActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 0:
-                    if(!sharedPreferences.getString("continuePosition","").equals("")){
-                        listView.setSelection(Integer.parseInt(continuePosition));  //让listview显示上次安检的位置
-                        Log.i("ContinueCheckActivity", "列表显示当前的位置是：" + continuePosition);
-                    }
+                    userListviewAdapter = new UserListviewAdapter(ContinueCheckUserActivity.this, userListviewItemList);
+                    userListviewAdapter.notifyDataSetChanged();
+                    listView.setAdapter(userListviewAdapter);
+                    listView.setSelection(continuePosition);  //让listview显示上次安检的位置
+                    Log.i("ContinueCheckActivity", "列表显示当前的位置是：" + continuePosition);
                     break;
                 case 1:
                     userListviewAdapter = new UserListviewAdapter(ContinueCheckUserActivity.this, userListviewItemList);
@@ -212,12 +201,6 @@ public class ContinueCheckUserActivity extends Activity {
                     if (noData.getVisibility() == View.GONE) {
                         Log.i("ContinueCheckActivity", "显示没有用户数据照片！");
                         noData.setVisibility(View.VISIBLE);
-                    }
-                    break;
-                case 3:
-                    if(!sharedPreferences.getString("continuePosition","").equals("")){
-                        listView.setSelection(Integer.parseInt(sharedPreferences.getString("continuePosition","")));  //让listview显示上次安检的位置
-                        Log.i("Continue_edit_delete", "列表显示当前的位置是：" + sharedPreferences.getString("continuePosition",""));
                     }
                     break;
             }
@@ -246,8 +229,7 @@ public class ContinueCheckUserActivity extends Activity {
         }
         while (cursor.moveToNext()) {
             if (cursor.getString(10).equals("false")) {
-                editor.putString("continuePosition", cursor.getPosition() + "");
-                editor.commit();
+                continuePosition = cursor.getPosition();  //查询未安检的用户位置
                 break;
             }
         }
@@ -318,6 +300,11 @@ public class ContinueCheckUserActivity extends Activity {
                 userListviewItem.setIfEdit(R.mipmap.userlist_red);
                 userListviewItem.setIfChecked("未检");
             }
+            if(cursor.getString(17).equals("true")){
+                userListviewItem.setIfUpload("已上传");
+            }else {
+                userListviewItem.setIfUpload("");
+            }
             userListviewItemList.add(userListviewItem);
             Log.i("ContinueCheckActivity", "用户列表的长度为：" + userListviewItemList.size());
         }
@@ -339,15 +326,20 @@ public class ContinueCheckUserActivity extends Activity {
             if(requestCode == currentPosition){
                 updateUserCheckedState(); //更新本地数据库用户表安检状态
                 item.setIfEdit(R.mipmap.userlist_gray);
+                item.setIfChecked("已检");
                 userListviewAdapter.notifyDataSetChanged();
-                for (int i = 0; i < task_total_numb; i++) {
-                    getContinueCheckPosition(stringList.get(i)); //获取继续安检的item位置
-                    if (!sharedPreferences.getString("continuePosition", "").equals("")) {
-                        listView.setSelection(Integer.parseInt(sharedPreferences.getString("continuePosition", "")));
-                        Log.i("ContinueCheckActivity", "页面回调进来了,显示的位置是："+sharedPreferences.getString("continuePosition", ""));
-                        break;
+                new Thread(){
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < task_total_numb; i++) {
+                            getContinueCheckPosition(stringList.get(i)); //获取继续安检的item位置
+                            if (continuePosition != 0) {
+                                handler.sendEmptyMessage(0);
+                                break;
+                            }
+                        }
                     }
-                }
+                }.start();
             }
         }
     }
@@ -358,7 +350,4 @@ public class ContinueCheckUserActivity extends Activity {
         //释放和数据库的连接
         db.close();
     }
-    //查询
-
-
 }
