@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_linearlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,30 +28,45 @@
             android:textColor="@android:color/white"
             android:textSize="21sp" />
     </RelativeLayout>
+
     <EditText
         android:id="@+id/ip_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="请输入IP号"
-        android:textSize="14sp"
-        android:textColor="@color/text_gray"
-        android:background="@drawable/ip_setting"
-        android:layout_marginTop="20dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:padding="10dp"/>
+        android:layout_marginTop="20dp"
+        android:background="@drawable/ip_setting"
+        android:hint="请输入IP号(务必在最后加上：)"
+        android:padding="10dp"
+        android:textColor="@color/text_black"
+        android:textSize="14sp" />
+
     <EditText
         android:id="@+id/port_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="请输入Port号"
-        android:textSize="14sp"
-        android:textColor="@color/text_gray"
-        android:background="@drawable/ip_setting"
-        android:layout_marginTop="20dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:padding="10dp"/>
+        android:layout_marginTop="20dp"
+        android:background="@drawable/ip_setting"
+        android:hint="请输入Port号"
+        android:padding="10dp"
+        android:textColor="@color/text_black"
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/edit"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginLeft="11dp"
+        android:layout_marginRight="11dp"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/user_detail_save_btn_selector"
+        android:text="编辑"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
     <Button
         android:id="@+id/confirm_btn"
         android:layout_width="match_parent"
@@ -58,6 +77,7 @@
         android:background="@drawable/user_detail_save_btn_selector"
         android:text="确定"
         android:textColor="@android:color/white"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:visibility="gone" />
 
 </LinearLayout>

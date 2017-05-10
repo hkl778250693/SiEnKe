@@ -86,7 +86,6 @@ public class NewTaskActivity extends Activity {
     private int currentPercent = 0;
     private Calendar c; //日历
     private List<PopupwindowListItem> popupwindowListItemList = new ArrayList<>();
-    private List<PopupwindowListItem> defaultList = new ArrayList<>();
     private Cursor cursor;
     private PopupwindowListAdapter adapter;
     private String itemId;
@@ -181,9 +180,11 @@ public class NewTaskActivity extends Activity {
                             @Override
                             public void run() {
                                 postMyTask();
+                                save_btn.setClickable(true);
                             }
                         }.start();
                     } else {
+                        save_btn.setClickable(true);
                         Toast.makeText(NewTaskActivity.this, "请添加用户数据哦！", Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -259,9 +260,14 @@ public class NewTaskActivity extends Activity {
 
     //设置背景透明度
     public void backgroundAlpha(float bgAlpha) {
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        WindowManager.LayoutParams lp = NewTaskActivity.this.getWindow().getAttributes();
         lp.alpha = bgAlpha; //0.0-1.0
-        getWindow().setAttributes(lp);
+        if (bgAlpha == 1) {
+            NewTaskActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//不移除该Flag的话,在有视频的页面上的视频会出现黑屏的bug
+        } else {
+            NewTaskActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//此行代码主要是解决在华为手机上半透明效果无效的bug
+        }
+        NewTaskActivity.this.getWindow().setAttributes(lp);
     }
 
     //请求网络数据
@@ -500,9 +506,9 @@ public class NewTaskActivity extends Activity {
                 NewTaskActivity.this.finish();
             }
         });
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.white_transparent));
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
-        backgroundAlpha(0.8F);   //背景变暗
+        //backgroundAlpha(0.8F);   //背景变暗
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -595,12 +601,13 @@ public class NewTaskActivity extends Activity {
                     listView.setAdapter(adapter);
                     break;
                 case 10:
-                    defaultList.clear();
+                    popupwindowListItemList.clear();
                     securityType.setText("无");
                     PopupwindowListItem item = new PopupwindowListItem();
+                    item.setItemId("");
                     item.setItemName("无");
-                    defaultList.add(item);
-                    adapter = new PopupwindowListAdapter(NewTaskActivity.this,defaultList);
+                    popupwindowListItemList.add(item);
+                    adapter = new PopupwindowListAdapter(NewTaskActivity.this,popupwindowListItemList);
                     adapter.notifyDataSetChanged();
                     listView.setAdapter(adapter);
                     break;

@@ -43,7 +43,7 @@ public class UserListActivity extends Activity {
     private int task_total_numb = 0;
     private SQLiteDatabase db;  //数据库
     private MySqliteHelper helper; //数据库帮助类
-    private int currentPosition,continueposition;  //点击listview  当前item的位置
+    private int currentPosition;  //点击listview
     private UserListviewAdapter userListviewAdapter;
     private UserListviewItem item;
     private SharedPreferences sharedPreferences;
@@ -55,39 +55,24 @@ public class UserListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userlist);
 
+        bindView();//绑定控件
         defaultSetting();//初始化设置
         getTaskParams();//获取任务编号参数
-        bindView();//绑定控件
         new Thread() {
             @Override
             public void run() {
                 if (task_total_numb != 0) {
                     for (int i = 0; i < task_total_numb; i++) {
-                        Log.i("UserListActivity----", "查询的任务编号条数为：" + task_total_numb+stringList);
                         getUserData(stringList.get(i));//读取所有安检用户数据
                         Log.i("UserListActivity----", "查询的任务编号是：" + stringList.get(i));
                     }
                     handler.sendEmptyMessage(0);
                 } else {
-                    if (noData.getVisibility() == View.GONE) {
-                        Log.i("UserListActivity_noData", "显示没有用户数据照片！");
-                        noData.setVisibility(View.VISIBLE);
-                    }
+                    handler.sendEmptyMessage(1);
                 }
-                super.run();
             }
         }.start();
         setOnClickListener();//点击事件
-    }
-
-    //强制竖屏
-    @Override
-    protected void onResume() {
-        if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-        Log.i("UserListActivity", "onResume进来了" );
-        super.onResume();
     }
 
     //绑定控件ID
@@ -102,6 +87,7 @@ public class UserListActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
+        name.setText("用户列表");
         helper = new MySqliteHelper(UserListActivity.this, 1);
         db = helper.getWritableDatabase();
         sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
@@ -110,7 +96,6 @@ public class UserListActivity extends Activity {
 
     //点击事件
     private void setOnClickListener() {
-        name.setText("用户列表");
         back.setOnClickListener(onClickListener);
         editDelete.setOnClickListener(onClickListener);
         listView.setTextFilterEnabled(true);  // 开启过滤功能
@@ -128,6 +113,8 @@ public class UserListActivity extends Activity {
                 intent.putExtra("user_phone_number",item.getPhoneNumber());
                 intent.putExtra("user_address",item.getAdress());
                 intent.putExtra("check_type",item.getSecurityType());
+                intent.putExtra("if_checked",item.getIfChecked());
+                intent.putExtra("if_upload",item.getIfUpload());
                 startActivityForResult(intent, currentPosition);
             }
         });
@@ -171,12 +158,6 @@ public class UserListActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.back:
-                    for (int i = 0; i < task_total_numb; i++) {
-                        getContinueCheckPosition(stringList.get(i)); //获取继续安检的item位置
-                        if (!sharedPreferences.getString("continuePosition", "").equals("")) {
-                            break;
-                        }
-                    }
                     UserListActivity.this.finish();
                     break;
                 case R.id.edit_delete:
@@ -198,6 +179,12 @@ public class UserListActivity extends Activity {
                     userListviewAdapter = new UserListviewAdapter(UserListActivity.this, userListviewItemList);
                     userListviewAdapter.notifyDataSetChanged();
                     listView.setAdapter(userListviewAdapter);
+                    break;
+                case 1:
+                    if (noData.getVisibility() == View.GONE) {
+                        Log.i("UserListActivity_noData", "显示没有用户数据照片！");
+                        noData.setVisibility(View.VISIBLE);
+                    }
                     break;
             }
             super.handleMessage(msg);
@@ -281,36 +268,19 @@ public class UserListActivity extends Activity {
             if (cursor.getString(10).equals("true")) {
                 Log.i("UserList=cursor", "安检状态为true");
                 userListviewItem.setIfEdit(R.mipmap.userlist_gray);
+                userListviewItem.setIfChecked("已检");
             } else {
                 Log.i("UserList=cursor", "安检状态为false");
                 userListviewItem.setIfEdit(R.mipmap.userlist_red);
+                userListviewItem.setIfChecked("未检");
+            }
+            if(cursor.getString(17).equals("true")){
+                userListviewItem.setIfUpload("已上传");
+            }else {
+                userListviewItem.setIfUpload("");
             }
             userListviewItemList.add(userListviewItem);
             Log.i("UserListActivityget=", "用户列表的长度为：" + userListviewItemList.size());
-        }
-        cursor.close(); //游标关闭
-    }
-
-    //获取继续安检的item位置
-    public void getContinueCheckPosition(String taskId) {
-        Log.i("ContinueCheckPosition", "获取继续安检位置进来了！");
-        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
-        //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
-        if (cursor.getCount() == 0) {
-            return;
-        }
-        while (cursor.moveToNext()) {
-            Log.i("ContinueCheckPosition", "游标进来了");
-            Log.i("ContinueCheckPosition", "安检状态为 = " + cursor.getString(10));
-            if (cursor.getString(10).equals("false")) {
-                Log.i("ContinueCheckPosition", "安检状态为 = " + cursor.getString(10));
-                Log.i("ContinueCheckPosition", "安检状态为false,此时的item位置为：" + cursor.getPosition());
-                Log.i("ContinueCheckPosition", "安检状态为false,此时的item的用户名为：" + cursor.getColumnName(2));
-                continueposition = cursor.getPosition();
-                editor.putString("continuePosition", cursor.getPosition() + "");
-                editor.commit();
-                break;
-            }
         }
         cursor.close(); //游标关闭
     }
@@ -330,6 +300,7 @@ public class UserListActivity extends Activity {
             if (requestCode == currentPosition) {
                 updateUserCheckedState(); //更新本地数据库用户表安检状态
                 item.setIfEdit(R.mipmap.userlist_gray);
+                item.setIfChecked("已检");
                 userListviewAdapter.notifyDataSetChanged();
                 Log.i("UserList=ActivityResult", "页面回调进来了");
             }

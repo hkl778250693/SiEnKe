@@ -19,6 +19,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.GridviewImageAdapter;
@@ -55,26 +57,32 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/3/16 0016.
  */
-public class UserDetailInfoActivity extends Activity {
+public class UserDetailInfoActivity extends AppCompatActivity {
     private ImageView back;  //返回
     private GridView gridView;
     private LinearLayout rootLinearlayout;  //添加图片
+    private RelativeLayout rootRelative;
     private RelativeLayout hiddenTypeRoot, hiddenReasonRoot;
     private TextView securityCheckCase, securityHiddenType, securityHiddenReason;  //安全情况,安全隐患类型，安全隐患原因
     private Button saveBtn, takePhoto, cancel;  //保存、拍照、相册、取消
     private ListView listView;
     private RadioButton cancelRb, saveRb;
     private LayoutInflater inflater;  //转换器
-    private View popupwindowView, securityCaseView, securityHiddenTypeView, securityHiddenreasonView, saveView;
+    private View noOperateView, popupwindowView, securityCaseView, securityHiddenTypeView, securityHiddenreasonView, saveView;
     private PopupWindow popupWindow;
     int sdkVersion = Build.VERSION.SDK_INT;  //当前SDK版本
     private int TYPE_FILE_CROP_IMAGE = 2;
-    protected static Uri tempUri, cropPhotoUri;
+    protected static Uri tempUri;
     protected static final int TAKE_PHOTO = 100;//拍照
     protected static final int CROP_SMALL_PICTURE = 300;  //裁剪成小图片
+    protected static final int PERMISSION_REQUEST_CODE = 1;  //6.0之后需要动态申请权限，   请求码
+    private String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}; //权限数组
+    private List<String> permissionList = new ArrayList<>();  //权限集合
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private String securityId, UserNumber, UserName, MeterNumber, UserAddress, CheckType, UserPhoneNumber;
+    private String securityId;
+    private String ifChecked;
+    private String ifUpload;
     private TextView userNumber, userName, meterNumber, userAddress, checkType, userPhoneNumber;
     private GridviewImageAdapter adapter;
     private PopupwindowListAdapter padapter;
@@ -85,7 +93,6 @@ public class UserDetailInfoActivity extends Activity {
     private SQLiteDatabase db;  //数据库
     private List<PopupwindowListItem> popupwindowListItemList = new ArrayList<>();
     private Cursor cursor1, cursor2, cursor3, cursor4, cursor5, cursor6, cursor7, cursor8;
-    private List<PopupwindowListItem> defaultList = new ArrayList<>();
     private String securityContentItemId, securityHiddenItemId, hiddenReasonItemId;//安检情况类型id,安检隐患类型id,安检隐患原因id
     private EditText newMeterNumb, remarks;
     private String securityContent;
@@ -100,10 +107,6 @@ public class UserDetailInfoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_detail_info);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            //申请WRITE_EXTERNAL_STORAGE权限
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1);
-        }
         bindView();//绑定控件
         defaultSetting();//初始化设置
         setViewClickListener();//点击事件
@@ -127,6 +130,7 @@ public class UserDetailInfoActivity extends Activity {
         hiddenReasonRoot = (RelativeLayout) findViewById(R.id.hidden_reason_root);
         saveBtn = (Button) findViewById(R.id.save_btn);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
+        rootRelative = (RelativeLayout) findViewById(R.id.root_relative);
         gridView = (GridView) findViewById(R.id.gridview);
     }
 
@@ -160,7 +164,7 @@ public class UserDetailInfoActivity extends Activity {
                     if (adapter.getCount() - 1 == position) {
                         // 判断是否达到了可添加图片最大数
                         if (cropPathLists.size() != 9) {
-                            createPhotoPopupwindow();
+                            requestPermissions();      //检测权限
                         }
                     }
                 }
@@ -263,40 +267,56 @@ public class UserDetailInfoActivity extends Activity {
         Intent intent = getIntent();
         if (intent != null) {
             securityId = intent.getStringExtra("security_id");
-            UserNumber = intent.getStringExtra("user_number");
-            UserName = intent.getStringExtra("user_name");
-            MeterNumber = intent.getStringExtra("meter_number");
-            UserAddress = intent.getStringExtra("user_address");
-            CheckType = intent.getStringExtra("check_type");
-            UserPhoneNumber = intent.getStringExtra("user_phone_number");
+            String userNumber1 = intent.getStringExtra("user_number");
+            String userName1 = intent.getStringExtra("user_name");
+            String meterNumber1 = intent.getStringExtra("meter_number");
+            String userAddress1 = intent.getStringExtra("user_address");
+            String checkType1 = intent.getStringExtra("check_type");
+            String userPhoneNumber1 = intent.getStringExtra("user_phone_number");
+            ifChecked = intent.getStringExtra("if_checked");
+            ifUpload = intent.getStringExtra("if_upload");
 
-            if (!UserNumber.equals("null")) {
-                userNumber.setText(UserNumber);
+            if(ifUpload.equals("已上传")){
+                new Thread(){
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(100);
+                            handler.sendEmptyMessage(18);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
+
+            if (!userNumber1.equals("null")) {
+                userNumber.setText(userNumber1);
             } else {
                 userNumber.setText("无");
             }
-            if (!UserName.equals("null")) {
-                userName.setText(UserName);
+            if (!userName1.equals("null")) {
+                userName.setText(userName1);
             } else {
                 userName.setText("无");
             }
-            if (!MeterNumber.equals("null")) {
-                meterNumber.setText(MeterNumber);
+            if (!meterNumber1.equals("null")) {
+                meterNumber.setText(meterNumber1);
             } else {
                 meterNumber.setText("无");
             }
-            if (!UserAddress.equals("null")) {
-                userAddress.setText(UserAddress);
+            if (!userAddress1.equals("null")) {
+                userAddress.setText(userAddress1);
             } else {
                 userAddress.setText("无");
             }
-            if (!CheckType.equals("null")) {
-                checkType.setText(CheckType);
+            if (!checkType1.equals("null")) {
+                checkType.setText(checkType1);
             } else {
                 checkType.setText("无");
             }
-            if (!UserPhoneNumber.equals("null")) {
-                userPhoneNumber.setText(UserPhoneNumber);
+            if (!userPhoneNumber1.equals("null")) {
+                userPhoneNumber.setText(userPhoneNumber1);
             } else {
                 userPhoneNumber.setText("无");
             }
@@ -312,11 +332,15 @@ public class UserDetailInfoActivity extends Activity {
                     new Thread() {
                         @Override
                         public void run() {
-                            if (securityContent != null) {
+                            if (!securityContent.equals("")) {
                                 getPreviewSecurityCheckCase(securityContent);
                                 if (cursor6.getCount() != 0) {
                                     handler.sendEmptyMessage(13);
+                                }else {
+                                    handler.sendEmptyMessage(19);
                                 }
+                            }else {
+                                handler.sendEmptyMessage(19);
                             }
                         }
                     }.start();
@@ -337,34 +361,24 @@ public class UserDetailInfoActivity extends Activity {
                     }
                 } else {
                     Log.i("UserDetailInfoActivity", "显示默认数据！");
-                    //显示默认安全情况
                     new Thread() {
                         @Override
                         public void run() {
+                            //显示默认安全情况
                             getSecurityCheckCase();
                             if (cursor1.getCount() != 0) {
                                 handler.sendEmptyMessage(5);
                             } else {
                                 handler.sendEmptyMessage(6);
                             }
-                        }
-                    }.start();
-                    //显示默认安全隐患类型
-                    new Thread() {
-                        @Override
-                        public void run() {
+                            //显示默认安全隐患类型
                             getSecurityHiddenType();
                             if (cursor2.getCount() != 0) {
                                 handler.sendEmptyMessage(7);
                             } else {
                                 handler.sendEmptyMessage(8);
                             }
-                        }
-                    }.start();
-                    //显示默认安全隐患原因
-                    new Thread() {
-                        @Override
-                        public void run() {
+                            //显示默认安全隐患原因
                             getSecurityHiddenReason("8");
                             if (cursor3.getCount() != 0) {
                                 handler.sendEmptyMessage(9);
@@ -376,6 +390,49 @@ public class UserDetailInfoActivity extends Activity {
                 }
             }
         }.start();
+    }
+
+    /**
+     * 动态申请权限，如果6.0以上则弹出需要的权限选择框，以下则直接运行
+     */
+    private void requestPermissions() {
+        //检查权限(6.0以上做权限判断)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(UserDetailInfoActivity.this, permissions[0]) != PackageManager.PERMISSION_GRANTED) {
+                /*if(ActivityCompat.shouldShowRequestPermissionRationale(UserDetailInfoActivity.this,Manifest.permission.CAMERA)){
+                    //已经禁止提示了
+                    Toast.makeText(UserDetailInfoActivity.this, "您已禁止该权限，需要重新开启！", Toast.LENGTH_SHORT).show();
+                }else {
+                    ActivityCompat.requestPermissions(UserDetailInfoActivity.this, new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE}, CAMERA_REQUEST_CODE);
+                }*/
+                permissionList.add(permissions[0]);
+            }
+            if (ContextCompat.checkSelfPermission(UserDetailInfoActivity.this, permissions[1]) != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(permissions[1]);
+            }
+            if (ContextCompat.checkSelfPermission(UserDetailInfoActivity.this, permissions[2]) != PackageManager.PERMISSION_GRANTED) {
+                permissionList.add(permissions[2]);
+            }
+
+            Log.i("requestPermissions", "权限集合的长度为：" + permissionList.size());
+            if (!permissionList.isEmpty()) {  //判断权限集合是否为空
+                String[] permissionArray = permissionList.toArray(new String[permissionList.size()]);
+                ActivityCompat.requestPermissions(UserDetailInfoActivity.this, permissionArray, PERMISSION_REQUEST_CODE);
+            } else {
+                createPhotoPopupwindow();
+            }
+        } else {
+            createPhotoPopupwindow();
+        }
+    }
+
+    //弹出popupwindow让用户不可操作
+    public void createNoOperate() {
+        inflater = LayoutInflater.from(UserDetailInfoActivity.this);
+        noOperateView = inflater.inflate(R.layout.popupwindow_no_operate, null);
+        popupWindow = new PopupWindow(noOperateView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.showAsDropDown(rootRelative, 0, 0);
     }
 
     //弹出拍照popupwindow
@@ -405,10 +462,10 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.white_transparent));
         popupWindow.setAnimationStyle(R.style.camera);
-        backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAtLocation(rootLinearlayout, Gravity.BOTTOM, 0, 0);
+        backgroundAlpha(0.6F);   //背景变暗
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -448,19 +505,15 @@ public class UserDetailInfoActivity extends Activity {
                 }
                 Intent intent = new Intent();
                 setResult(Activity.RESULT_OK, intent);
-                if (!(securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格"))) {
-                    editor.putInt("problem_number", sharedPreferences.getInt("problem_number", 0) + 1);  //保存到sharedPreferences
-                    editor.commit();
-                }
                 popupWindow.dismiss();
                 finish();
             }
         });
         popupWindow.update();
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.white_transparent));
         popupWindow.setAnimationStyle(R.style.camera);
-        backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
+        backgroundAlpha(0.6F);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -486,6 +539,27 @@ public class UserDetailInfoActivity extends Activity {
                 Log.i("createSecurityCasePopu", "选中的安检情况ID" + securityContentItemId);
                 if (!(securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格"))) {
                     showHiddenTypeAndReason();
+                    if (ifChecked.equals("已检")) {
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                //显示默认安全隐患类型
+                                getSecurityHiddenType();
+                                if (cursor2.getCount() != 0) {
+                                    handler.sendEmptyMessage(7);
+                                } else {
+                                    handler.sendEmptyMessage(8);
+                                }
+                                //显示默认安全隐患原因
+                                getSecurityHiddenReason("8");
+                                if (cursor3.getCount() != 0) {
+                                    handler.sendEmptyMessage(9);
+                                } else {
+                                    handler.sendEmptyMessage(10);
+                                }
+                            }
+                        }.start();
+                    }
                 } else {
                     noShowHiddenTypeAndReason();
                 }
@@ -496,8 +570,8 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.update();
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
-        backgroundAlpha(0.8F);   //背景变暗
         popupWindow.showAsDropDown(securityCheckCase, 0, 0);
+        backgroundAlpha(0.6F);   //背景变暗
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -556,7 +630,7 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.update();
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
-        backgroundAlpha(0.8F);   //背景变暗
+        backgroundAlpha(0.6F);   //背景变暗
         popupWindow.showAsDropDown(securityHiddenType, 0, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
@@ -587,7 +661,7 @@ public class UserDetailInfoActivity extends Activity {
         popupWindow.update();
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popupwindow_spinner_shape));
         popupWindow.setAnimationStyle(R.style.Popupwindow);
-        backgroundAlpha(0.8F);   //背景变暗
+        backgroundAlpha(0.6F);   //背景变暗
         popupWindow.showAsDropDown(securityHiddenReason, 0, 0);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
@@ -599,18 +673,30 @@ public class UserDetailInfoActivity extends Activity {
 
     //设置背景透明度
     public void backgroundAlpha(float bgAlpha) {
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        WindowManager.LayoutParams lp = UserDetailInfoActivity.this.getWindow().getAttributes();
         lp.alpha = bgAlpha; //0.0-1.0
-        getWindow().setAttributes(lp);
+        if (bgAlpha == 1) {
+            UserDetailInfoActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//不移除该Flag的话,在有视频的页面上的视频会出现黑屏的bug
+        } else {
+            UserDetailInfoActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//此行代码主要是解决在华为手机上半透明效果无效的bug
+        }
+        UserDetailInfoActivity.this.getWindow().setAttributes(lp);
     }
 
     //调用相机
     public void openCamera() {
         Intent openCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        openCameraIntent.putExtra("autofocus", true); // 自动对焦
+        openCameraIntent.putExtra("fullScreen", false); // 全屏
+        openCameraIntent.putExtra("showActionIcons", false);
+        openCameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        openCameraIntent.putExtra(MediaStore.Images.Media.ORIENTATION, 0);
         // 指定照片保存路径（SD卡），temp.jpg为一个临时文件，每次拍照后这个图片都会被替换
-        tempUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "temp.jpg"));
+        /*MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_CROP_IMAGE, securityId);
+        tempUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);*/
+        tempUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/temp.jpg"));
         openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);
-        Log.i("openCamera===>", "保存的地址为" + tempUri);
+        Log.i("openCamera===>", "临时保存的地址为" + tempUri.getPath());
         startActivityForResult(openCameraIntent, TAKE_PHOTO);
     }
 
@@ -628,8 +714,15 @@ public class UserDetailInfoActivity extends Activity {
                     }
                     break;
                 case CROP_SMALL_PICTURE:
-                    Log.i("CROP_SMALL_PICTURE===>", "有数据返回！");
+                    if (tempUri != null) {
+                        File file = new File(tempUri.getPath());
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                    }
+                    tempUri = null;
                     cropPathLists.add(cropPhotoPath);
+                    Log.i("CROP_SMALL_PICTURE===>", "图片集合长度为：" + cropPathLists.size() + "路径为" + cropPhotoPath);
                     handler.sendEmptyMessage(1);
                     break;
                 case 500:
@@ -666,13 +759,13 @@ public class UserDetailInfoActivity extends Activity {
                     listView.setAdapter(padapter);
                     break;
                 case 4:
-                    defaultList.clear();
+                    popupwindowListItemList.clear();
                     securityCheckCase.setText("无");
                     PopupwindowListItem item = new PopupwindowListItem();
                     item.setItemId("");
                     item.setItemName("无");
-                    defaultList.add(item);
-                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this, defaultList);
+                    popupwindowListItemList.add(item);
+                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this, popupwindowListItemList);
                     padapter.notifyDataSetChanged();
                     listView.setAdapter(padapter);
                     break;
@@ -726,11 +819,15 @@ public class UserDetailInfoActivity extends Activity {
                         new Thread() {
                             @Override
                             public void run() {
-                                if (securityHidden != null) {
+                                if (!securityHidden.equals("")) {
                                     getPreviewSecurityHiddenType(securityHidden);
-                                }
-                                if (cursor7.getCount() != 0) {
-                                    handler.sendEmptyMessage(14);
+                                    if (cursor7.getCount() != 0) {
+                                        handler.sendEmptyMessage(14);
+                                    }else {
+                                        handler.sendEmptyMessage(20);
+                                    }
+                                }else {
+                                    handler.sendEmptyMessage(20);
                                 }
                             }
                         }.start();
@@ -738,11 +835,15 @@ public class UserDetailInfoActivity extends Activity {
                         new Thread() {
                             @Override
                             public void run() {
-                                if (hiddenReason != null) {
+                                if (!hiddenReason.equals("")) {
                                     getPreviewSecurityHiddenReason(hiddenReason);
-                                }
-                                if (cursor8.getCount() != 0) {
-                                    handler.sendEmptyMessage(15);
+                                    if (cursor8.getCount() != 0) {
+                                        handler.sendEmptyMessage(15);
+                                    }else {
+                                        handler.sendEmptyMessage(21);
+                                    }
+                                }else {
+                                    handler.sendEmptyMessage(21);
                                 }
                             }
                         }.start();
@@ -761,26 +862,41 @@ public class UserDetailInfoActivity extends Activity {
                     securityHiddenReason.setText(cursor8.getString(3));
                     break;
                 case 16:
-                    defaultList.clear();
+                    popupwindowListItemList.clear();
                     securityHiddenType.setText("无");
                     PopupwindowListItem item1 = new PopupwindowListItem();
                     item1.setItemId("");
                     item1.setItemName("无");
-                    defaultList.add(item1);
-                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this, defaultList);
+                    popupwindowListItemList.add(item1);
+                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this, popupwindowListItemList);
                     padapter.notifyDataSetChanged();
                     listView.setAdapter(padapter);
                     break;
                 case 17:
-                    defaultList.clear();
+                    popupwindowListItemList.clear();
                     securityHiddenReason.setText("无");
                     PopupwindowListItem item2 = new PopupwindowListItem();
                     item2.setItemId("");
                     item2.setItemName("无");
-                    defaultList.add(item2);
-                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this, defaultList);
+                    popupwindowListItemList.add(item2);
+                    padapter = new PopupwindowListAdapter(UserDetailInfoActivity.this, popupwindowListItemList);
                     padapter.notifyDataSetChanged();
                     listView.setAdapter(padapter);
+                    break;
+                case 18:
+                    createNoOperate();
+                    saveBtn.setText(getString(R.string.no_edit));
+                    break;
+                case 19:
+                    securityCheckCase.setText("无");
+                    securityHiddenType.setText("无");
+                    securityHiddenReason.setText("无");
+                    break;
+                case 20:
+                    securityHiddenType.setText("无");
+                    break;
+                case 21:
+                    securityHiddenReason.setText("无");
                     break;
             }
             super.handleMessage(msg);
@@ -906,23 +1022,30 @@ public class UserDetailInfoActivity extends Activity {
             intent.setDataAndType(uri, "image/*");
             // 设置裁剪
             intent.putExtra("crop", "true");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             // aspectX aspectY 是宽高的比例
             intent.putExtra("aspectX", 1);
             intent.putExtra("aspectY", 1.3);
             // outputX outputY 是裁剪图片宽高
             intent.putExtra("outputX", 500);
             intent.putExtra("outputY", 650);
-            intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
             intent.putExtra("noFaceDetection", true);//取消人脸识别功能
             // 当图片的宽高不足时，会出现黑边，去除黑边
             intent.putExtra("scale", true);
             intent.putExtra("scaleUpIfNeeded", true);
+            intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+            intent.putExtra("return-data", false);//设置为不返回数据
             MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_CROP_IMAGE, securityId);
-            cropPhotoUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);
+            Uri cropPhotoUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);
             Log.i("startCropPhoto", "图片裁剪的uri = " + cropPhotoUri);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, cropPhotoUri);
-            intent.putExtra("return-data", false);//设置为不返回数据
+            /*if(cropPhotoUri.getPath().contains("sdcard0")){
+                cropPhotoPath = cropPhotoUri.getPath().replace("0/Pictures","/0/Pictures");
+            }else {
+                cropPhotoPath = cropPhotoUri.getPath();
+            }*/
             cropPhotoPath = cropPhotoUri.getPath();
+            Log.i("startCropPhoto", "图片裁剪的地址为：" + cropPhotoPath);
             startActivityForResult(intent, CROP_SMALL_PICTURE);
         }
     }
@@ -977,7 +1100,7 @@ public class UserDetailInfoActivity extends Activity {
             values.put("remarks", remarks.getText().toString().trim());
             Log.i("insertUserInfo", "备注是：" + remarks.getText().toString().trim());
         }
-        if (!(securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格"))) { // 如果是合格或者复检合格，则插入空的隐患类型和原因
+        if (!(securityCheckCase.getText().toString().equals("合格") || securityCheckCase.getText().toString().equals("复检合格"))) { // 如果是合格或者复检合格，则插入空的隐患类型和原因
             //判断隐患类型是否通过点击列表选择
             if (securityHiddenItemId != null) {
                 values.put("security_hidden", securityHiddenItemId);
@@ -994,11 +1117,13 @@ public class UserDetailInfoActivity extends Activity {
                 values.put("security_hidden_reason", "");
                 Log.i("insertUserInfo", "隐患原因ID空的情况：" + hiddenReasonItemId);
             }
+            values.put("ifPass", "false");
         } else {
             values.put("security_hidden", "");
             values.put("security_hidden_reason", "");
+            values.put("ifPass", "true");
         }
-        values.put("currentTime",getCurrentTime());
+        values.put("currentTime", getCurrentTime());
         db.update("User", values, "securityNumber=?", new String[]{securityId});
     }
 
@@ -1087,6 +1212,7 @@ public class UserDetailInfoActivity extends Activity {
 
     /**
      * 获取当前时间
+     *
      * @return
      */
     private String getCurrentTime() {
@@ -1096,7 +1222,7 @@ public class UserDetailInfoActivity extends Activity {
         return currentTime;
     }
 
-    @Override
+    /*@Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
     }
@@ -1104,6 +1230,27 @@ public class UserDetailInfoActivity extends Activity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+    }*/
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0) {
+                    for (int result : grantResults) {
+                        if (result != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(UserDetailInfoActivity.this, "必须同意所有权限才能操作哦！", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+                    //用户同意授权
+                    createPhotoPopupwindow();//调用相机
+                } else {
+                    //用户拒绝授权
+                    Toast.makeText(UserDetailInfoActivity.this, "您拒绝了授权！", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
     }
 
     @Override
@@ -1132,6 +1279,10 @@ public class UserDetailInfoActivity extends Activity {
         }
         if (cursor8 != null) {
             cursor8.close();
+        }
+        if(popupWindow != null){
+            popupWindow.dismiss();
+            popupWindow = null;
         }
         db.close();
     }

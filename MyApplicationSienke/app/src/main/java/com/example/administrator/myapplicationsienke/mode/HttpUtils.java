@@ -138,10 +138,10 @@ public class HttpUtils {
                 Map.Entry<String, Object> entry = (Map.Entry<String, Object>) paramIterator.next();
                 String key = entry.getKey();
                 Object value = entry.getValue();
+                Log.i("postData", "上传的key值为：" + key);
+                Log.i("postData", "上传的value信息为：" + URLEncoder.encode(value.toString(), "UTF-8"));
                 ds.writeBytes(twoHyphens + boundary + end);//--SJDASJODAODASSD
                 ds.writeBytes("Content-Disposition: form-data;accept-charset=\"utf-8\"; " + "name=\"" + key + "\"" + end + end +  URLEncoder.encode(value.toString(), "UTF-8"));//Content-Disposition: form-data; name="key"
-                Log.i("postData", "上传的key值为：" + key);
-                Log.i("postData", "上传的备注信息为：" + URLEncoder.encode(value.toString(), "UTF-8"));
                 ds.writeBytes(end);
             }
             /*for (String str : map.keySet()) {//循环取出key和value

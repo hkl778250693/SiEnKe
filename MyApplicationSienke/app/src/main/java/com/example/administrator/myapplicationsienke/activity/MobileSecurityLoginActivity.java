@@ -41,7 +41,8 @@ public class MobileSecurityLoginActivity extends Activity {
     Button cancel_btn;
     private CheckBox remindMe;  //记住账号密码
     private EditText editMobileUser, editmobilePsw;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences_login,sharedPreferences;
+    private SharedPreferences sharedPreferences_login_copy;   //退出登录会用到
     private SharedPreferences.Editor editor;
     private String ip, port;  //接口ip地址   端口
     private LinearLayout rootLinearlayout;
@@ -78,17 +79,22 @@ public class MobileSecurityLoginActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
-        sharedPreferences = getSharedPreferences("login_info", Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
-        Log.i("MobileSecurityLogin", "默认设置进来了！是否记住账号："+sharedPreferences.getBoolean("remind_me",false));
-        if(sharedPreferences.getBoolean("remind_me",false)){
+        sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences_login_copy = getSharedPreferences("login_info_copy", Context.MODE_PRIVATE);
+        editor = sharedPreferences_login.edit();
+        Log.i("MobileSecurityLogin", "默认设置进来了！是否记住账号："+sharedPreferences_login.getBoolean("remind_me",false));
+        if(sharedPreferences_login.getBoolean("remind_me",false)){
             Log.i("MobileSecurityLogin", "记住账号默认设置进来了！");
             remindMe.setChecked(true);
-            editMobileUser.setText(sharedPreferences.getString("login_name",""));//设置EditText控件的内容
-            editMobileUser.setSelection(sharedPreferences.getString("login_name","").length());//将光标移至文字末尾
-            editmobilePsw.setText(sharedPreferences.getString("login_psw",""));
-            editmobilePsw.setSelection(sharedPreferences.getString("login_psw","").length());//将光标移至文字末尾
+            editMobileUser.setText(sharedPreferences_login.getString("login_name",""));//设置EditText控件的内容
+            editMobileUser.setSelection(sharedPreferences_login.getString("login_name","").length());//将光标移至文字末尾
+            editmobilePsw.setText(sharedPreferences_login.getString("login_psw",""));
+            editmobilePsw.setSelection(sharedPreferences_login.getString("login_psw","").length());//将光标移至文字末尾
         }else {
+            editMobileUser.setText(sharedPreferences_login_copy.getString("login_name",""));//设置EditText控件的内容
+            editMobileUser.setSelection(sharedPreferences_login_copy.getString("login_name","").length());//将光标移至文字末尾
+            editMobileUser.requestFocus();
             Log.i("MobileSecurityLogin", "没记住账号默认设置进来了！");
         }
     }
@@ -104,10 +110,12 @@ public class MobileSecurityLoginActivity extends Activity {
                     Log.i("MobileSecurityLogin", "记住账号");
                     editor.putBoolean("remind_me",true);
                     editor.apply();
+                    sharedPreferences_login_copy.edit().putBoolean("remind_me",true).apply();
                 }else {
                     Log.i("MobileSecurityLogin", "没记住账号");
                     editor.putBoolean("remind_me",false);
                     editor.apply();
+                    sharedPreferences_login_copy.edit().putBoolean("remind_me",false).apply();
                 }
             }
         });
@@ -155,13 +163,11 @@ public class MobileSecurityLoginActivity extends Activity {
                         //请求的地址
                         if (!sharedPreferences.getString("security_ip", "").equals("")) {
                             ip = sharedPreferences.getString("security_ip", "");
-                            //Log.i("sharedPreferences=ip=>",ip);
                         } else {
                             ip = "88.88.88.66:";
                         }
                         if (!sharedPreferences.getString("security_port", "").equals("")) {
                             port = sharedPreferences.getString("security_port", "");
-                            //Log.i("sharedPreferences=ip=>",port);
                         } else {
                             port = "8088";
                         }
@@ -219,8 +225,11 @@ public class MobileSecurityLoginActivity extends Activity {
                             if (jsonObject.optInt("messg", 0) == 1) {
                                 editor.putInt("company_id",jsonObject.optInt("companyid",0));
                                 editor.putString("user_name",jsonObject.optString("userName",""));
-                                editor.commit();
-                                Log.i("MobileSecurityLogin", "当前用户是："+sharedPreferences.getString("user_name",""));
+                                editor.apply();
+                                Log.i("MobileSecurityLogin", "当前用户是："+sharedPreferences_login.getString("user_name",""));
+                                //信息备份，退出登录时会用到
+                                sharedPreferences_login_copy.edit().putInt("company_id",jsonObject.optInt("companyid",0)).apply();
+                                sharedPreferences_login_copy.edit().putString("user_name",jsonObject.optString("userName","")).apply();
                                 handler.sendEmptyMessage(1);
                             }
                             if (jsonObject.optInt("messg", 0) == 0) {
@@ -251,26 +260,30 @@ public class MobileSecurityLoginActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    if(editMobileUser.getText().toString().equals(sharedPreferences.getString("login_name",""))){
+                    if(editMobileUser.getText().toString().equals(sharedPreferences_login_copy.getString("login_name","")) && editmobilePsw.getText().toString().equals(sharedPreferences_login_copy.getString("login_psw",""))){
                         Log.i("MobileSecurityLogin", "用户未改变");
-                        editor.putBoolean("user_exchanged",false);
-                        editor.apply();
+                        sharedPreferences_login_copy.edit().putBoolean("user_exchanged",false).apply();
                     }else {
                         Log.i("MobileSecurityLogin", "用户改变");
-                        editor.putBoolean("user_exchanged",true);
-                        editor.apply();
+                        sharedPreferences_login_copy.edit().putBoolean("user_exchanged",true).apply();
                     }
-                    Log.i("MobileSecurityLogin", "是否记住账号"+sharedPreferences.getBoolean("remind_me",false));
-                    if(sharedPreferences.getBoolean("remind_me",false)){
+                    Log.i("MobileSecurityLogin", "是否记住账号"+sharedPreferences_login.getBoolean("remind_me",false));
+                    if(sharedPreferences_login.getBoolean("remind_me",false)){
                         editor.putString("login_name",editMobileUser.getText().toString());
                         editor.putString("login_psw",editmobilePsw.getText().toString());
                         editor.apply();
+                        sharedPreferences_login_copy.edit().putString("login_name",editMobileUser.getText().toString()).apply();
+                        sharedPreferences_login_copy.edit().putString("login_psw",editmobilePsw.getText().toString()).apply();
                     }else {
+                        sharedPreferences_login_copy.edit().putString("login_name",editMobileUser.getText().toString()).apply();
+                        sharedPreferences_login_copy.edit().putString("login_psw",editmobilePsw.getText().toString()).apply();
                         Log.i("MobileSecurityLogin", "未记住密码！账号为"+editMobileUser.getText().toString());
                     }
                     Toast.makeText(MobileSecurityLoginActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MobileSecurityLoginActivity.this, SecurityChooseActivity.class);
                     startActivity(intent);
+                    editor.putBoolean("have_logined",true);
+                    editor.apply();
                     logonBtn.setClickable(true);
                     finish();
                     break;

@@ -24,12 +24,14 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.adapter.UploadListViewAdapter;
 import com.example.administrator.myapplicationsienke.mode.HttpUtils;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.UploadListViewItem;
 import com.example.administrator.myapplicationsienke.model.UploadViewHolder;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +50,7 @@ public class UploadActivity extends Activity {
     private ArrayList<Integer> integers = new ArrayList<>();//保存选中任务的序号
     private HashMap<String, Object> map = new HashMap<String, Object>();
     private HashMap<String, Object> map1;
-    private ArrayList<String> stringList = new ArrayList<>();//保存任务编号参数
+    private String ip, port;  //接口ip地址   端口
     private Cursor cursor;
     private SQLiteDatabase db;  //数据库
     private UploadListViewAdapter adapter;   //适配器
@@ -163,27 +165,25 @@ public class UploadActivity extends Activity {
                     if (integers.size() != 0) {
                         upLoad.setClickable(false);
                         showPopupwindow();  // 显示上传进度提示
-                        new Thread(){
+                        new Thread() {
                             @Override
                             public void run() {
                                 for (int j = 0; j < integers.size(); j++) {
                                     getUploadUserTotalNumber(map.get("taskId" + integers.get(j)).toString());  //根据任务编号获得需要上传的所有用户数量，并作为最大进度
                                 }
-                                Log.i("getUploadUserTotalNumb", "最大进度为：" + maxProgress);
-                                uploadProgress.setMax(maxProgress * 10);
+                                handler.sendEmptyMessage(8);
                                 for (int j = 0; j < integers.size(); j++) {
                                     getUserDataAndPost(map.get("taskId" + integers.get(j)).toString());  //根据任务编号去查询用户信息
                                     //stringList.add(map.get("taskId" + integers.get(j)).toString());
                                     Log.i("UploadActivity", "得到的任务编号为：" + map.get("taskId" + integers.get(j)).toString());
                                 }
                                 Log.i("getUploadUserTotalNumb", "上传成功的用户数量为：" + uploadNumber);
-                                new Thread(){
+                                new Thread() {
                                     @Override
                                     public void run() {
                                         if (uploadNumber != 0) {
                                             if (uploadProgress.getProgress() == maxProgress * 10) {
                                                 Log.i("uploadProgress", "上传的进度为：" + uploadProgress.getProgress());
-                                                progressPercent.setText("100");
                                                 Message msg = new Message();
                                                 msg.what = 4;
                                                 msg.arg1 = uploadNumber;
@@ -192,7 +192,7 @@ public class UploadActivity extends Activity {
                                             }
                                         } else {
                                             Log.i("up_load==========", "点击上传时记录的未安检户数为：" + noCheckNumber);
-                                            if (noCheckNumber == 0) {   //说明当前勾选的任务用户数据已经全部上传
+                                            if (noCheckNumber == 0 && "保存成功".equals(httpUtils.result)) {   //说明当前勾选的任务用户数据已经全部上传
                                                 handler.sendEmptyMessage(6);
                                             } else {
                                                 Message msg = new Message();
@@ -331,7 +331,7 @@ public class UploadActivity extends Activity {
                     if (!cursor.getString(11).equals("")) {
                         map1.put("n_safety_state", cursor.getString(11));
                     } else {
-                        map1.put("n_safety_state", null);
+                        map1.put("n_safety_state", "");
                     }
                     Log.i("getUserData=>", "安检状态是：" + cursor.getString(11));
                     if (!cursor.getString(13).equals("")) {
@@ -343,13 +343,13 @@ public class UploadActivity extends Activity {
                     if (!cursor.getString(14).equals("")) {
                         map1.put("n_safety_hidden_id", cursor.getString(14));
                     } else {
-                        map1.put("n_safety_hidden_id", null);
+                        map1.put("n_safety_hidden_id", "");
                     }
                     Log.i("getUserData=>", "隐患类型是：" + cursor.getString(14));
                     if (!cursor.getString(15).equals("")) {
                         map1.put("n_safety_hidden_reason_id", cursor.getString(15));
                     } else {
-                        map1.put("n_safety_hidden_reason_id", null);
+                        map1.put("n_safety_hidden_reason_id", "");
                     }
                     Log.i("getUserData=>", "隐患原因ID是：" + cursor.getString(15));
                     if (!cursor.getString(18).equals("")) {
@@ -357,14 +357,31 @@ public class UploadActivity extends Activity {
                     }
                     Log.i("getUserData=>", "安检的时间是：" + cursor.getString(18));
                     getPhotoData(securityNumber);
-                    httpUtils.postData("http://88.88.88.66:8088/SMDemo/updateInspection.do", map1, fileMap);
+                    if (!sharedPreferences.getString("security_ip", "").equals("")) {
+                        ip = sharedPreferences.getString("security_ip", "");
+                        Log.i("sharedPref_security_ip", ip);
+                    } else {
+                        ip = "88.88.88.66:";
+                    }
+                    if (!sharedPreferences.getString("security_port", "").equals("")) {
+                        port = sharedPreferences.getString("security_port", "");
+                        Log.i("sharedPref_securityPort", port);
+                    } else {
+                        port = "8088";
+                    }
+                    httpUtils.postData("http://" + ip + port + "/SMDemo/updateInspection.do", map1, fileMap);
+                    Log.i("httpUtils=>", "上传的地址为：" + "http://" + ip + port + "/SMDemo/updateInspection.do");
                     if ("保存成功".equals(httpUtils.result)) {
                         updateUserUploadState(securityNumber);   //如果返回保存成功则将用户表的上传状态改为true
                         uploadNumber++;
                         handler.sendEmptyMessage(3);
-                    } else if ("保存失败".equals(httpUtils.result) || "".equals(httpUtils.result)) {
+                    } else if ("保存失败".equals(httpUtils.result)) {
                         Log.i("UploadActivity=>", "保存失败！");
                         handler.sendEmptyMessage(5);
+                        break;
+                    } else if ("".equals(httpUtils.result)) {
+                        Log.i("UploadActivity=>", "网络请求错误！");
+                        handler.sendEmptyMessage(9);
                         break;
                     }
                 }
@@ -381,7 +398,7 @@ public class UploadActivity extends Activity {
         Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
         while (cursor.moveToNext()) {
             if (cursor.getString(10).equals("true") && cursor.getString(17).equals("false")) {  //当检测到是安检过，并且未上传的时候进来
-                maxProgress ++;
+                maxProgress++;
             }
         }
         cursor.close(); //游标关闭
@@ -416,9 +433,9 @@ public class UploadActivity extends Activity {
                 popupWindow.dismiss();
             }
         });
-        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.white_transparent));
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
-        backgroundAlpha(0.8F);   //背景变暗
+        backgroundAlpha(0.5F);   //背景变暗
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -432,6 +449,11 @@ public class UploadActivity extends Activity {
     public void backgroundAlpha(float bgAlpha) {
         WindowManager.LayoutParams lp = UploadActivity.this.getWindow().getAttributes();
         lp.alpha = bgAlpha; //0.0-1.0
+        if (bgAlpha == 1) {
+            UploadActivity.this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//不移除该Flag的话,在有视频的页面上的视频会出现黑屏的bug
+        } else {
+            UploadActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);//此行代码主要是解决在华为手机上半透明效果无效的bug
+        }
         UploadActivity.this.getWindow().setAttributes(lp);
     }
 
@@ -472,9 +494,10 @@ public class UploadActivity extends Activity {
                     //设置进度值和百分比
                     uploadProgress.setProgress(currentProgress);
                     progressPercent.setText(String.valueOf(currentPercent));
-                    Log.i("handleMessage", "当前的进度为：" + currentProgress+"当前的进度百分比为："+currentPercent);
+                    Log.i("handleMessage", "当前的进度为：" + currentProgress + "当前的进度百分比为：" + currentPercent);
                     break;
                 case 4:
+                    progressPercent.setText("100");
                     String uploadResult;
                     if (msg.arg2 == 0) {
                         uploadResult = "数据上传完成！共上传了" + msg.arg1 + "个用户数据";
@@ -521,6 +544,20 @@ public class UploadActivity extends Activity {
                     noCheckNumber = 0;
                     uploadNumber = 0;
                     break;
+                case 8:
+                    Log.i("getUploadUserTotalNumb", "最大进度为：" + maxProgress);
+                    uploadProgress.setMax(maxProgress * 10);
+                    break;
+                case 9:
+                    progressName.setText("上传出错啦！请检测网络或IP端口是否正确！");
+                    linearlayoutUpload.setVisibility(View.GONE);
+                    uploadProgress.setVisibility(View.GONE);
+                    uploadFailed.setImageResource(R.mipmap.defeated);
+                    uploadFailed.setVisibility(View.VISIBLE);
+                    finishBtn.setVisibility(View.VISIBLE);
+                    noCheckNumber = 0;
+                    uploadNumber = 0;
+                    break;
             }
             super.handleMessage(msg);
         }
@@ -531,5 +568,9 @@ public class UploadActivity extends Activity {
         super.onDestroy();
         //释放和数据库的连接
         db.close();
+        if (popupWindow != null) {
+            popupWindow.dismiss();
+            popupWindow = null;
+        }
     }
 }

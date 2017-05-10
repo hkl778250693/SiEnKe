@@ -205,12 +205,36 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/if_edit"
+    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/userlist_red" />
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/if_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/userlist_red" />
+        <TextView
+            android:id="@+id/if_checked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="未检"
+            android:layout_marginTop="15dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignTop="@id/if_edit"
+            android:textSize="12sp"
+            android:textColor="@android:color/white"/>
+        <TextView
+            android:id="@+id/if_upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:layout_alignBottom="@id/if_edit"
+            android:layout_marginBottom="15dp"
+            android:layout_centerHorizontal="true"
+            android:textSize="12sp"
+            android:textColor="@color/theme_colors"/>
+    </RelativeLayout>
 
 </LinearLayout>

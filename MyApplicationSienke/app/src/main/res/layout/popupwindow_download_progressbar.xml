@@ -41,7 +41,7 @@
             android:id="@+id/linearlayout_down"
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
@@ -73,7 +73,7 @@
         <Button
             android:id="@+id/finish_btn"
             android:layout_width="60dp"
-            android:layout_height="20dp"
+            android:layout_height="25dp"
             android:layout_marginTop="10dp"
             android:layout_centerInParent="true"
             android:background="@drawable/user_detail_save_btn_selector"

@@ -9,6 +9,7 @@
     android:focusableInTouchMode="true">
 
     <RelativeLayout
+        android:id="@+id/root_relative"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/theme_colors">
@@ -347,7 +348,7 @@
                 android:paddingRight="16dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="70dp"
                     android:layout_height="wrap_content"
                     android:text="表编号："
                     android:textColor="@color/text_black"
@@ -359,7 +360,7 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:background="@drawable/linearlayout_shape"
-                    android:hint="请输入表编号(非必须)"
+                    android:hint="请输入表编号(选填)"
                     android:textColor="@color/text_gray"
                     android:textSize="12sp"
                     android:paddingTop="6dp"
@@ -374,12 +375,12 @@
                 android:orientation="horizontal"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:layout_marginTop="5dp">
+                android:layout_marginTop="7dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="70dp"
                     android:layout_height="wrap_content"
-                    android:text="备注："
+                    android:text="@string/remarks"
                     android:textColor="@color/text_black"
                     android:textSize="14sp"/>
 
@@ -389,7 +390,7 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:background="@drawable/linearlayout_shape"
-                    android:hint="备注信息(非必须)"
+                    android:hint="备注信息(选填)"
                     android:textColor="@color/text_gray"
                     android:textSize="12sp"
                     android:paddingTop="6dp"
@@ -402,7 +403,6 @@
                 android:id="@+id/hidden_type_root"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="7dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="7dp"
@@ -471,7 +471,7 @@
                 android:orientation="horizontal"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:paddingTop="16dp"
+                android:paddingTop="10dp"
                 android:gravity="center_vertical">
 
                 <TextView
@@ -498,7 +498,7 @@
                 android:padding="10dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="10dp"
                 android:gravity="center_horizontal">
                 <com.example.administrator.myapplicationsienke.mode.MyGridview
                     android:id="@+id/gridview"

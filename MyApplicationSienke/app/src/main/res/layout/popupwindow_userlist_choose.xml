@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
 
     <ScrollView
         android:layout_width="wrap_content"
@@ -20,7 +21,7 @@
                 android:id="@+id/not_security_check"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:background="@drawable/button_white_bg_take_photo_selector"
+                android:background="@drawable/spinner_selector"
                 android:button="@null"
                 android:text="姓名"
                 android:gravity="center"
@@ -36,7 +37,7 @@
                 android:id="@+id/pass_security_check"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:background="@drawable/button_white_bg_album_selector"
+                android:background="@drawable/spinner_selector"
                 android:button="@null"
                 android:gravity="center"
                 android:text="表编号"
@@ -52,7 +53,7 @@
                 android:id="@+id/not_pass_security_check"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:background="@drawable/button_white_bg_album_selector"
+                android:background="@drawable/spinner_selector"
                 android:button="@null"
                 android:text="地址"
                 android:gravity="center"

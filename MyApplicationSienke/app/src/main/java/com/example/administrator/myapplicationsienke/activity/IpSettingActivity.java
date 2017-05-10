@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
@@ -18,10 +19,11 @@ import com.example.administrator.myapplicationsienke.R;
 public class IpSettingActivity extends Activity {
     private ImageView back;
     private EditText ipEdit,portEdit;
-    private Button confirmBtn;
+    private Button confirmBtn,edit;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private String ip,port;
+    private LinearLayout rootLinearlayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +39,14 @@ public class IpSettingActivity extends Activity {
         back= (ImageView) findViewById(R.id.back);
         ipEdit = (EditText) findViewById(R.id.ip_edit);
         confirmBtn = (Button) findViewById(R.id.confirm_btn);
+        edit = (Button) findViewById(R.id.edit);
         portEdit = (EditText) findViewById(R.id.port_edit);
+        rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
     }
     //点击事件
     private void setViewClickListener(){
         back.setOnClickListener(clickListener);
+        edit.setOnClickListener(clickListener);
         confirmBtn.setOnClickListener(clickListener);
     }
 
@@ -52,12 +57,46 @@ public class IpSettingActivity extends Activity {
                 case R.id.back:
                     IpSettingActivity.this.finish();
                     break;
+                case R.id.edit:
+                    ipEdit.setTextColor(getResources().getColor(R.color.text_black));
+                    portEdit.setTextColor(getResources().getColor(R.color.text_black));
+                    portEdit.setFocusable(true);
+                    portEdit.setFocusableInTouchMode(true);
+                    portEdit.requestFocus();
+                    ipEdit.setFocusable(true);
+                    ipEdit.setFocusableInTouchMode(true);
+                    ipEdit.requestFocus();
+                    ipEdit.setCursorVisible(true);
+                    portEdit.setCursorVisible(true);
+                    if(!sharedPreferences.getString("security_ip","").equals("")){
+                        ipEdit.setSelection(sharedPreferences.getString("security_ip","").length());//将光标移至文字末尾
+                    }else {
+                        ipEdit.setSelection("88.88.88.66:".length());//将光标移至文字末尾
+                    }
+                    if(!sharedPreferences.getString("security_port","").equals("")){
+                        portEdit.setSelection(sharedPreferences.getString("security_port","").length());//将光标移至文字末尾
+                    }else {
+                        portEdit.setSelection("8080".length());//将光标移至文字末尾
+                    }
+                    edit.setVisibility(View.GONE);
+                    confirmBtn.setVisibility(View.VISIBLE);
+                    break;
                 case R.id.confirm_btn:
+                    edit.setVisibility(View.VISIBLE);
+                    confirmBtn.setVisibility(View.GONE);
+                    ipEdit.setTextColor(getResources().getColor(R.color.text_gray));
+                    portEdit.setTextColor(getResources().getColor(R.color.text_gray));
+                    ipEdit.setCursorVisible(false);
+                    portEdit.setCursorVisible(false);
+                    ipEdit.setFocusable(false);
+                    ipEdit.setFocusableInTouchMode(false);
+                    portEdit.setFocusable(false);
+                    portEdit.setFocusableInTouchMode(false);
                     ip = ipEdit.getText().toString().trim();
                     port = portEdit.getText().toString().trim();
                     editor.putString("security_ip",ip);
                     editor.putString("security_port",port);
-                    editor.commit();
+                    editor.apply();
                     Toast.makeText(IpSettingActivity.this,"保存成功",Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -68,6 +107,22 @@ public class IpSettingActivity extends Activity {
     private void defaultSetting() {
         sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        ipEdit.setTextColor(getResources().getColor(R.color.text_gray));
+        portEdit.setTextColor(getResources().getColor(R.color.text_gray));
+        ipEdit.setFocusable(false);
+        ipEdit.setFocusableInTouchMode(false);
+        portEdit.setFocusable(false);
+        portEdit.setFocusableInTouchMode(false);
+        if(!sharedPreferences.getString("security_ip","").equals("")){
+            ipEdit.setText(sharedPreferences.getString("security_ip",""));
+        }else {
+            ipEdit.setText("88.88.88.66:");
+        }
+        if(!sharedPreferences.getString("security_port","").equals("")){
+            portEdit.setText(sharedPreferences.getString("security_port",""));
+        }else {
+            portEdit.setText("8088");
+        }
     }
 }
 
