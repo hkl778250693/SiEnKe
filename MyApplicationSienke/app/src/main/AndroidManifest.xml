@@ -55,7 +55,6 @@
         <activity android:name=".activity.ContinueCheckUserActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.EdiTextListViewActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.MyPhotoGalleryActivity" android:screenOrientation="portrait"/>
-
     </application>
 
 

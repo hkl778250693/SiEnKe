@@ -4,76 +4,76 @@
     android:layout_height="match_parent"
     android:background="@color/transparent"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingLeft="50dp"
+    android:paddingRight="50dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/business_check_shape"
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp">
 
-            <TextView
-                android:id="@+id/tips"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/white"
-                android:paddingLeft="30dp"
-                android:paddingRight="30dp"
-                android:text="类型："
-                android:textColor="@color/text_black"
-                android:textSize="14sp" />
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+                <TextView
+                    android:id="@+id/tips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/gray_thin"
+                    android:paddingRight="10dp"
+                    android:text="类型："
+                    android:textColor="@color/text_black"
+                    android:textSize="14sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/gray_thin"
+                    android:paddingRight="10dp"
+                    android:text="（多选）"
+                    android:textColor="@color/text_black"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <GridView
+                android:id="@+id/gridview"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:numColumns="2"
+                android:padding="5dp"
+                android:horizontalSpacing="10dp"
+                android:verticalSpacing="10dp"
+                android:layout_height="70dp"/>
+
         </LinearLayout>
 
-        <LinearLayout
+
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:padding="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/white"
-                android:paddingLeft="30dp"
-                android:paddingRight="30dp"
+                android:background="@color/gray_thin"
+                android:paddingRight="10dp"
                 android:text="开始时间："
-                android:textColor="@color/text_black"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/end_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/linearlayout_shape"
-                android:drawableRight="@mipmap/down"
-                android:gravity="center"
-                android:paddingLeft="30dp"
-                android:paddingRight="30dp"
-                android:text="2017-3-13"
-                android:textColor="@color/text_black"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/white"
-                android:paddingLeft="30dp"
-                android:paddingRight="30dp"
-                android:text="结束时间："
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
                 android:textColor="@color/text_black"
                 android:textSize="14sp" />
 
@@ -81,22 +81,61 @@
                 android:id="@+id/start_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/linearlayout_shape"
+                android:drawableRight="@mipmap/down"
+                android:gravity="center"
+                android:drawablePadding="20dp"
+                android:paddingLeft="30dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:text="2017-3-13"
+                android:textColor="@color/text_black"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:background="@color/gray_thin"
+                android:paddingRight="10dp"
+                android:text="结束时间："
+                android:textColor="@color/text_black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/end_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:background="@drawable/linearlayout_shape"
                 android:drawableRight="@mipmap/down"
                 android:gravity="center"
                 android:paddingLeft="30dp"
-                android:paddingRight="30dp"
+                android:drawablePadding="20dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:paddingRight="20dp"
                 android:text="2017-3-15"
                 android:textColor="@color/text_black"
                 android:textSize="14sp" />
-        </LinearLayout>
+        </RelativeLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="10dp"
-            android:background="@color/gray_thin" />
+            android:background="@color/gray" />
 
         <RadioGroup
             android:layout_width="match_parent"
@@ -104,7 +143,7 @@
             android:orientation="horizontal">
 
             <RadioButton
-                android:id="@+id/cancel_rb"
+                android:id="@+id/cancel_filter"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -120,10 +159,10 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
-                android:background="@color/gray_thin" />
+                android:background="@color/gray" />
 
             <RadioButton
-                android:id="@+id/save_rb"
+                android:id="@+id/down_filter"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

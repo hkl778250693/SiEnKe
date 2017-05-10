@@ -1,5 +1,6 @@
 package com.example.administrator.myapplicationsienke.fragment;
 
+import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +19,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -28,8 +32,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
+import com.example.administrator.myapplicationsienke.activity.DownLoadDetailActivity;
 import com.example.administrator.myapplicationsienke.activity.UploadActivity;
+import com.example.administrator.myapplicationsienke.adapter.GridviewTypeAdapter;
+import com.example.administrator.myapplicationsienke.adapter.TaskChooseAdapter;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
+import com.example.administrator.myapplicationsienke.model.GridviewTypeItem;
+import com.example.administrator.myapplicationsienke.model.GridviewTypeViewholder;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
 
 import org.json.JSONArray;
@@ -46,13 +55,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by Administrator on 2017/3/16 0016.
  */
 public class DataTransferFragment extends Fragment {
-    private View view, popupwindowView, uploadView;
+    private View view, filterPopup,popupwindowView, uploadView;
     private TextView upload, download, progressName, progressPercent, tips;
     private LinearLayout rootLinearlayout, linearlayoutDown;
     private Button finishBtn;
@@ -77,6 +88,16 @@ public class DataTransferFragment extends Fragment {
     private int userProgress = 0;
     private JSONArray jsonArray;
     private long lastClickTime = 0;
+    private TextView startDate;//开始日期选择器
+    private TextView endDate;//结束日期选择器
+    private RadioButton cancelFilter, downFilter;
+    private GridviewTypeAdapter adapter;
+    private List<GridviewTypeItem> gridviewTypeItemList = new ArrayList<>();
+    private Cursor cursor;
+    private GridView gridView;
+    private Calendar c; //日历
+    private GridviewTypeItem item;
+    private ArrayList<String> stringList = new ArrayList<>();//保存安检类型编号ID
 
     @Nullable
     @Override
@@ -118,23 +139,8 @@ public class DataTransferFragment extends Fragment {
                     break;
                 case R.id.download:
                     download.setClickable(false);
-                    showPopupwindow();
-                    if (!sharedPreferences.getBoolean("have_download", false)) {
-                        /*if(isFastDoubleClick()){
-                            Toast.makeText(getActivity(), "您点击太频繁了！", Toast.LENGTH_SHORT).show();
-                        }*/
-                        //开启支线程进行请求任务信息
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                requireMyTask("SafeCheckPlan.do", "safePlanMember=");
-                                super.run();
-                            }
-                        }.start();
-                    } else {
-                        download.setClickable(true);
-                        Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
-                    }
+                    showFilterPopup();
+                    download.setClickable(true);
                     break;
             }
         }
@@ -147,6 +153,24 @@ public class DataTransferFragment extends Fragment {
         editor = sharedPreferences.edit();
         MySqliteHelper helper = new MySqliteHelper(getActivity(), 1);
         db = helper.getWritableDatabase();
+    }
+
+    //读取安检状态信息
+    public void getSecurityState() {
+        gridviewTypeItemList.clear();
+        cursor = db.query("SecurityState", null, null, null, null, null, null);//查询并获得游标
+        Log.i("getSecurityState=>", " 查询到的状态个数为：" + cursor.getCount());
+        //如果游标为空，则显示默认数据
+        if (cursor.getCount() == 0) {
+            return;
+        }
+        while (cursor.moveToNext()) {
+            GridviewTypeItem item = new GridviewTypeItem();
+            item.setTypeId(cursor.getString(1));
+            item.setTypeName(cursor.getString(2));
+            gridviewTypeItemList.add(item);
+        }
+        Log.i("getSecurityState=>", " 安检状态个数为：" + gridviewTypeItemList.size());
     }
 
     //弹出上传前提示popupwindow
@@ -189,6 +213,131 @@ public class DataTransferFragment extends Fragment {
                 backgroundAlpha(1.0F);
             }
         });
+    }
+
+    //下载前筛选popupwindow
+    public void showFilterPopup() {
+        layoutInflater = LayoutInflater.from(getActivity());
+        filterPopup = layoutInflater.inflate(R.layout.popupwindow_download_detail, null);
+        popupWindow = new PopupWindow(filterPopup, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        gridView = (GridView) filterPopup.findViewById(R.id.gridview);
+        startDate = (TextView) filterPopup.findViewById(R.id.start_date);
+        endDate = (TextView) filterPopup.findViewById(R.id.end_date);
+        cancelFilter = (RadioButton) filterPopup.findViewById(R.id.cancel_filter);
+        downFilter = (RadioButton) filterPopup.findViewById(R.id.down_filter);
+        //设置点击事件
+        c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        startDate.setText(year + "-" + (month + 1) + "-" + day);
+        endDate.setText(year + "-" + (month + 1) + "-" + day);
+        startDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //开始时间选择器
+                new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        startDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                    }
+                }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+        endDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //结束时间选择器
+                new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        endDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                    }
+                }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+        cancelFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+        downFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!sharedPreferences.getBoolean("have_download", false)) {
+                    saveSecurityTypeInfo();     //保存选中的安检类型编号信息
+                    if(stringList.size() != 0){
+                        popupWindow.dismiss();
+                        showPopupwindow();
+                        //开启支线程进行请求任务信息
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                try {
+                                    for(int i = 0;i<stringList.size();i++){
+                                        requireMyTask("SafeCheckPlan.do", "safePlanMember=" + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8")
+                                                +"&securityId="+stringList.get(i)+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
+                                    }
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                }
+                                super.run();
+                            }
+                        }.start();
+                    }else {
+                        Toast.makeText(getActivity(), "请选择安检类型和时间哦！", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                GridviewTypeViewholder viewholder = (GridviewTypeViewholder) view.getTag();
+                viewholder.checkBox.toggle();
+                GridviewTypeAdapter.getIsCheck().put(position,viewholder.checkBox.isChecked());
+            }
+        });
+        popupWindow.update();
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.white_transparent));
+        popupWindow.setAnimationStyle(R.style.camera);
+        popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
+        new Thread(){
+            @Override
+            public void run() {
+                getSecurityState();
+                if (cursor.getCount() != 0) {
+                    handler.sendEmptyMessage(10);
+                }else {
+                    handler.sendEmptyMessage(11);
+                }
+            }
+        }.start();
+        backgroundAlpha(0.6F);   //背景变暗
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                backgroundAlpha(1.0F);
+            }
+        });
+    }
+
+    //保存选中的安检类型编号信息
+    public void saveSecurityTypeInfo() {
+        int count = adapter.getCount();
+        Log.i("count====>", "长度为：" + count);
+        for (int i = 0; i < count; i++) {
+            if (GridviewTypeAdapter.getIsCheck().get(i)) {
+                item = gridviewTypeItemList.get((int) adapter.getItemId(i));
+                Log.i("DataTransferFragment", "这次被勾选的安检类型编号是" +item.getTypeId());
+                stringList.add(item.getTypeId());
+            }
+        }
+        Log.i("DataTransferFragment", "安检类型集合长度为：" + stringList.size());
+
     }
 
     //show下载popupwindow
@@ -257,12 +406,7 @@ public class DataTransferFragment extends Fragment {
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
-                    if (!keyAndValue.equals("")) {
-                        url = new URL(httpUrl + "?" + keyAndValue + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8"));
-                        //没有参数传递
-                    } else {
-                        url = new URL(httpUrl);
-                    }
+                    url = new URL(httpUrl + "?" + keyAndValue);
                     Log.i("url=============>", url + "");
                     httpURLConnection = (HttpURLConnection) url.openConnection();
                     httpURLConnection.setRequestMethod("GET");
@@ -599,6 +743,19 @@ public class DataTransferFragment extends Fragment {
                         currentUserPercent = 0;
                         download.setClickable(true);
                     }
+                    break;
+                case 10:
+                    adapter = new GridviewTypeAdapter(getActivity(),gridviewTypeItemList);
+                    gridView.setAdapter(adapter);
+                    break;
+                case 11:
+                    gridviewTypeItemList.clear();
+                    GridviewTypeItem item = new GridviewTypeItem();
+                    item.setTypeName("无");
+                    item.setTypeId("");
+                    gridviewTypeItemList.add(item);
+                    adapter = new GridviewTypeAdapter(getActivity(),gridviewTypeItemList);
+                    gridView.setAdapter(adapter);
                     break;
             }
             super.handleMessage(msg);
