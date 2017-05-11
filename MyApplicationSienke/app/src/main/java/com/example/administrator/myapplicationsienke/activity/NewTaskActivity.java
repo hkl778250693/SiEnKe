@@ -408,6 +408,15 @@ public class NewTaskActivity extends Activity {
         values.put("userAddress", object.optString("userAdress",""));
         values.put("taskId", resultTaskId);
         values.put("ifChecked", "false");
+        values.put("security_content","");
+        values.put("newMeterNumber","");
+        values.put("remarks","");
+        values.put("security_hidden","");
+        values.put("security_hidden_reason","");
+        values.put("photoNumber","0");
+        values.put("ifUpload","false");
+        values.put("currentTime","");
+        values.put("ifPass","");
         db.insert("User", null, values);
     }
 

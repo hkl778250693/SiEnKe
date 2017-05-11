@@ -32,6 +32,8 @@ public class SecurityStatisticsActivity extends Activity {
     private SQLiteDatabase db;  //数据库
     private MySqliteHelper helper; //数据库帮助类
     private int task_total_numb = 0;
+    private int totalUserNumber = 0;//所有任务总户数
+    private int taskTotalUserNumber = 0;//任务分区总户数
     private ArrayList<String> stringList = new ArrayList<>();//保存字符串参数
     private int checkedUserNumber = 0;  //已检户数
     private int partProblemNumber = 0;  //按任务分区存在问题户数
@@ -136,6 +138,7 @@ public class SecurityStatisticsActivity extends Activity {
     //按任务分区获取存在问题户数
     public void getPartProblemNumber(String taskId){
         Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+        taskTotalUserNumber = cursor.getCount();//获取任务分区用户总数
         //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
         if (cursor.getCount() == 0) {
             return;
@@ -149,9 +152,10 @@ public class SecurityStatisticsActivity extends Activity {
         cursor.close(); //游标关闭
     }
 
-    //按任务分区获取存在问题户数
+    //获取所有存在问题户数
     public void getTotalProblemNumber(){
         Cursor  cursor = db.query("User", null, null, null, null, null, null);//查询并获得游标
+        totalUserNumber = cursor.getCount(); //获取所有任务总户数
         //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
         if (cursor.getCount() == 0) {
             return;
@@ -167,11 +171,8 @@ public class SecurityStatisticsActivity extends Activity {
 
     //总用户统计
     public void getTotalUserNumber (){
-        if (sharedPreferences.getInt("totalCount", 0) != 0) {
-            totalNumber.setText(String.valueOf(sharedPreferences.getInt("totalCount", 0)));
-        } else {
-            totalNumber.setText("0");
-        }
+        Log.i("getTaskUserNumber===>", "所有任务总户数=" + totalUserNumber + "户");
+        totalNumber.setText(String.valueOf(totalUserNumber));
         if (checkedUserNumber != 0) {
             checkedNumber.setText(String.valueOf(checkedUserNumber));
         } else {
@@ -205,12 +206,8 @@ public class SecurityStatisticsActivity extends Activity {
 
     //任务分区统计
     public void getTaskUserNumber (){
-        if (sharedPreferences.getInt("taskTotalUserNumber", 0) != 0) {
-            Log.i("getTaskUserNumber===>", "任务总户数=" + sharedPreferences.getInt("taskTotalUserNumber", 0) + "户");
-            totalNumber.setText(String.valueOf(sharedPreferences.getInt("taskTotalUserNumber", 0)));
-        } else {
-            totalNumber.setText("0");
-        }
+        Log.i("getTaskUserNumber===>", "任务分区总户数=" + taskTotalUserNumber + "户");
+        totalNumber.setText(String.valueOf(taskTotalUserNumber));
         if (checkedUserNumber != 0) {
             checkedNumber.setText(String.valueOf(checkedUserNumber));
         } else {
