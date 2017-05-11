@@ -1,48 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/type_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:layout_height="wrap_content"
+    android:background="@drawable/gridview_type_item_selector"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingLeft="3dp"
+    android:paddingRight="3dp">
 
-    <LinearLayout
-        android:id="@+id/type_layout"
+    <TextView
+        android:id="@+id/type_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/search_bg"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp">
-        <TextView
-            android:id="@+id/type_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="sada"
-            android:layout_marginRight="3dp"
-            android:visibility="gone"/>
+        android:layout_marginRight="3dp"
+        android:text="sada"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/type_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="sada"
-            android:textSize="12sp"
-            android:textColor="@color/text_black"
-            android:layout_marginRight="3dp"/>
+    <TextView
+        android:id="@+id/type_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="3dp"
+        android:text="sada"
+        android:textColor="@color/text_black"
+        android:textSize="12sp" />
 
-        <CheckBox
-            android:id="@+id/is_checked"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:background="@drawable/check_box_selector"
-            android:button="@null"
-            android:clickable="false"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true" />
-
-
-    </LinearLayout>
+    <CheckBox
+        android:id="@+id/is_checked"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/check_box_selector"
+        android:button="@null"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
 
 </LinearLayout>
