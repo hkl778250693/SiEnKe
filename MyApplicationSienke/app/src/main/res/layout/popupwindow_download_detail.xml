@@ -2,11 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent"
     android:gravity="center"
     android:orientation="vertical"
-    android:paddingLeft="50dp"
-    android:paddingRight="50dp">
+    android:paddingLeft="25dp"
+    android:paddingRight="25dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,85 +19,75 @@
             android:orientation="horizontal"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:paddingTop="10dp">
+            android:paddingTop="10dp"
+            android:gravity="center_vertical">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/tips"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
-                <TextView
-                    android:id="@+id/tips"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/gray_thin"
-                    android:paddingRight="10dp"
-                    android:text="类型："
-                    android:textColor="@color/text_black"
-                    android:textSize="14sp" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/gray_thin"
-                    android:paddingRight="10dp"
-                    android:text="（多选）"
-                    android:textColor="@color/text_black"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <GridView
-                android:id="@+id/gridview"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:numColumns="2"
-                android:padding="5dp"
-                android:horizontalSpacing="10dp"
-                android:verticalSpacing="10dp"
-                android:layout_height="70dp"/>
-
-        </LinearLayout>
-
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp">
+                android:background="@color/gray_thin"
+                android:text="类型："
+                android:textColor="@color/text_black"
+                android:textSize="14sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/gray_thin"
-                android:paddingRight="10dp"
+                android:paddingRight="5dp"
+                android:text="(多选)"
+                android:textColor="@color/text_black"
+                android:textSize="12sp" />
+
+            <GridView
+                android:id="@+id/gridview"
+                android:layout_width="0dp"
+                android:layout_height="65dp"
+                android:layout_weight="1"
+                android:horizontalSpacing="10dp"
+                android:numColumns="2"
+                android:padding="2dp"
+                android:verticalSpacing="10dp" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:background="@color/gray_thin"
                 android:text="开始时间："
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
                 android:textColor="@color/text_black"
                 android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/start_date"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
+                android:layout_weight="1"
                 android:background="@drawable/linearlayout_shape"
                 android:drawableRight="@mipmap/down"
                 android:gravity="center"
-                android:drawablePadding="20dp"
-                android:paddingLeft="30dp"
                 android:paddingRight="20dp"
-                android:paddingTop="5dp"
                 android:paddingBottom="5dp"
+                android:paddingTop="5dp"
                 android:text="2017-3-13"
                 android:textColor="@color/text_black"
                 android:textSize="14sp" />
-        </RelativeLayout>
+        </LinearLayout>
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:padding="10dp">
 
             <TextView
@@ -107,29 +96,26 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:background="@color/gray_thin"
-                android:paddingRight="10dp"
+                android:layout_marginRight="10dp"
                 android:text="结束时间："
                 android:textColor="@color/text_black"
                 android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/end_date"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
+                android:layout_weight="1"
                 android:background="@drawable/linearlayout_shape"
                 android:drawableRight="@mipmap/down"
                 android:gravity="center"
-                android:paddingLeft="30dp"
-                android:drawablePadding="20dp"
-                android:paddingTop="5dp"
                 android:paddingBottom="5dp"
                 android:paddingRight="20dp"
+                android:paddingTop="5dp"
                 android:text="2017-3-15"
                 android:textColor="@color/text_black"
                 android:textSize="14sp" />
-        </RelativeLayout>
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"

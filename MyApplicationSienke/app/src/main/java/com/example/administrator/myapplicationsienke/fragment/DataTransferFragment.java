@@ -98,6 +98,7 @@ public class DataTransferFragment extends Fragment {
     private Calendar c; //日历
     private GridviewTypeItem item;
     private ArrayList<String> stringList = new ArrayList<>();//保存安检类型编号ID
+    private String securityIds = "";  //存放下载数据的url的参数值
 
     @Nullable
     @Override
@@ -267,7 +268,7 @@ public class DataTransferFragment extends Fragment {
             public void onClick(View v) {
                 if (!sharedPreferences.getBoolean("have_download", false)) {
                     saveSecurityTypeInfo();     //保存选中的安检类型编号信息
-                    if(stringList.size() != 0){
+                    if(stringList.size() > 1){
                         popupWindow.dismiss();
                         showPopupwindow();
                         //开启支线程进行请求任务信息
@@ -276,9 +277,27 @@ public class DataTransferFragment extends Fragment {
                             public void run() {
                                 try {
                                     for(int i = 0;i<stringList.size();i++){
+                                        securityIds += stringList.get(i)+",";
+                                        if(i == (stringList.size()-1)){
+                                            securityIds = stringList.get(i);
+                                        }
                                         requireMyTask("SafeCheckPlan.do", "safePlanMember=" + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8")
-                                                +"&securityId="+stringList.get(i)+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
+                                                +"&securityId="+securityIds+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
                                     }
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                }
+                                super.run();
+                            }
+                        }.start();
+                    }else if(stringList.size() == 1){
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                try {
+                                    securityIds = stringList.get(0);
+                                    requireMyTask("SafeCheckPlan.do", "safePlanMember=" + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8")
+                                            +"&securityId="+securityIds+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
                                 } catch (UnsupportedEncodingException e) {
                                     e.printStackTrace();
                                 }
@@ -337,7 +356,6 @@ public class DataTransferFragment extends Fragment {
             }
         }
         Log.i("DataTransferFragment", "安检类型集合长度为：" + stringList.size());
-
     }
 
     //show下载popupwindow
@@ -383,7 +401,7 @@ public class DataTransferFragment extends Fragment {
         getActivity().getWindow().setAttributes(lp);
     }
 
-    //请求网络数据
+    //下载任务数据
     private void requireMyTask(final String method, final String keyAndValue) {
         new Thread() {
             @Override
@@ -418,8 +436,6 @@ public class DataTransferFragment extends Fragment {
                     //传回的数据解析成String
                     if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
                         InputStream inputStream = httpURLConnection.getInputStream();
-                        Log.i("start_inputStream==>", "" + inputStream);
-                        Log.i("mid_inputStream==>", "" + inputStream);
                         InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                         StringBuilder stringBuilder = new StringBuilder();
@@ -427,7 +443,6 @@ public class DataTransferFragment extends Fragment {
                         while ((str = bufferedReader.readLine()) != null) {
                             stringBuilder.append(str);
                         }
-                        Log.i("end_inputStream==>", "" + inputStream);
                         taskResult = stringBuilder.toString();
                         Log.i("taskResult=====>", taskResult);
                         JSONObject jsonObject = new JSONObject(taskResult);
@@ -449,7 +464,7 @@ public class DataTransferFragment extends Fragment {
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
-                    Log.i("IOException==========>", "网络请求异常!");
+                    Log.i("IOException", "下载任务数据网络请求异常!");
                     handler.sendEmptyMessage(3);
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -459,7 +474,7 @@ public class DataTransferFragment extends Fragment {
         }.start();
     }
 
-    //自定义异步任务
+    //自定义异步任务下载用户数据
     //启动任务的参数，进度参数，结果参数
     public class MyAsyncTask extends AsyncTask<String, Integer, String> {
         @Override
@@ -495,7 +510,7 @@ public class DataTransferFragment extends Fragment {
                     Log.i("userResult==========>", userResult);
                     JSONObject jsonObject = new JSONObject(userResult);
                     if (!jsonObject.optString("total", "").equals("0")) {
-                        if (url.toString().contains(taskNumbList.get(0))) {
+                        if (url.toString().contains(taskNumbList.get(0))) { //当第一个任务有数据的时候就将任务信息保存本地，下次将不会进来
                             //有相应用户数据
                             editor.putBoolean("user_data", true);
                             editor.commit();
@@ -557,7 +572,7 @@ public class DataTransferFragment extends Fragment {
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
-                Log.i("IOException==========>", "网络请求异常!");
+                Log.i("IOException", "下载用户数据网络请求异常!");
                 if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
                     handler.sendEmptyMessage(3);
                 }
@@ -819,14 +834,6 @@ public class DataTransferFragment extends Fragment {
         values.put("ifUpload","false");
         values.put("currentTime","");
         values.put("ifPass","");
-        values.put("security_content", "");
-        values.put("newMeterNumber", "");
-        values.put("remarks", "");
-        values.put("security_hidden", "");
-        values.put("security_hidden_reason", "");
-        values.put("photoNumber", "0");
-        values.put("ifUpload", "false");
-        values.put("currentTime", "");
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
