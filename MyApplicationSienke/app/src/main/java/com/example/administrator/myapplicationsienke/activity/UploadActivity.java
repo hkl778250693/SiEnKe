@@ -57,7 +57,7 @@ public class UploadActivity extends Activity {
     private MySqliteHelper helper; //数据库帮助类
     private SharedPreferences.Editor editor;
     private String checkState;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private String defaul = "";//默认的全部不勾选
     private TextView selectAll, reverse, selectCancel;
     private HttpUtils httpUtils;
@@ -88,7 +88,7 @@ public class UploadActivity extends Activity {
         new Thread() {
             @Override
             public void run() {
-                getTaskData();//读取下载到本地的任务数据
+                getTaskData(sharedPreferences_login.getString("login_name",""));//读取下载到本地的任务数据
                 handler.sendEmptyMessage(1);
                 super.run();
             }
@@ -101,7 +101,8 @@ public class UploadActivity extends Activity {
     private void defaultSetting() {
         helper = new MySqliteHelper(UploadActivity.this, 1);
         db = helper.getReadableDatabase();
-        sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         httpUtils = new HttpUtils();
         //初始化勾选框信息，默认都是以未勾选为单位
@@ -169,7 +170,7 @@ public class UploadActivity extends Activity {
                             @Override
                             public void run() {
                                 for (int j = 0; j < integers.size(); j++) {
-                                    getUploadUserTotalNumber(map.get("taskId" + integers.get(j)).toString());  //根据任务编号获得需要上传的所有用户数量，并作为最大进度
+                                    getUploadUserTotalNumber(map.get("taskId" + integers.get(j)).toString(),sharedPreferences_login.getString("login_name",""));  //根据任务编号获得需要上传的所有用户数量，并作为最大进度
                                 }
                                 handler.sendEmptyMessage(8);
                                 for (int j = 0; j < integers.size(); j++) {
@@ -289,8 +290,8 @@ public class UploadActivity extends Activity {
     }
 
     //读取下载到本地的任务数据
-    public void getTaskData() {
-        cursor = db.query("Task", null, null, null, null, null, null);//查询并获得游标
+    public void getTaskData(String loginName) {
+        cursor = db.rawQuery("select * from Task where loginName=?", new String[]{loginName});//查询并获得游标
         if (cursor.getCount() == 0) {
             if (noData.getVisibility() == View.GONE) {
                 noData.setVisibility(View.VISIBLE);
@@ -394,8 +395,8 @@ public class UploadActivity extends Activity {
     }
 
     //读取本地安检过的并且未上传的用户数据总数
-    public void getUploadUserTotalNumber(final String taskId) {
-        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+    public void getUploadUserTotalNumber(String taskId,String loginName) {
+        Cursor cursor = db.rawQuery("select * from User where taskId=? and loginName=?", new String[]{taskId,loginName});//查询并获得游标
         while (cursor.moveToNext()) {
             if (cursor.getString(10).equals("true") && cursor.getString(17).equals("false")) {  //当检测到是安检过，并且未上传的时候进来
                 maxProgress++;

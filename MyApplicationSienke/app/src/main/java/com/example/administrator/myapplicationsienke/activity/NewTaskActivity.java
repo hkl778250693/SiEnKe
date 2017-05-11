@@ -125,8 +125,8 @@ public class NewTaskActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
-        sharedPreferences = NewTaskActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
         sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = NewTaskActivity.this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         MySqliteHelper helper = new MySqliteHelper(NewTaskActivity.this, 1);
         db = helper.getWritableDatabase();
@@ -392,6 +392,7 @@ public class NewTaskActivity extends Activity {
         values.put("securityType", securityType.getText().toString());
         values.put("totalCount", parclebleList.size());
         values.put("endTime", endDate.getText().toString());
+        values.put("loginName",sharedPreferences_login.getString("login_name",""));
         db.insert("Task", null, values);
     }
 
@@ -417,6 +418,7 @@ public class NewTaskActivity extends Activity {
         values.put("ifUpload","false");
         values.put("currentTime","");
         values.put("ifPass","");
+        values.put("loginName",sharedPreferences_login.getString("login_name",""));
         db.insert("User", null, values);
     }
 

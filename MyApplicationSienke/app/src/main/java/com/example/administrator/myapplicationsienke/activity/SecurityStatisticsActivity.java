@@ -25,7 +25,7 @@ import java.util.Iterator;
 public class SecurityStatisticsActivity extends Activity {
     private ImageView securityStatisticsBack;
     private TextView checkedNumber, totalNumber, notCheckedNumber, finishRate, problemCheckedNumber;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private RadioButton userStatisticsBtn,taskStatisticsBtn;
     private int notChecked = 0;  //未安检的户数
@@ -65,7 +65,8 @@ public class SecurityStatisticsActivity extends Activity {
     private void defaultSetting() {
         helper = new MySqliteHelper(SecurityStatisticsActivity.this, 1);
         db = helper.getWritableDatabase();
-        sharedPreferences = SecurityStatisticsActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = SecurityStatisticsActivity.this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         userStatisticsBtn.setChecked(true);
         getTaskParams();
@@ -73,12 +74,12 @@ public class SecurityStatisticsActivity extends Activity {
             @Override
             public void run() {
                 for (int i = 0; i < task_total_numb; i++) {
-                    getCheckedNumber(stringList.get(i)); //获取已检用户户数
+                    getCheckedNumber(stringList.get(i),sharedPreferences_login.getString("login_name","")); //根据当前登录的用户去获取已检用户户数
                 }
                 for (int i = 0; i < task_total_numb; i++) {
-                    getPartProblemNumber(stringList.get(i)); //获取存在问题户数
+                    getPartProblemNumber(stringList.get(i),sharedPreferences_login.getString("login_name","")); //获取存在问题户数
                 }
-                getTotalProblemNumber();
+                getTotalProblemNumber(sharedPreferences_login.getString("login_name",""));   //获取所有存在问题户数
                 getTotalUserNumber();
             }
         }.start();
@@ -120,8 +121,8 @@ public class SecurityStatisticsActivity extends Activity {
     }
 
     //获取已安检户数
-    public void getCheckedNumber(String taskId){
-        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+    public void getCheckedNumber(String taskId,String loginName){
+        Cursor cursor = db.rawQuery("select * from User where taskId=? and loginName=?", new String[]{taskId,loginName});//查询并获得游标
         //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
         if (cursor.getCount() == 0) {
             return;
@@ -136,9 +137,9 @@ public class SecurityStatisticsActivity extends Activity {
     }
 
     //按任务分区获取存在问题户数
-    public void getPartProblemNumber(String taskId){
-        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
-        taskTotalUserNumber = cursor.getCount();//获取任务分区用户总数
+    public void getPartProblemNumber(String taskId,String loginName){
+        Cursor cursor = db.rawQuery("select * from User where taskId=? and loginName=?", new String[]{taskId,loginName});//查询并获得游标
+        taskTotalUserNumber += cursor.getCount();//获取任务分区用户总数
         //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
         if (cursor.getCount() == 0) {
             return;
@@ -153,8 +154,8 @@ public class SecurityStatisticsActivity extends Activity {
     }
 
     //获取所有存在问题户数
-    public void getTotalProblemNumber(){
-        Cursor  cursor = db.query("User", null, null, null, null, null, null);//查询并获得游标
+    public void getTotalProblemNumber(String loginName){
+        Cursor  cursor = db.rawQuery("select * from User where loginName=?", new String[]{loginName});//查询并获得游标
         totalUserNumber = cursor.getCount(); //获取所有任务总户数
         //在页面finish之前，从上到下查询本地数据库没有安检的用户，相对应的item位置，查询到一个就break
         if (cursor.getCount() == 0) {
@@ -178,12 +179,8 @@ public class SecurityStatisticsActivity extends Activity {
         } else {
             checkedNumber.setText("0");
         }
-        if (sharedPreferences.getInt("totalCount", 0) != 0 ) {
-            notChecked = sharedPreferences.getInt("totalCount", 0) - checkedUserNumber;
-            notCheckedNumber.setText(String.valueOf(notChecked));
-        } else {
-            notCheckedNumber.setText("0");
-        }
+        notChecked = totalUserNumber - checkedUserNumber;
+        notCheckedNumber.setText(String.valueOf(notChecked));
         if (sharedPreferences.getInt("totalCount", 0) != 0) {
             double checkedNumber = (double) checkedUserNumber* 100;
             double totalCount = (double) sharedPreferences.getInt("totalCount", 0);
@@ -213,12 +210,8 @@ public class SecurityStatisticsActivity extends Activity {
         } else {
             checkedNumber.setText("0");
         }
-        if (sharedPreferences.getInt("taskTotalUserNumber", 0) != 0 ) {
-            notChecked = sharedPreferences.getInt("taskTotalUserNumber", 0) - checkedUserNumber;
-            notCheckedNumber.setText(String.valueOf(notChecked));
-        } else {
-            notCheckedNumber.setText("0");
-        }
+        notChecked = taskTotalUserNumber - checkedUserNumber;
+        notCheckedNumber.setText(String.valueOf(notChecked));
         if (sharedPreferences.getInt("taskTotalUserNumber", 0) != 0) {
             double checkedNumber = (double) checkedUserNumber* 100;
             double totalCount = (double) sharedPreferences.getInt("taskTotalUserNumber", 0);

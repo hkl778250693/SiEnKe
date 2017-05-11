@@ -67,7 +67,7 @@ public class SecurityChooseActivity extends FragmentActivity {
     private ViewPager viewPager;
     private SecurityCheckViewPagerAdapter adapter;
     private long exitTime = 0;//退出程序
-    private SharedPreferences sharedPreferences, sharedPreferences_login,sharedPreferences_login_copy;
+    private SharedPreferences sharedPreferences, sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private Bundle params;
     private Set<String> stringSet = new HashSet<>();//保存字符串参数
@@ -284,7 +284,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         cancelRb = (RadioButton) quiteView.findViewById(R.id.cancel_rb);
         saveRb = (RadioButton) quiteView.findViewById(R.id.save_rb);
         //设置点击事件
-        tips.setText("退出后不会删除历史数据，下次登录依然可以使用本账号！(注意：切换账号后则清空历史数据)");
+        tips.setText("退出后不会删除历史数据，下次登录依然可以使用本账号！");
         saveRb.setTextColor(getResources().getColor(R.color.red));
         saveRb.setText("退出登录");
         cancelRb.setOnClickListener(new View.OnClickListener() {
@@ -299,7 +299,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                 quitePopup.dismiss();
                 Intent intent = new Intent(SecurityChooseActivity.this, MobileSecurityLoginActivity.class);
                 startActivity(intent);
-                sharedPreferences_login.edit().clear().apply();
                 finish();
             }
         });
@@ -333,9 +332,8 @@ public class SecurityChooseActivity extends FragmentActivity {
         optionRbt.setChecked(true);
         helper = new MySqliteHelper(SecurityChooseActivity.this, 1);
         db = helper.getWritableDatabase();
-        sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
-        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
-        sharedPreferences_login_copy = getSharedPreferences("login_info_copy", Context.MODE_PRIVATE); //退出登录以后需要这个备份记录是否更换账号
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);  //退出登录以后需要这个备份记录是否更换账号
+        sharedPreferences = this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         isFirst = sharedPreferences.getBoolean("FIRST",true);
         if(isFirst){
@@ -364,16 +362,15 @@ public class SecurityChooseActivity extends FragmentActivity {
             }.start();
         }
         userName.setText(sharedPreferences_login.getString("user_name", "")); //设置登录用户的名称
-        Log.i("user_exchanged", "用户是否改变" + sharedPreferences_login_copy.getBoolean("user_exchanged", false));
-        if (sharedPreferences_login_copy.getBoolean("user_exchanged", false)) {
+        if (sharedPreferences_login.getBoolean("user_exchanged", false)) {
             Log.i("user_exchanged", "用户改变了" );
-            editor.clear();
+            /*editor.clear();
             editor.apply();
             db.delete("User", null, null);  //删除User表中的所有数据（官方推荐方法）
             db.delete("Task", null, null);  //删除Task表中的所有数据
             //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
             db.execSQL("update sqlite_sequence set seq=0 where name='User'");
-            db.execSQL("update sqlite_sequence set seq=0 where name='Task'");
+            db.execSQL("update sqlite_sequence set seq=0 where name='Task'");*/
         }
     }
 

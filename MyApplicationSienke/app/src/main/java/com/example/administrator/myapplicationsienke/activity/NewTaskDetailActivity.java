@@ -65,7 +65,7 @@ public class NewTaskDetailActivity extends Activity {
     private List<NewTaskListviewItem> newTaskListviewItemList = new ArrayList<>();
     private String ip, port;  //接口ip地址   端口
     private String result; //网络请求结果
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private LayoutInflater layoutInflater;
     private LinearLayout rootLinearlayout;
@@ -106,7 +106,8 @@ public class NewTaskDetailActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
-        sharedPreferences = NewTaskDetailActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = NewTaskDetailActivity.this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         if (no_data.getVisibility() == View.GONE) {
             no_data.setVisibility(View.VISIBLE);

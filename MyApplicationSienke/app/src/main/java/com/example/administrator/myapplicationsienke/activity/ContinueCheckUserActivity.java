@@ -47,7 +47,7 @@ public class ContinueCheckUserActivity extends Activity {
     private int currentPosition;  //点击listview  当前item的位置
     private UserListviewAdapter userListviewAdapter;
     private UserListviewItem item;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private int continuePosition = 0;  //继续安检位置
 
@@ -64,7 +64,7 @@ public class ContinueCheckUserActivity extends Activity {
             public void run() {
                 if(task_total_numb != 0){
                     for (int i = 0; i < task_total_numb; i++) {
-                        getUserData(stringList.get(i));//读取继续安检用户数据
+                        getUserData(stringList.get(i),sharedPreferences_login.getString("login_name",""));//读取继续安检用户数据
                     }
                     handler.sendEmptyMessage(1);
                     for (int i = 0; i < task_total_numb; i++) {
@@ -97,7 +97,8 @@ public class ContinueCheckUserActivity extends Activity {
         name.setText("继续安检");
         helper = new MySqliteHelper(ContinueCheckUserActivity.this, 1);
         db = helper.getWritableDatabase();
-        sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
     }
 
@@ -269,8 +270,8 @@ public class ContinueCheckUserActivity extends Activity {
      */
 
     //读取下载到本地的任务数据
-    public void getUserData(String taskId) {
-        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});
+    public void getUserData(String taskId,String loginName) {
+        Cursor cursor = db.rawQuery("select * from User where taskId=? and loginName=?", new String[]{taskId,loginName});
         //如果游标为空，则显示没有数据图片
         if (cursor.getCount() == 0) {
             if (noData.getVisibility() == View.GONE) {

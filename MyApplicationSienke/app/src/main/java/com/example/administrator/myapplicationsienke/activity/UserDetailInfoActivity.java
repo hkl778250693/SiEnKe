@@ -78,7 +78,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
     protected static final int PERMISSION_REQUEST_CODE = 1;  //6.0之后需要动态申请权限，   请求码
     private String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}; //权限数组
     private List<String> permissionList = new ArrayList<>();  //权限集合
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private String securityId;
     private String ifChecked;
@@ -258,7 +258,8 @@ public class UserDetailInfoActivity extends AppCompatActivity {
 
     //初始化设置
     private void defaultSetting() {
-        sharedPreferences = UserDetailInfoActivity.this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = UserDetailInfoActivity.this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         MySqliteHelper helper = new MySqliteHelper(UserDetailInfoActivity.this, 1);
         db = helper.getWritableDatabase();

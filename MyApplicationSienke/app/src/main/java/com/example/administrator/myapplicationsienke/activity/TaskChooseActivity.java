@@ -41,7 +41,7 @@ public class TaskChooseActivity extends Activity {
     private ArrayList<String> stringList = new ArrayList<>();//保存任务编号参数
     private Intent intent;
     private String defaul = "";//默认的全部不勾选
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private Cursor cursor;
     private int taskTotalUserNumber = 0;
@@ -56,7 +56,7 @@ public class TaskChooseActivity extends Activity {
         new Thread() {
             @Override
             public void run() {
-                getTaskData();//读取下载到本地的任务数据
+                getTaskData(sharedPreferences_login.getString("login_name",""));//读取下载到本地的任务数据
                 handler.sendEmptyMessage(1);
                 super.run();
             }
@@ -76,7 +76,8 @@ public class TaskChooseActivity extends Activity {
     private void defaultSetting() {
         helper = new MySqliteHelper(TaskChooseActivity.this, 1);
         db = helper.getReadableDatabase();
-        sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         //初始化勾选框信息，默认都是以未勾选为单位
         for (int i = 0; i < taskChooseList.size(); i++) {
@@ -237,8 +238,8 @@ public class TaskChooseActivity extends Activity {
      */
 
     //读取下载到本地的任务数据
-    public void getTaskData() {
-        cursor = db.query("Task", null, null, null, null, null, null);//查询并获得游标
+    public void getTaskData(String loginName) {
+        cursor = db.rawQuery("select * from Task where loginName=?", new String[]{loginName});//查询并获得游标
         //如果游标为空，则显示没有数据图片
         if (cursor.getCount() == 0) {
             save.setText("去下载");

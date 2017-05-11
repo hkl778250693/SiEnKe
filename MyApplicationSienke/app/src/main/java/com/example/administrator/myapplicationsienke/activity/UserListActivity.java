@@ -46,7 +46,7 @@ public class UserListActivity extends Activity {
     private int currentPosition;  //点击listview
     private UserListviewAdapter userListviewAdapter;
     private UserListviewItem item;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private EditText etSearch;
 
@@ -63,7 +63,7 @@ public class UserListActivity extends Activity {
             public void run() {
                 if (task_total_numb != 0) {
                     for (int i = 0; i < task_total_numb; i++) {
-                        getUserData(stringList.get(i));//读取所有安检用户数据
+                        getUserData(stringList.get(i),sharedPreferences_login.getString("login_name",""));//读取所有安检用户数据
                         Log.i("UserListActivity----", "查询的任务编号是：" + stringList.get(i));
                     }
                     handler.sendEmptyMessage(0);
@@ -90,7 +90,8 @@ public class UserListActivity extends Activity {
         name.setText("用户列表");
         helper = new MySqliteHelper(UserListActivity.this, 1);
         db = helper.getWritableDatabase();
-        sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
     }
 
@@ -237,9 +238,9 @@ public class UserListActivity extends Activity {
      */
 
     //读取下载到本地的任务数据
-    public void getUserData(String taskId) {
+    public void getUserData(String taskId,String loginName) {
         Log.i("UserListActivityget=", "查询用户数据进来了：！");
-        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+        Cursor cursor = db.rawQuery("select * from User where taskId=? and loginName=?", new String[]{taskId,loginName});//查询并获得游标
         Log.i("UserListActivityget=", "数据库进来了：！");
         Log.i("UserListActivityget=", "任务编号是：" + taskId);
         Log.i("UserListActivityget=", "有" + cursor.getCount() + "条数据！");

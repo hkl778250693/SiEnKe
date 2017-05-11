@@ -23,7 +23,7 @@ public class MoreSettingsActivity extends Activity {
     private EditText ipEdit;   //IP地址编辑
     private EditText servePhoneEdit;  //服务电话编辑
     private String ip,servePhoneNumber;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private Intent intent;
 
@@ -101,7 +101,8 @@ public class MoreSettingsActivity extends Activity {
     };
 
     private void defaultSetting() {
-        sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         //Log.i("sharedPreferences====>",sharedPreferences.getString("IP",""));
         if(!sharedPreferences.getString("IP","").equals("")){

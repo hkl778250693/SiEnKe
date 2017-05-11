@@ -21,7 +21,7 @@ public class MySqliteHelper extends SQLiteOpenHelper {
 
     //任务表
     final String CREATE_TABLE_SQL_TASK = "CREATE TABLE Task " +
-            "(task_id integer primary key AUTOINCREMENT,taskName varchar(200),taskId varchar(200),securityType varchar(200),totalCount varchar(200),endTime varchar(200))";
+            "(task_id integer primary key AUTOINCREMENT,taskName varchar(200),taskId varchar(200),securityType varchar(200),totalCount varchar(200),endTime varchar(200),loginName varchar(200))";
 
     //安检图片表
     final String CREATE_TABLE_SQL_SECURITY_PHOTO_INFO = "CREATE TABLE security_photo " +

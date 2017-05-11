@@ -30,21 +30,16 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.administrator.myapplicationsienke.R;
-import com.example.administrator.myapplicationsienke.activity.DownLoadDetailActivity;
 import com.example.administrator.myapplicationsienke.activity.UploadActivity;
 import com.example.administrator.myapplicationsienke.adapter.GridviewTypeAdapter;
-import com.example.administrator.myapplicationsienke.adapter.TaskChooseAdapter;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.GridviewTypeItem;
 import com.example.administrator.myapplicationsienke.model.GridviewTypeViewholder;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +51,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -149,8 +143,8 @@ public class DataTransferFragment extends Fragment {
 
     //初始化设置
     private void defaultSetting() {
-        sharedPreferences = getActivity().getSharedPreferences("data", Context.MODE_PRIVATE);
         sharedPreferences_login = getActivity().getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = getActivity().getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         MySqliteHelper helper = new MySqliteHelper(getActivity(), 1);
         db = helper.getWritableDatabase();
@@ -805,6 +799,7 @@ public class DataTransferFragment extends Fragment {
         values.put("totalCount", taskObject.optInt("countRs", 0) + "");
         totalCount += taskObject.optInt("countRs", 0);
         values.put("endTime", taskObject.optString("safetyEnd", ""));
+        values.put("loginName",sharedPreferences_login.getString("login_name",""));
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
@@ -834,6 +829,7 @@ public class DataTransferFragment extends Fragment {
         values.put("ifUpload","false");
         values.put("currentTime","");
         values.put("ifPass","");
+        values.put("loginName",sharedPreferences_login.getString("login_name",""));
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象

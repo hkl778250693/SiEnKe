@@ -39,7 +39,6 @@
         //安检
         <activity android:name=".activity.MobileSecurityLoginActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.SecurityChooseActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".activity.CheckUserListActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.NewTaskActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.NoCheckUserListActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.TaskChooseActivity" android:screenOrientation="portrait"/>
@@ -47,13 +46,11 @@
         <activity android:name=".activity.UserDetailInfoActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.UserListActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.UploadActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".activity.DownloadActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.FileManageActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.IpSettingActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.SystemSettingActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.NewTaskDetailActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.ContinueCheckUserActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".activity.EdiTextListViewActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.MyPhotoGalleryActivity" android:screenOrientation="portrait"/>
     </application>
 

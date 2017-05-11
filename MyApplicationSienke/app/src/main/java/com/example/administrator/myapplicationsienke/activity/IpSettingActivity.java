@@ -20,7 +20,7 @@ public class IpSettingActivity extends Activity {
     private ImageView back;
     private EditText ipEdit,portEdit;
     private Button confirmBtn,edit;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private String ip,port;
     private LinearLayout rootLinearlayout;
@@ -105,7 +105,8 @@ public class IpSettingActivity extends Activity {
 
     //初始化设置
     private void defaultSetting() {
-        sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         ipEdit.setTextColor(getResources().getColor(R.color.text_gray));
         portEdit.setTextColor(getResources().getColor(R.color.text_gray));

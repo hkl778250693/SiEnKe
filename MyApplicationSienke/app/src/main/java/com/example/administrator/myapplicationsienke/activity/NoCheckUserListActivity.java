@@ -41,7 +41,7 @@ public class NoCheckUserListActivity extends Activity {
     private List<UserListviewItem> noCheckUserItemList = new ArrayList<>();
     private SQLiteDatabase db;  //数据库
     private MySqliteHelper helper; //数据库帮助类
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private EditText etSearch;//搜索框
     private TextView noData;
@@ -64,7 +64,7 @@ public class NoCheckUserListActivity extends Activity {
             public void run() {
                 if(task_total_numb != 0){
                     for (int i = 0; i < task_total_numb; i++) {
-                        getUserInfo(stringList.get(i));//读取未检任务数据
+                        getUserInfo(stringList.get(i),sharedPreferences_login.getString("login_name",""));//读取未检任务数据
                     }
                     handler.sendEmptyMessage(0);
                 }else {
@@ -90,7 +90,8 @@ public class NoCheckUserListActivity extends Activity {
         name.setText("未检用户");
         helper = new MySqliteHelper(NoCheckUserListActivity.this, 1);
         db = helper.getWritableDatabase();
-        sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
     }
 
@@ -203,8 +204,8 @@ public class NoCheckUserListActivity extends Activity {
     }
 
     //读取下载到本地的任务数据
-    public void getUserInfo(String taskId) {
-        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});
+    public void getUserInfo(String taskId,String loginName) {
+        Cursor cursor = db.rawQuery("select * from User where taskId=? and loginName=?", new String[]{taskId,loginName});
         //如果游标为空，则显示没有数据图片
         if (cursor.getCount() == 0) {
             if (noData.getVisibility() == View.GONE) {
