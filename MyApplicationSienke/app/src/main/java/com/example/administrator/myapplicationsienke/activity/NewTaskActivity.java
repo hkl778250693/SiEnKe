@@ -419,6 +419,7 @@ public class NewTaskActivity extends Activity {
         values.put("currentTime","");
         values.put("ifPass","");
         values.put("loginName",sharedPreferences_login.getString("login_name",""));
+        values.put("security_state","0");
         db.insert("User", null, values);
     }
 

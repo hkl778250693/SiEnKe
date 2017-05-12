@@ -81,6 +81,7 @@ public class GridviewImageAdapter extends BaseAdapter {
                 Glide.with(context).load(R.mipmap.forbidden_camera).into(viewHolder.imageView);
             }
         }else {
+            Log.i("GridviewImageAdapter","此时的照片路径为："+gridviewImageList.get(position));
             // 正常显示
             // 判断是否需要显示删除按钮
             if(getDeleteShow()){
@@ -88,7 +89,6 @@ public class GridviewImageAdapter extends BaseAdapter {
             }else {
                 viewHolder.delete.setVisibility(View.GONE);
             }
-            Log.i("GridviewImageAdapter","此时的照片路径为："+gridviewImageList.get(position));
             if(gridviewImageList.get(position) != null){
                 file = new File(gridviewImageList.get(position));
                 if(file != null){

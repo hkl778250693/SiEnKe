@@ -100,7 +100,7 @@ public class SystemSettingActivity extends Activity {
     }
 
     private boolean clearPhoto() {
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) , "SiEnKe_Crop");
+        File file = new File(Environment.getExternalStorageDirectory() , "ThinkerSoft/crop");
         if (file.exists()) { // 判断文件是否存在
             if (file.isFile()) { // 判断是否是文件
                 Log.i("clearPhoto=>", "删除的照片文件夹路径为：" + file.getPath());
@@ -116,7 +116,7 @@ public class SystemSettingActivity extends Activity {
                     childFiles[i].delete(); // 把每个文件 用这个方法进行迭代
                 }
             }
-            //file.delete();
+            file.delete();
             return true;
         } else {
             Log.i("clearPhoto=>", "文件不存在！");

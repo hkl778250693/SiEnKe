@@ -13,10 +13,51 @@ import java.util.Date;
  * Created by Administrator on 2017/4/14 0014.
  */
 public class MyPhotoUtils {
-    private int TYPE_FILE_CROP_IMAGE;
     private String securityId;
+    private File cropDir;  //裁剪后的图片路径
+    private File tempDir;    //未裁剪的临时图片
 
-    public MyPhotoUtils(int type,String securityId) {
+    public MyPhotoUtils(String securityId) {
+        this.securityId = securityId;
+        File external = Environment.getExternalStorageDirectory();
+        String rootDir = "/" + "ThinkerSoft";
+        tempDir = new File(external, rootDir + "/icon");
+        cropDir = new File(external, rootDir + "/crop");
+        if (!tempDir.getParentFile().exists()) {
+            tempDir.getParentFile().mkdirs();
+        }
+        if (!tempDir.exists()) {
+            tempDir.mkdirs();
+        }
+
+        if (!cropDir.getParentFile().exists()) {
+            cropDir.getParentFile().mkdirs();
+        }
+        if (!cropDir.exists()) {
+            cropDir.mkdirs();
+        }
+    }
+
+    public File createTempFile() {
+        String timeFlag = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String fileName = "";
+        if (tempDir != null) {
+            //fileName = UUID.randomUUID().toString() + ".png";
+            fileName = "Icon_IMG_" + timeFlag + ".jpg";
+        }
+        return new File(tempDir, fileName);
+    }
+
+    public File createCropFile() {
+        String timeFlag = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String fileName = "";
+        if (cropDir != null) {
+            fileName = "Crop_IMG_" + timeFlag + "_" + securityId + ".jpg";
+        }
+        return new File(cropDir, fileName);
+    }
+
+    /*public MyPhotoUtils(int type,String securityId) {
         this.TYPE_FILE_CROP_IMAGE = type;
         this.securityId = securityId;
     }
@@ -59,5 +100,5 @@ public class MyPhotoUtils {
             return null;
         }
         return filePath;
-    }
+    }*/
 }

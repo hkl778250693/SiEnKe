@@ -330,9 +330,9 @@ public class UploadActivity extends Activity {
                     securityNumber = cursor.getString(1);
                     Log.i("getUserData=>", "上传的用户数为：" + cursor.getCount());
                     if (!cursor.getString(11).equals("")) {
-                        map1.put("n_safety_state", cursor.getString(11));
+                        map1.put("C_SAFETY_SECURITYCONTENT", cursor.getString(11));
                     } else {
-                        map1.put("n_safety_state", "");
+                        map1.put("C_SAFETY_SECURITYCONTENT", "");
                     }
                     Log.i("getUserData=>", "安检状态是：" + cursor.getString(11));
                     if (!cursor.getString(13).equals("")) {
@@ -355,9 +355,10 @@ public class UploadActivity extends Activity {
                     Log.i("getUserData=>", "隐患原因ID是：" + cursor.getString(15));
                     if (!cursor.getString(18).equals("")) {
                         map1.put("d_safety_inspection_date", cursor.getString(18));
-
                     }
                     Log.i("getUserData=>", "安检的时间是：" + cursor.getString(18));
+                    map1.put("n_safety_state", cursor.getString(21));
+                    map1.put("C_SAFETY_INSPECTION_MEMBER", sharedPreferences_login.getString("user_name", ""));
                     getPhotoData(securityNumber);
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");

@@ -863,6 +863,7 @@ public class DataTransferFragment extends Fragment {
         values.put("currentTime","");
         values.put("ifPass","");
         values.put("loginName",sharedPreferences_login.getString("login_name",""));
+        values.put("security_state","0");
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
