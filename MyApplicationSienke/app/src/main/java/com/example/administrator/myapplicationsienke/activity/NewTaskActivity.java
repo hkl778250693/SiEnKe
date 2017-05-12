@@ -48,8 +48,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -89,6 +92,7 @@ public class NewTaskActivity extends Activity {
     private Cursor cursor;
     private PopupwindowListAdapter adapter;
     private String itemId;
+    private int res;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,17 +180,28 @@ public class NewTaskActivity extends Activity {
                 case R.id.save_btn:
                     save_btn.setClickable(false);
                     if (parclebleList.size() != 0) {
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                postMyTask();
-                                save_btn.setClickable(true);
+                        if(!taskName.getText().toString().equals("") ){
+                            String str1= startDate.getText().toString();
+                            String str2= endDate.getText().toString();
+                            res=str1.compareTo(str2);
+                            Log.i("NewTaskActivity","比较结果:"+res);
+                            if(res <= 0){
+                                new Thread() {
+                                    @Override
+                                    public void run() {
+                                        postMyTask();
+                                    }
+                                }.start();
+                            }else{
+                                Toast.makeText(NewTaskActivity.this, "开始时间不能大于结束时间哦！", Toast.LENGTH_SHORT).show();
                             }
-                        }.start();
+                        }else{
+                            Toast.makeText(NewTaskActivity.this, "任务名称不能为空哦！", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        save_btn.setClickable(true);
                         Toast.makeText(NewTaskActivity.this, "请添加用户数据哦！", Toast.LENGTH_SHORT).show();
                     }
+                    save_btn.setClickable(true);
                     break;
                 case R.id.security_type:
                     createSecurityTypePopupwindow();
