@@ -330,11 +330,11 @@ public class UploadActivity extends Activity {
                     securityNumber = cursor.getString(1);
                     Log.i("getUserData=>", "上传的用户数为：" + cursor.getCount());
                     if (!cursor.getString(11).equals("")) {
-                        map1.put("C_SAFETY_SECURITYCONTENT", cursor.getString(11));
+                        map1.put("c_safety_securitycontent", cursor.getString(11));
                     } else {
-                        map1.put("C_SAFETY_SECURITYCONTENT", "");
+                        map1.put("c_safety_securitycontent", "");
                     }
-                    Log.i("getUserData=>", "安检状态是：" + cursor.getString(11));
+                    Log.i("getUserData=>", "安检情况是：" + cursor.getString(11));
                     if (!cursor.getString(13).equals("")) {
                         map1.put("c_safety_remark", cursor.getString(13));
                     } else {
@@ -358,19 +358,21 @@ public class UploadActivity extends Activity {
                     }
                     Log.i("getUserData=>", "安检的时间是：" + cursor.getString(18));
                     map1.put("n_safety_state", cursor.getString(21));
-                    map1.put("C_SAFETY_INSPECTION_MEMBER", sharedPreferences_login.getString("user_name", ""));
+                    Log.i("getUserData=>", "安检状态是：" + cursor.getString(21));
+                    map1.put("c_safety_inspection_member", sharedPreferences_login.getString("user_name", ""));
+                    Log.i("getUserData=>", "安检人员是：" + sharedPreferences_login.getString("user_name", ""));
                     getPhotoData(securityNumber);
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                         Log.i("sharedPref_security_ip", ip);
                     } else {
-                        ip = "88.88.88.66:";
+                        ip = "88.88.88.31:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                         Log.i("sharedPref_securityPort", port);
                     } else {
-                        port = "8088";
+                        port = "8080";
                     }
                     httpUtils.postData("http://" + ip + port + "/SMDemo/updateInspection.do", map1, fileMap);
                     Log.i("httpUtils=>", "上传的地址为：" + "http://" + ip + port + "/SMDemo/updateInspection.do");
