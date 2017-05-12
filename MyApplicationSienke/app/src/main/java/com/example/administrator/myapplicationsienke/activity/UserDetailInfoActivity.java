@@ -451,7 +451,11 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 takePhoto.setClickable(false);
                 popupWindow.dismiss();
-                openCamera();//拍照
+                if (Tools.hasSdcard()) {
+                    openCamera();//拍照
+                }else {
+                    Toast.makeText(UserDetailInfoActivity.this, "没有SD卡哦，不能拍照！", Toast.LENGTH_SHORT).show();
+                }
                 takePhoto.setClickable(true);
             }
         });
@@ -687,23 +691,22 @@ public class UserDetailInfoActivity extends AppCompatActivity {
 
     //调用相机
     public void openCamera() {
-        Intent openCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File file = new MyPhotoUtils(securityId).createTempFile();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            tempUri = FileProvider.getUriForFile(UserDetailInfoActivity.this, "com.example.administrator.myapplicationsienke.fileprovider", file);//通过FileProvider创建一个content类型的Uri
+        } else {
+            // 指定照片保存路径（SD卡），temp.jpg为一个临时文件，每次拍照后这个图片都会被替换
+            tempUri = Uri.fromFile(file);
+        }
+        Intent openCameraIntent = new Intent();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            openCameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
+        }
+        openCameraIntent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);//设置Action为拍照
         openCameraIntent.putExtra("autofocus", true); // 自动对焦
         openCameraIntent.putExtra("fullScreen", false); // 全屏
         openCameraIntent.putExtra("showActionIcons", false);
         openCameraIntent.putExtra(MediaStore.Images.Media.ORIENTATION, 0);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            tempUri = FileProvider.getUriForFile(UserDetailInfoActivity.this, "com.bugull.cameratakedemo.fileprovider", new File(Environment.getExternalStorageDirectory() + "/temp.jpg"));//通过FileProvider创建一个content类型的Uri
-        } else {
-            tempUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/temp.jpg"));
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            openCameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
-        }
-        // 指定照片保存路径（SD卡），temp.jpg为一个临时文件，每次拍照后这个图片都会被替换
-        /*MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_CROP_IMAGE, securityId);
-        tempUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);*/
-        tempUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/temp.jpg"));
         openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);
         Log.i("openCamera===>", "临时保存的地址为" + tempUri.getPath());
         startActivityForResult(openCameraIntent, TAKE_PHOTO);
@@ -716,13 +719,10 @@ public class UserDetailInfoActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {   //如果返回码是可用的
             switch (requestCode) {
                 case TAKE_PHOTO:
-                    startCropPhoto(tempUri);
-                    Log.i("TAKE_PHOTO=====>", "没有数据返回！");
-                    if (data != null) {
-                        Log.i("TAKE_PHOTO=====>", "有数据返回！");
-                    }
+                    startCropPhoto();
                     break;
                 case CROP_SMALL_PICTURE:
+                    Log.i("UserDetailActivity", "图片裁剪回调进来了！ " );
                     if (tempUri != null) {
                         File file = new File(tempUri.getPath());
                         if (file.exists()) {
@@ -730,8 +730,6 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                         }
                     }
                     tempUri = null;
-                    cropPathLists.add(cropPhotoPath);
-                    Log.i("CROP_SMALL_PICTURE===>", "图片集合长度为：" + cropPathLists.size() + "路径为" + cropPhotoPath);
                     handler.sendEmptyMessage(1);
                     break;
                 case 500:
@@ -752,6 +750,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
+                    Log.i("UserDetailActivity", "显示图片进来了！ " );
                     adapter = new GridviewImageAdapter(UserDetailInfoActivity.this, cropPathLists);
                     adapter.notifyDataSetChanged();
                     gridView.setAdapter(adapter);
@@ -1022,16 +1021,19 @@ public class UserDetailInfoActivity extends AppCompatActivity {
 
     /**
      * 裁剪图片方法实现
-     *
-     * @param uri
      */
-    protected void startCropPhoto(Uri uri) {
-        if (uri != null) {
+    protected void startCropPhoto() {
+        if (tempUri != null) {
+            File file = new MyPhotoUtils(securityId).createCropFile();
+            Uri cropPhotoUri = Uri.fromFile(file);
+            Log.i("startCropPhoto", "图片裁剪的uri = " + cropPhotoUri);
             Intent intent = new Intent("com.android.camera.action.CROP");
-            intent.setDataAndType(uri, "image/*");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+            intent.setDataAndType(tempUri, "image/*");
             // 设置裁剪
             intent.putExtra("crop", "true");
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             // aspectX aspectY 是宽高的比例
             intent.putExtra("aspectX", 1);
             intent.putExtra("aspectY", 1.3);
@@ -1044,18 +1046,14 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             intent.putExtra("scaleUpIfNeeded", true);
             intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
             intent.putExtra("return-data", false);//设置为不返回数据
-            MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_CROP_IMAGE, securityId);
-            Uri cropPhotoUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);
-            Log.i("startCropPhoto", "图片裁剪的uri = " + cropPhotoUri);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, cropPhotoUri);
-            /*if(cropPhotoUri.getPath().contains("sdcard0")){
-                cropPhotoPath = cropPhotoUri.getPath().replace("0/Pictures","/0/Pictures");
-            }else {
-                cropPhotoPath = cropPhotoUri.getPath();
-            }*/
-            cropPhotoPath = cropPhotoUri.getPath();
+            startActivityForResult(intent, CROP_SMALL_PICTURE);cropPhotoPath = cropPhotoUri.getPath();
             Log.i("startCropPhoto", "图片裁剪的地址为：" + cropPhotoPath);
-            startActivityForResult(intent, CROP_SMALL_PICTURE);
+            cropPathLists.add(cropPhotoPath);
+            Log.i("startCropPhoto===>", "图片集合长度为：" + cropPathLists.size() + "路径为" + cropPhotoPath);
+        }else {
+            Log.i("startCropPhoto", "传过来的uri为空！");
+            Toast.makeText(UserDetailInfoActivity.this, "拍照失败，请重试！", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1111,6 +1109,13 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             Log.i("insertUserInfo", "备注是：" + remarks.getText().toString().trim());
         }
         if (!(securityCheckCase.getText().toString().equals("合格") || securityCheckCase.getText().toString().equals("复检合格"))) { // 如果是合格或者复检合格，则插入空的隐患类型和原因
+            if(securityCheckCase.getText().toString().equals("安全隐患")){
+                values.put("security_state", "2");
+            }else if(securityCheckCase.getText().toString().equals("拒绝安检")){
+                values.put("security_state", "5");
+            }else if(securityCheckCase.getText().toString().equals("第一次到访不遇") || securityCheckCase.getText().toString().equals("第二次到访不遇") || securityCheckCase.getText().toString().equals("第三次到访不遇")){
+                values.put("security_state", "4");
+            }
             //判断隐患类型是否通过点击列表选择
             if (securityHiddenItemId != null) {
                 values.put("security_hidden", securityHiddenItemId);
@@ -1132,6 +1137,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             values.put("security_hidden", "");
             values.put("security_hidden_reason", "");
             values.put("ifPass", "true");
+            values.put("security_state", "1");
         }
         values.put("currentTime", getCurrentTime());
         db.update("User", values, "securityNumber=? and loginName=?", new String[]{securityId,sharedPreferences_login.getString("login_name","")});
