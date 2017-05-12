@@ -93,6 +93,7 @@ public class DataTransferFragment extends Fragment {
     private GridviewTypeItem item;
     private ArrayList<String> stringList = new ArrayList<>();//保存安检类型编号ID
     private String securityIds = "";  //存放下载数据的url的参数值
+    private int res;
 
     @Nullable
     @Override
@@ -263,44 +264,52 @@ public class DataTransferFragment extends Fragment {
                 if (sharedPreferences.getBoolean("have_download", false)) {
                     Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
                 } else {
-                    saveSecurityTypeInfo();     //保存选中的安检类型编号信息
-                    if(stringList.size() > 1){
-                        popupWindow.dismiss();
-                        showPopupwindow();
-                        //开启支线程进行请求任务信息
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                try {
-                                    for(int i = 0;i<stringList.size();i++){
-                                        securityIds += stringList.get(i)+",";
+                    String str1= startDate.getText().toString();
+                    String str2= endDate.getText().toString();
+                    res=str1.compareTo(str2);
+                    Log.i("NewTaskActivity","比较结果:"+res);
+                    if(res <= 0){
+                        saveSecurityTypeInfo();     //保存选中的安检类型编号信息
+                        if(stringList.size() > 1){
+                            popupWindow.dismiss();
+                            showPopupwindow();
+                            //开启支线程进行请求任务信息
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        for(int i = 0;i<stringList.size();i++){
+                                            securityIds += stringList.get(i)+",";
+                                        }
+                                        requireMyTask("SafeCheckPlan.do", "safePlanMember=" + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8")
+                                                +"&securityId="+securityIds+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
                                     }
-                                    requireMyTask("SafeCheckPlan.do", "safePlanMember=" + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8")
-                                            +"&securityId="+securityIds+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
-                                } catch (UnsupportedEncodingException e) {
-                                    e.printStackTrace();
+                                    super.run();
                                 }
-                                super.run();
-                            }
-                        }.start();
-                    }else if(stringList.size() == 1){
-                        popupWindow.dismiss();
-                        showPopupwindow();
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                try {
-                                    securityIds = stringList.get(0);
-                                    requireMyTask("SafeCheckPlan.do", "safePlanMember=" + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8")
-                                            +"&securityId="+securityIds+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
-                                } catch (UnsupportedEncodingException e) {
-                                    e.printStackTrace();
+                            }.start();
+                        }else if(stringList.size() == 1){
+                            popupWindow.dismiss();
+                            showPopupwindow();
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        securityIds = stringList.get(0);
+                                        requireMyTask("SafeCheckPlan.do", "safePlanMember=" + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8")
+                                                +"&securityId="+securityIds+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
+                                    super.run();
                                 }
-                                super.run();
-                            }
-                        }.start();
-                    }else {
-                        Toast.makeText(getActivity(), "请选择安检类型和时间哦！", Toast.LENGTH_SHORT).show();
+                            }.start();
+                        }else {
+                            Toast.makeText(getActivity(), "请选择安检类型和时间哦！", Toast.LENGTH_SHORT).show();
+                        }
+                    }else{
+                        Toast.makeText(getActivity(), "开始时间不能大于结束时间哦！", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
