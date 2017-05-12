@@ -19,6 +19,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -495,7 +496,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 updateUserInfo();
                 if (cropPathLists.size() != 0) {
-                    db.delete("security_photo", "securityNumber=?", new String[]{securityId});  //删除security_photo表中的当前用户的照片数据
+                    db.delete("security_photo", "securityNumber=? and loginName=?", new String[]{securityId,sharedPreferences_login.getString("login_name","")});  //删除security_photo表中的当前用户的照片数据
                     //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
                     Log.i("createSavePopupwindow", "删除的图片的安检ID为：" + securityId);
                     //db.execSQL("update sqlite_sequence set seq=0 where name='security_photo'");
@@ -690,8 +691,15 @@ public class UserDetailInfoActivity extends AppCompatActivity {
         openCameraIntent.putExtra("autofocus", true); // 自动对焦
         openCameraIntent.putExtra("fullScreen", false); // 全屏
         openCameraIntent.putExtra("showActionIcons", false);
-        openCameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         openCameraIntent.putExtra(MediaStore.Images.Media.ORIENTATION, 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            tempUri = FileProvider.getUriForFile(UserDetailInfoActivity.this, "com.bugull.cameratakedemo.fileprovider", new File(Environment.getExternalStorageDirectory() + "/temp.jpg"));//通过FileProvider创建一个content类型的Uri
+        } else {
+            tempUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/temp.jpg"));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            openCameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
+        }
         // 指定照片保存路径（SD卡），temp.jpg为一个临时文件，每次拍照后这个图片都会被替换
         /*MyPhotoUtils photoUtils = new MyPhotoUtils(TYPE_FILE_CROP_IMAGE, securityId);
         tempUri = photoUtils.getOutFileUri(TYPE_FILE_CROP_IMAGE);*/
@@ -907,7 +915,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
     //读取安全情况状态信息
     public void getSecurityCheckCase() {
         popupwindowListItemList.clear();
-        cursor1 = db.query("security_content", null, null, null, null, null, null);//查询并获得游标
+        cursor1 = db.rawQuery("select * from security_content where loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});//查询并获得游标
         Log.i("getSecurityCheckCase=>", " 查询到的状态个数为：" + cursor1.getCount());
         //如果游标为空，则显示默认数据
         if (cursor1.getCount() == 0) {
@@ -924,7 +932,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
 
     //读取上次安全情况状态信息
     public void getPreviewSecurityCheckCase(String securityContent) {
-        cursor6 = db.rawQuery("select * from security_content where securityId=?", new String[]{securityContent});//查询并获得游标
+        cursor6 = db.rawQuery("select * from security_content where securityId=? and loginName=?", new String[]{securityContent,sharedPreferences_login.getString("login_name","")});//查询并获得游标
         //如果游标为空，则返回空
         if (cursor6.getCount() == 0) {
             return;
@@ -939,7 +947,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
     //读取安全隐患类型信息
     public void getSecurityHiddenType() {
         popupwindowListItemList.clear();
-        cursor2 = db.query("security_hidden", null, null, null, null, null, null);//查询并获得游标
+        cursor2 = db.rawQuery("select * from security_hidden where loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});//查询并获得游标
         //如果游标为空，则返回空
         if (cursor2.getCount() == 0) {
             return;
@@ -955,7 +963,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
 
     //读取上次安全隐患类型信息
     public void getPreviewSecurityHiddenType(String securityHiddenItemId) {
-        cursor7 = db.rawQuery("select * from security_hidden where n_safety_hidden_id=?", new String[]{securityHiddenItemId});//查询并获得游标
+        cursor7 = db.rawQuery("select * from security_hidden where n_safety_hidden_id=? and loginName=?", new String[]{securityHiddenItemId,sharedPreferences_login.getString("login_name","")});//查询并获得游标
         //如果游标为空，则显示默认数据
         if (cursor7.getCount() == 0) {
             return;
@@ -970,7 +978,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
     //读取安全隐患原因信息
     public void getSecurityHiddenReason(String itemId) {
         popupwindowListItemList.clear();
-        cursor3 = db.rawQuery("select * from security_hidden_reason where n_safety_hidden_id=?", new String[]{itemId});//查询并获得游标
+        cursor3 = db.rawQuery("select * from security_hidden_reason where n_safety_hidden_id=? and loginName=?", new String[]{itemId,sharedPreferences_login.getString("login_name","")});//查询并获得游标
         //如果游标为空，则返回空
         if (cursor3.getCount() == 0) {
             return;
@@ -986,7 +994,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
 
     //读取安全隐患原因默认信息
     public void getSecurityHiddenReasonDefault(String itemId) {
-        cursor4 = db.rawQuery("select * from security_hidden_reason where n_safety_hidden_id=?", new String[]{itemId});//查询并获得游标
+        cursor4 = db.rawQuery("select * from security_hidden_reason where n_safety_hidden_id=? and loginName=?", new String[]{itemId,sharedPreferences_login.getString("login_name","")});//查询并获得游标
         //如果游标为空，则显示默认数据
         if (cursor4.getCount() == 0) {
             return;
@@ -1000,7 +1008,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
 
     //读取上次安全隐患原因信息
     public void getPreviewSecurityHiddenReason(String itemId) {
-        cursor8 = db.rawQuery("select * from security_hidden_reason where n_safety_hidden_reason_id=?", new String[]{itemId});//查询并获得游标
+        cursor8 = db.rawQuery("select * from security_hidden_reason where n_safety_hidden_reason_id=? and loginName=?", new String[]{itemId,sharedPreferences_login.getString("login_name","")});//查询并获得游标
         //如果游标为空，则显示默认数据
         if (cursor8.getCount() == 0) {
             return;
@@ -1069,6 +1077,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
         values.put("securityNumber", securityId);
         values.put("photoPath", photoPath);
+        values.put("loginName",sharedPreferences_login.getString("login_name",""));
         db.insert("security_photo", null, values);
     }
 
@@ -1078,7 +1087,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
     private void updateUserPhoto(String photoNumber) {
         ContentValues values = new ContentValues();
         values.put("photoNumber", photoNumber);
-        db.update("User", values, "securityNumber=?", new String[]{securityId});
+        db.update("User", values, "securityNumber=? and loginName=?", new String[]{securityId,sharedPreferences_login.getString("login_name","")});
     }
 
     /**
@@ -1125,14 +1134,14 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             values.put("ifPass", "true");
         }
         values.put("currentTime", getCurrentTime());
-        db.update("User", values, "securityNumber=?", new String[]{securityId});
+        db.update("User", values, "securityNumber=? and loginName=?", new String[]{securityId,sharedPreferences_login.getString("login_name","")});
     }
 
     /**
      * 根据安检ID查询用户是否处于安检状态，如果是安检状态，则显示上次安检所记录的内容，否则显示默认的内容
      */
     private boolean querySecurityState(String securityId) {
-        Cursor cursor = db.rawQuery("select * from User where securityNumber=?", new String[]{securityId});//查询并获得游标
+        Cursor cursor = db.rawQuery("select * from User where securityNumber=? and loginName=?", new String[]{securityId,sharedPreferences_login.getString("login_name","")});//查询并获得游标
         while (cursor.moveToNext()) {
             if (cursor.getString(10).equals("true")) {
                 return true;
@@ -1146,7 +1155,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
      * 根据安检ID查询用户上次安检情况信息
      */
     private void queryUserSecurityContent(String securityId) {
-        Cursor cursor = db.rawQuery("select * from User where securityNumber=?", new String[]{securityId});//查询并获得游标
+        Cursor cursor = db.rawQuery("select * from User where securityNumber=? and loginName=?", new String[]{securityId,sharedPreferences_login.getString("login_name","")});//查询并获得游标
         while (cursor.moveToNext()) {
             Log.i("querySecurityContent", "上次安检信息查询进来了，数据条数为：" + cursor.getCount());
             Log.i("querySecurityContent", "上次安检用户为：" + cursor.getString(2));
@@ -1170,7 +1179,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
      * 根据安检ID查询用户是否处于安检状态，如果是安检状态，则显示上次安检所记录的图片，否则不显示
      */
     private void querySecurityPhoto(String securityId) {
-        cursor5 = db.rawQuery("select * from security_photo where securityNumber=?", new String[]{securityId});//查询并获得游标
+        cursor5 = db.rawQuery("select * from security_photo where securityNumber=? and loginName=?", new String[]{securityId,sharedPreferences_login.getString("login_name","")});//查询并获得游标
         while (cursor5.moveToNext()) {
             cropPathLists.add(cursor5.getString(1));
         }

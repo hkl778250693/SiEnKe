@@ -87,10 +87,10 @@ public class SecurityChooseActivity extends FragmentActivity {
         Log.i("SecurityChooseActivity", "onResume");
         if(sharedPreferences.getBoolean("clear_data",false)){
             Log.i("SecurityChooseActivity", "onResume进来了，重新下载数据！");
-            db.delete("SecurityState", null, null);  //删除SecurityState表中的所有数据
-            db.delete("security_content", null, null);  //删除security_content表中的所有数据
-            db.delete("security_hidden", null, null);  //删除security_hidden表中的所有数据
-            db.delete("security_hidden_reason", null, null);  //删除security_hidden_reason表中的所有数据
+            db.delete("SecurityState", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户SecurityState表中的所有数据
+            db.delete("security_content", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户security_content表中的所有数据
+            db.delete("security_hidden", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户security_hidden表中的所有数据
+            db.delete("security_hidden_reason", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户security_hidden_reason表中的所有数据
             //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
             db.execSQL("update sqlite_sequence set seq=0 where name='SecurityState'");
             db.execSQL("update sqlite_sequence set seq=0 where name='security_content'");
@@ -340,10 +340,10 @@ public class SecurityChooseActivity extends FragmentActivity {
             Log.i("SecurityChooseActivity", "第一次进入APP");
             editor.putBoolean("FIRST",false);
             editor.apply();
-            db.delete("SecurityState", null, null);  //删除SecurityState表中的所有数据
-            db.delete("security_content", null, null);  //删除security_content表中的所有数据
-            db.delete("security_hidden", null, null);  //删除security_hidden表中的所有数据
-            db.delete("security_hidden_reason", null, null);  //删除security_hidden_reason表中的所有数据
+            db.delete("SecurityState", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户SecurityState表中的所有数据
+            db.delete("security_content", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户security_content表中的所有数据
+            db.delete("security_hidden", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户security_hidden表中的所有数据
+            db.delete("security_hidden_reason", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户security_hidden_reason表中的所有数据
             //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
             db.execSQL("update sqlite_sequence set seq=0 where name='SecurityState'");
             db.execSQL("update sqlite_sequence set seq=0 where name='security_content'");
@@ -798,6 +798,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         ContentValues values = new ContentValues();
         values.put("securityId", stateObject.optInt("securityId", 0) + "");
         values.put("securityName", stateObject.optString("securityName", ""));
+        values.put("loginName",sharedPreferences_login.getString("login_name",""));
         db.insert("SecurityState", null, values);
     }
 
@@ -806,6 +807,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         ContentValues values = new ContentValues();
         values.put("securityId", contentObject.optInt("securityId", 0) + "");
         values.put("securityName", contentObject.optString("securityName", ""));
+        values.put("loginName",sharedPreferences_login.getString("login_name",""));
         db.insert("security_content", null, values);
     }
 
@@ -814,6 +816,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         ContentValues values = new ContentValues();
         values.put("n_safety_hidden_id", hiddenObject.optInt("n_safety_hidden_id", 0) + "");
         values.put("n_safety_hidden_name", hiddenObject.optString("n_safety_hidden_name", ""));
+        values.put("loginName",sharedPreferences_login.getString("login_name",""));
         db.insert("security_hidden", null, values);
     }
 
@@ -823,6 +826,7 @@ public class SecurityChooseActivity extends FragmentActivity {
         values.put("n_safety_hidden_reason_id", reasonObject.optInt("n_safety_hidden_reason_id", 0) + "");
         values.put("n_safety_hidden_id", reasonObject.optInt("n_safety_hidden_id", 0) + "");
         values.put("n_safety_hidden_reason_name", reasonObject.optString("n_safety_hidden_reason_name", ""));
+        values.put("loginName",sharedPreferences_login.getString("login_name",""));
         db.insert("security_hidden_reason", null, values);
     }
 

@@ -25,27 +25,27 @@ public class MySqliteHelper extends SQLiteOpenHelper {
 
     //安检图片表
     final String CREATE_TABLE_SQL_SECURITY_PHOTO_INFO = "CREATE TABLE security_photo " +
-            "(id integer primary key AUTOINCREMENT,photoPath varchar(200),securityNumber varchar(200))";
+            "(id integer primary key AUTOINCREMENT,photoPath varchar(200),securityNumber varchar(200),loginName varchar(200))";
 
     //安检状态表（安检类型）
     final String CREATE_TABLE_SQL_SECURITY_STATE = "CREATE TABLE SecurityState " +
-            "(id integer primary key AUTOINCREMENT,securityId varchar(200),securityName varchar(200))";
+            "(id integer primary key AUTOINCREMENT,securityId varchar(200),securityName varchar(200),loginName varchar(200))";
 
     //安全情况表
     final String CREATE_TABLE_SQL_SECURITY_CONTENT = "CREATE TABLE security_content " +
-            "(id integer primary key AUTOINCREMENT,securityId varchar(200),securityName varchar(200))";
+            "(id integer primary key AUTOINCREMENT,securityId varchar(200),securityName varchar(200),loginName varchar(200))";
 
     //安全隐患类型表
     final String CREATE_TABLE_SQL_SECURITY_HIDDEEN = "CREATE TABLE security_hidden " +
-            "(id integer primary key AUTOINCREMENT,n_safety_hidden_id varchar(200),n_safety_hidden_name varchar(200))";
+            "(id integer primary key AUTOINCREMENT,n_safety_hidden_id varchar(200),n_safety_hidden_name varchar(200),loginName varchar(200))";
 
     //安全隐患原因表
     final String CREATE_TABLE_SQL_SECURITY_HIDDEEN_REASON = "CREATE TABLE security_hidden_reason " +
-            "(id integer primary key AUTOINCREMENT,n_safety_hidden_reason_id varchar(200),n_safety_hidden_id varchar(200),n_safety_hidden_reason_name varchar(200))";
+            "(id integer primary key AUTOINCREMENT,n_safety_hidden_reason_id varchar(200),n_safety_hidden_id varchar(200),n_safety_hidden_reason_name varchar(200),loginName varchar(200))";
 
     //安全信息与照片关联表
     final String CREATE_TABLE_SQL_SECURITY_INFO_PHOTO = "CREATE TABLE security_info_photo " +
-            "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200))";
+            "(id integer primary key AUTOINCREMENT,name varchar(200),chengji varchar(200),loginName varchar(200))";
 
 
     //构造器
@@ -79,7 +79,6 @@ public class MySqliteHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_SQL_SECURITY_HIDDEEN);                //安全隐患表
         db.execSQL(CREATE_TABLE_SQL_SECURITY_HIDDEEN_REASON);         //安全隐患原因表
         db.execSQL(CREATE_TABLE_SQL_SECURITY_INFO_PHOTO);            //安全信息与照片关联表
-
     }
 
     //SQLiteDatabase 数据库操作类
@@ -95,7 +94,7 @@ public class MySqliteHelper extends SQLiteOpenHelper {
     //delete 删除方法
 
     //版本更新回调函数
-    @Override                                    //旧版本号       //新版本
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }

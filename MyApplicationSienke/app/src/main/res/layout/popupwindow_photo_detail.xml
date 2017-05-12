@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1"
-            android:textColor="@color/theme_colors"
+            android:textColor="@android:color/white"
             android:textSize="14sp" />
 
         <TextView
@@ -34,7 +34,7 @@
             android:text="/"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:textColor="@color/theme_colors"
+            android:textColor="@android:color/white"
             android:textSize="14sp" />
 
         <TextView
@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1"
-            android:textColor="@color/theme_colors"
+            android:textColor="@android:color/white"
             android:textSize="14sp" />
     </LinearLayout>
 

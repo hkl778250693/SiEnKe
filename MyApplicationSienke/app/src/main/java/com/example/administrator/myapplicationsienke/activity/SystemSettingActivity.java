@@ -30,7 +30,7 @@ import java.io.File;
 public class SystemSettingActivity extends Activity {
     private ImageView back;
     private TextView ip, clearData;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences,sharedPreferences_login;
     private SharedPreferences.Editor editor;
     private SQLiteDatabase db;  //数据库
     private MySqliteHelper helper; //数据库帮助类
@@ -85,17 +85,18 @@ public class SystemSettingActivity extends Activity {
     };
 
     private void clearData() {
-        sharedPreferences = this.getSharedPreferences("data", Context.MODE_PRIVATE);
+        sharedPreferences_login = this.getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        sharedPreferences = this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         helper = new MySqliteHelper(SystemSettingActivity.this, 1);
         db = helper.getWritableDatabase();
         editor.clear();
         editor.apply();
-        db.delete("User", null, null);  //删除User表中的所有数据（官方推荐方法）
-        db.delete("Task", null, null);  //删除Task表中的所有数据
+        db.delete("User", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除User表中当前用户的所有数据（官方推荐方法）
+        db.delete("Task", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除Task表中当前用户的所有数据
         //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
-        db.execSQL("update sqlite_sequence set seq=0 where name='User'");
-        db.execSQL("update sqlite_sequence set seq=0 where name='Task'");
+        /*db.execSQL("update sqlite_sequence set seq=0 where name='User'");
+        db.execSQL("update sqlite_sequence set seq=0 where name='Task'");*/
     }
 
     private boolean clearPhoto() {
@@ -133,7 +134,7 @@ public class SystemSettingActivity extends Activity {
         cancelRb = (RadioButton) view.findViewById(R.id.cancel_rb);
         saveRb = (RadioButton) view.findViewById(R.id.save_rb);
         //设置点击事件
-        tips.setText("确定要清空本地数据吗！");
+        tips.setText("确定要清空本地数据和照片吗！");
         saveRb.setText("确定");
         cancelRb.setOnClickListener(new View.OnClickListener() {
             @Override

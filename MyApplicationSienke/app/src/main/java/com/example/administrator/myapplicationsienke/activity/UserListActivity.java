@@ -291,7 +291,7 @@ public class UserListActivity extends Activity {
         ContentValues values = new ContentValues();
         values.put("ifChecked", "true");
         Log.i("UserList=update", "更新安检状态为true");
-        db.update("User", values, "securityNumber=?", new String[]{item.getSecurityNumber()});
+        db.update("User", values, "securityNumber=? and loginName=?", new String[]{item.getSecurityNumber(),sharedPreferences_login.getString("login_name","")});
     }
 
     @Override

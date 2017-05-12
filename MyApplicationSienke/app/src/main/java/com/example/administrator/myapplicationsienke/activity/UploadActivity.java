@@ -355,6 +355,7 @@ public class UploadActivity extends Activity {
                     Log.i("getUserData=>", "隐患原因ID是：" + cursor.getString(15));
                     if (!cursor.getString(18).equals("")) {
                         map1.put("d_safety_inspection_date", cursor.getString(18));
+
                     }
                     Log.i("getUserData=>", "安检的时间是：" + cursor.getString(18));
                     getPhotoData(securityNumber);

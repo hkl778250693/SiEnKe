@@ -311,10 +311,10 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="7dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:paddingTop="15dp">
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -322,6 +322,7 @@
                     android:layout_alignParentLeft="true"
                     android:text="安检情况："
                     android:textColor="@color/text_black"
+                    android:layout_centerVertical="true"
                     android:textSize="14sp" />
 
                 <TextView
@@ -335,6 +336,7 @@
                     android:paddingBottom="4dp"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
+                    android:layout_centerVertical="true"
                     android:paddingTop="4dp"
                     android:text=""
                     android:textColor="@color/text_gray" />
@@ -345,7 +347,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp">
+                android:paddingRight="16dp"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="70dp"
@@ -374,8 +377,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:layout_marginTop="7dp">
+                android:paddingRight="16dp">
 
                 <TextView
                     android:layout_width="70dp"
@@ -405,7 +407,7 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:paddingTop="7dp"
+                android:paddingTop="10dp"
                 android:visibility="visible">
 
                 <TextView
@@ -438,7 +440,7 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:paddingTop="7dp"
+                android:paddingTop="10dp"
                 android:visibility="visible">
 
                 <TextView

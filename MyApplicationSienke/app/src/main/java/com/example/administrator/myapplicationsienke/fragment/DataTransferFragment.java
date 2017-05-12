@@ -260,7 +260,9 @@ public class DataTransferFragment extends Fragment {
         downFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!sharedPreferences.getBoolean("have_download", false)) {
+                if (sharedPreferences.getBoolean("have_download", false)) {
+                    Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
+                } else {
                     saveSecurityTypeInfo();     //保存选中的安检类型编号信息
                     if(stringList.size() > 1){
                         popupWindow.dismiss();
@@ -272,12 +274,9 @@ public class DataTransferFragment extends Fragment {
                                 try {
                                     for(int i = 0;i<stringList.size();i++){
                                         securityIds += stringList.get(i)+",";
-                                        if(i == (stringList.size()-1)){
-                                            securityIds = stringList.get(i);
-                                        }
-                                        requireMyTask("SafeCheckPlan.do", "safePlanMember=" + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8")
-                                                +"&securityId="+securityIds+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
                                     }
+                                    requireMyTask("SafeCheckPlan.do", "safePlanMember=" + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8")
+                                            +"&securityId="+securityIds+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
                                 } catch (UnsupportedEncodingException e) {
                                     e.printStackTrace();
                                 }
@@ -285,6 +284,8 @@ public class DataTransferFragment extends Fragment {
                             }
                         }.start();
                     }else if(stringList.size() == 1){
+                        popupWindow.dismiss();
+                        showPopupwindow();
                         new Thread() {
                             @Override
                             public void run() {
@@ -301,8 +302,6 @@ public class DataTransferFragment extends Fragment {
                     }else {
                         Toast.makeText(getActivity(), "请选择安检类型和时间哦！", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -340,6 +339,7 @@ public class DataTransferFragment extends Fragment {
 
     //保存选中的安检类型编号信息
     public void saveSecurityTypeInfo() {
+        //stringList.clear();
         int count = adapter.getCount();
         Log.i("count====>", "长度为：" + count);
         for (int i = 0; i < count; i++) {
@@ -406,13 +406,11 @@ public class DataTransferFragment extends Fragment {
                     Log.i("sharedPreferences====>", sharedPreferences.getString("IP", ""));
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         ip = "88.88.88.66:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
-                        //Log.i("sharedPreferences=ip=>",ip);
                     } else {
                         port = "8088";
                     }
@@ -503,11 +501,11 @@ public class DataTransferFragment extends Fragment {
                     userResult = stringBuilder.toString();
                     Log.i("userResult==========>", userResult);
                     JSONObject jsonObject = new JSONObject(userResult);
-                    if (!jsonObject.optString("total", "").equals("0")) {
+                    /*if (!jsonObject.optString("total", "").equals("0")) {
+                        //有相应用户数据
+                        editor.putBoolean("user_data", true);
+                        editor.commit();
                         if (url.toString().contains(taskNumbList.get(0))) { //当第一个任务有数据的时候就将任务信息保存本地，下次将不会进来
-                            //有相应用户数据
-                            editor.putBoolean("user_data", true);
-                            editor.commit();
                             for (int i = 0; i < taskNumbList.size(); i++) {
                                 if (sharedPreferences.getBoolean("user_data", true)) {
                                     if (i == 0) {
@@ -516,9 +514,6 @@ public class DataTransferFragment extends Fragment {
                                             try {
                                                 taskObject = jsonArray.getJSONObject(j);
                                                 insertTaskDataBase();
-                                                editor.putInt("totalCount", totalCount);
-                                                editor.commit();
-                                                Log.i("totalCount==========>", "总户数=" + totalCount);
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
@@ -544,9 +539,9 @@ public class DataTransferFragment extends Fragment {
                                     break;
                                 }
                             }
-                            /*if(sharedPreferences.getBoolean("user_data",true)){    //下载完之后做相应处理
+                            *//*if(sharedPreferences.getBoolean("user_data",true)){    //下载完之后做相应处理
                                 handler.sendEmptyMessage(10);
-                            }*/
+                            }*//*
                         }
                         return userResult;
                     } else {
@@ -554,6 +549,47 @@ public class DataTransferFragment extends Fragment {
                         editor.commit();
                         if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
                             //没有相应用户数据
+                            handler.sendEmptyMessage(4);
+                        }
+                    }*/
+                    if (!jsonObject.optString("total", "").equals("0")) {
+                        //有相应用户数据
+                        if (url.toString().contains(taskNumbList.get(taskNumbList.size()-1))) { //当第最后一个任务有数据的时候就将任务信息保存本地
+                            Log.i("jsonArray==========>", "jsonArray==" + jsonArray.length());
+                            for (int j = 0; j < jsonArray.length(); j++) {
+                                try {
+                                    taskObject = jsonArray.getJSONObject(j);
+                                    insertTaskDataBase();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            for (int i = 0; i < taskNumbList.size(); i++) {
+                                try {
+                                    Thread.sleep(200);
+                                    userProgress += 10 * taskNumbList.size() / taskNumbList.size();
+                                    currentUserPercent = (1000 * (i + 1)) / (10 * taskNumbList.size());
+                                    Message msg = new Message();
+                                    msg.what = 9;
+                                    msg.arg1 = userProgress;
+                                    msg.arg2 = currentUserPercent;
+                                    Log.i("down_user_progress=>", " 循环次数为" + taskNumbList.size());
+                                    Log.i("down_user_progress=>", " 更新进度条" + userProgress);
+                                    Log.i("down_user_progress=>", " 下载进度: " + currentUserPercent);
+                                    handler.sendMessage(msg);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            /*if(sharedPreferences.getBoolean("user_data",true)){    //下载完之后做相应处理
+                                handler.sendEmptyMessage(10);
+                            }*/
+                        }
+                        return userResult;
+                    } else {
+                        if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
+                            //没有相应用户数据
+                            handler.sendEmptyMessage(4);
                         }
                     }
                 } else {
@@ -583,7 +619,7 @@ public class DataTransferFragment extends Fragment {
             if (isCancelled()) {
                 return;
             }
-            downloadProgress.setProgress(values[0]);
+            //downloadProgress.setProgress(values[0]);
         }
 
         @Override
@@ -700,12 +736,10 @@ public class DataTransferFragment extends Fragment {
                     }
                     break;
                 case 2:
-                    download.setClickable(true);
                     popupWindow.dismiss();
                     Toast.makeText(getActivity(), "没有任务下载哦！", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
-                    download.setClickable(true);
                     popupWindow.dismiss();
                     Toast.makeText(getActivity(), "网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
@@ -747,7 +781,7 @@ public class DataTransferFragment extends Fragment {
                         finishBtn.setVisibility(View.VISIBLE);
                         downFailed.setVisibility(View.GONE);
                         editor.putBoolean("have_download", true);   //下载之后必须上传才能再次下载
-                        editor.commit();
+                        editor.apply();
                         userProgress = 0;
                         currentUserPercent = 0;
                         download.setClickable(true);
@@ -797,7 +831,6 @@ public class DataTransferFragment extends Fragment {
         values.put("taskId", taskObject.optInt("safetyplanId", 0) + "");
         values.put("securityType", taskObject.optString("securityName", ""));
         values.put("totalCount", taskObject.optInt("countRs", 0) + "");
-        totalCount += taskObject.optInt("countRs", 0);
         values.put("endTime", taskObject.optString("safetyEnd", ""));
         values.put("loginName",sharedPreferences_login.getString("login_name",""));
         // 第一个参数:表名称

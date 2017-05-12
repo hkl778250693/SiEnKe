@@ -637,7 +637,7 @@ public class NewTaskActivity extends Activity {
     //读取安检状态信息
     public void getSecurityState() {
         popupwindowListItemList.clear();
-        cursor = db.query("SecurityState", null, null, null, null, null, null);//查询并获得游标
+        cursor = db.rawQuery("select * from SecurityState where loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});//查询并获得游标
         Log.i("getSecurityState=>", " 查询到的状态个数为：" + cursor.getCount());
         //如果游标为空，则显示默认数据
         if (cursor.getCount() == 0) {
