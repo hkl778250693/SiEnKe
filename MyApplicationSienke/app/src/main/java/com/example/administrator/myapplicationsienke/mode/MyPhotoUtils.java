@@ -1,5 +1,7 @@
 package com.example.administrator.myapplicationsienke.mode;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
@@ -16,11 +18,13 @@ public class MyPhotoUtils {
     private String securityId;
     private File cropDir;  //裁剪后的图片路径
     private File tempDir;    //未裁剪的临时图片
+    private SharedPreferences sharedPreferences_login;
 
-    public MyPhotoUtils(String securityId) {
+    public MyPhotoUtils(Context context,String securityId) {
         this.securityId = securityId;
+        sharedPreferences_login = context.getSharedPreferences("login_info", Context.MODE_PRIVATE);
         File external = Environment.getExternalStorageDirectory();
-        String rootDir = "/" + "ThinkerSoft";
+        String rootDir = "/" + "ThinkerSoft_"+sharedPreferences_login.getString("login_name","");
         tempDir = new File(external, rootDir + "/icon");
         cropDir = new File(external, rootDir + "/crop");
         if (!tempDir.getParentFile().exists()) {
@@ -39,11 +43,10 @@ public class MyPhotoUtils {
     }
 
     public File createTempFile() {
-        String timeFlag = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String fileName = "";
         if (tempDir != null) {
             //fileName = UUID.randomUUID().toString() + ".png";
-            fileName = "Icon_IMG_" + timeFlag + ".jpg";
+            fileName = "Icon_IMG_" + ".jpg";
         }
         return new File(tempDir, fileName);
     }

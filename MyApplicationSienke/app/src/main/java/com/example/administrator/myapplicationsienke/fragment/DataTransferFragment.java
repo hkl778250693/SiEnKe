@@ -348,7 +348,7 @@ public class DataTransferFragment extends Fragment {
 
     //保存选中的安检类型编号信息
     public void saveSecurityTypeInfo() {
-        //stringList.clear();
+        stringList.clear();
         int count = adapter.getCount();
         Log.i("count====>", "长度为：" + count);
         for (int i = 0; i < count; i++) {
@@ -416,12 +416,12 @@ public class DataTransferFragment extends Fragment {
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                     } else {
-                        ip = "88.88.88.66:";
+                        ip = "192.168.2.201:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                     } else {
-                        port = "8088";
+                        port = "8080";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递
@@ -657,13 +657,13 @@ public class DataTransferFragment extends Fragment {
             ip = sharedPreferences.getString("security_ip", "");
             Log.i("sharedPreferences=ip=>", ip);
         } else {
-            ip = "88.88.88.66:";
+            ip = "192.168.2.201:";
         }
         if (!sharedPreferences.getString("security_port", "").equals("")) {
             port = sharedPreferences.getString("security_port", "");
             Log.i("sharedPreferences=ip=>", port);
         } else {
-            port = "8088";
+            port = "8080";
         }
         new Thread() {
             @Override

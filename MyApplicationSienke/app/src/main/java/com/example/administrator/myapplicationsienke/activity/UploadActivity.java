@@ -182,24 +182,22 @@ public class UploadActivity extends Activity {
                                 new Thread() {
                                     @Override
                                     public void run() {
-                                        if (uploadNumber != 0) {
-                                            if (uploadProgress.getProgress() == maxProgress * 10) {
-                                                Log.i("uploadProgress", "上传的进度为：" + uploadProgress.getProgress());
-                                                Message msg = new Message();
-                                                msg.what = 4;
-                                                msg.arg1 = uploadNumber;
-                                                msg.arg2 = noCheckNumber;
-                                                handler.sendMessage(msg);
-                                            }
-                                        } else {
-                                            Log.i("up_load==========", "点击上传时记录的未安检户数为：" + noCheckNumber);
-                                            if (noCheckNumber == 0 && "保存成功".equals(httpUtils.result)) {   //说明当前勾选的任务用户数据已经全部上传
-                                                handler.sendEmptyMessage(6);
+                                        if(sharedPreferences.getBoolean("upload_success",true)){
+                                            if (uploadNumber != 0) {
+                                                if (uploadProgress.getProgress() == maxProgress * 10) {
+                                                    Log.i("uploadProgress", "上传的进度为：" + uploadProgress.getProgress());
+                                                    handler.sendEmptyMessage(4);
+                                                }
                                             } else {
-                                                Message msg = new Message();
-                                                msg.what = 7;
-                                                msg.arg1 = noCheckNumber;
-                                                handler.sendMessage(msg);
+                                                Log.i("up_load==========", "点击上传时记录的未安检户数为：" + noCheckNumber);
+                                                if (noCheckNumber == 0 && "保存成功".equals(httpUtils.result)) {   //说明当前勾选的任务用户数据已经全部上传
+                                                    handler.sendEmptyMessage(6);
+                                                } else {
+                                                    Message msg = new Message();
+                                                    msg.what = 7;
+                                                    msg.arg1 = noCheckNumber;
+                                                    handler.sendMessage(msg);
+                                                }
                                             }
                                         }
                                     }
@@ -366,7 +364,7 @@ public class UploadActivity extends Activity {
                         ip = sharedPreferences.getString("security_ip", "");
                         Log.i("sharedPref_security_ip", ip);
                     } else {
-                        ip = "88.88.88.31:";
+                        ip = "192.168.2.201:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
@@ -379,12 +377,15 @@ public class UploadActivity extends Activity {
                     if ("保存成功".equals(httpUtils.result)) {
                         updateUserUploadState(securityNumber);   //如果返回保存成功则将用户表的上传状态改为true
                         uploadNumber++;
+                        editor.putBoolean("upload_success",true).apply();
                         handler.sendEmptyMessage(3);
                     } else if ("保存失败".equals(httpUtils.result)) {
                         Log.i("UploadActivity=>", "保存失败！");
+                        editor.putBoolean("upload_success",false).apply();
                         handler.sendEmptyMessage(5);
                         break;
                     } else if ("".equals(httpUtils.result)) {
+                        editor.putBoolean("upload_success",false).apply();
                         Log.i("UploadActivity=>", "网络请求错误！");
                         handler.sendEmptyMessage(9);
                         break;
@@ -504,10 +505,10 @@ public class UploadActivity extends Activity {
                 case 4:
                     progressPercent.setText("100");
                     String uploadResult;
-                    if (msg.arg2 == 0) {
-                        uploadResult = "数据上传完成！共上传了" + msg.arg1 + "个用户数据";
+                    if (noCheckNumber == 0) {
+                        uploadResult = "数据上传完成！共上传了" + uploadNumber + "个用户数据";
                     } else {
-                        uploadResult = "数据上传完成！共上传了" + msg.arg1 + "个用户数据,还有" + msg.arg2 + "个用户未安检，请您安检以后继续上传！";
+                        uploadResult = "数据上传完成！共上传了" + uploadNumber + "个用户数据,还有" + noCheckNumber + "个用户未安检，请您安检以后继续上传！";
                     }
                     progressName.setText(uploadResult);
                     linearlayoutUpload.setVisibility(View.GONE);

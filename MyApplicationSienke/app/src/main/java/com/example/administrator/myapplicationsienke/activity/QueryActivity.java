@@ -258,7 +258,7 @@ public class QueryActivity extends Activity {
                         ip = sharedPreferences.getString("IP", "");
                         //Log.i("sharedPreferences=ip=>",ip);
                     } else {
-                        ip = "88.88.88.31:8080";
+                        ip = "192.168.2.201:8080";
                     }
                     String httpUrl = "http://" + ip + "/SMDemo/" + method;
                     //有参数传递

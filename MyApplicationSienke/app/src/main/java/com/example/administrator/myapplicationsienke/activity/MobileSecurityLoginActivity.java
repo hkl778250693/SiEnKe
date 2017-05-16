@@ -158,12 +158,12 @@ public class MobileSecurityLoginActivity extends Activity {
                         if (!sharedPreferences.getString("security_ip", "").equals("")) {
                             ip = sharedPreferences.getString("security_ip", "");
                         } else {
-                            ip = "88.88.88.66:";
+                            ip = "192.168.2.201:";
                         }
                         if (!sharedPreferences.getString("security_port", "").equals("")) {
                             port = sharedPreferences.getString("security_port", "");
                         } else {
-                            port = "8088";
+                            port = "8080";
                         }
                         String httpUrl = "http://" + ip + port + "/SMDemo/login.do";
                         Log.i("httpUrl==========>", "" + httpUrl);
@@ -193,7 +193,7 @@ public class MobileSecurityLoginActivity extends Activity {
                         urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                         //urlConnection.setRequestProperty("Origin", "http://"+ ip + port);
                         urlConnection.setRequestProperty("Content-Length", String.valueOf(data.getBytes().length));
-                        urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0");
+                        //urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0");
                         //获取输出流
                         OutputStream os = urlConnection.getOutputStream();
                         os.write(data.getBytes("UTF-8"));

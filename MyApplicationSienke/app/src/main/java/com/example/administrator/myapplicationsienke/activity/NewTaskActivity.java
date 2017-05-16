@@ -295,12 +295,12 @@ public class NewTaskActivity extends Activity {
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                     } else {
-                        ip = "88.88.88.66:";
+                        ip = "192.168.2.201:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                     } else {
-                        port = "8088";
+                        port = "8080";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/addSafePlan.do";
                     Log.i("postMyTask_url====>", "" + httpUrl);
@@ -385,7 +385,7 @@ public class NewTaskActivity extends Activity {
                 JSONObject object1 = new JSONObject();
                 object1.put("c_user_id", parclebleList.get(i).getUserId());
                 object1.put("n_data_state", 1);
-                object1.put("n_safety_state", 1);
+                object1.put("n_safety_state", 0);
                 object1.put("n_safety_date_type", 0);
                 object1.put("c_safety_type", Integer.parseInt(itemId));       //安检类型
                 jsonArray.put(i, object1);
@@ -450,12 +450,12 @@ public class NewTaskActivity extends Activity {
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                     } else {
-                        ip = "88.88.88.66:";
+                        ip = "192.168.2.201:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                     } else {
-                        port = "8088";
+                        port = "8080";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     //有参数传递

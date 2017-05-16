@@ -108,7 +108,7 @@ public class MoreSettingsActivity extends Activity {
         if(!sharedPreferences.getString("IP","").equals("")){
             ipEdit.setText(sharedPreferences.getString("IP",""));
         }else {
-            ipEdit.setText("88.88.88.31:8080");
+            ipEdit.setText("192.168.2.200:8080");
         }
         if(!sharedPreferences.getString("servePhoneNumber","").equals("")){
             servePhoneEdit.setText(sharedPreferences.getString("servePhoneNumber",""));

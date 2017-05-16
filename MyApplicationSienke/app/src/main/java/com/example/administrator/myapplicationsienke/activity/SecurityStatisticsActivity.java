@@ -183,7 +183,7 @@ public class SecurityStatisticsActivity extends Activity {
         notCheckedNumber.setText(String.valueOf(notChecked));
         if (sharedPreferences.getInt("totalCount", 0) != 0) {
             double checkedNumber = (double) checkedUserNumber* 100;
-            double totalCount = (double) sharedPreferences.getInt("totalCount", 0);
+            double totalCount = (double) totalUserNumber;
             double finishingRate = checkedNumber/totalCount;  //完成率
             Log.i("getTotalUserNumber===>", "完成率=" + finishingRate + "%");
             DecimalFormat df = new DecimalFormat("0.0");
@@ -214,7 +214,7 @@ public class SecurityStatisticsActivity extends Activity {
         notCheckedNumber.setText(String.valueOf(notChecked));
         if (sharedPreferences.getInt("taskTotalUserNumber", 0) != 0) {
             double checkedNumber = (double) checkedUserNumber* 100;
-            double totalCount = (double) sharedPreferences.getInt("taskTotalUserNumber", 0);
+            double totalCount = (double) taskTotalUserNumber;
             double finishingRate = checkedNumber/totalCount;  //完成率
             Log.i("getTaskUserNumber===>", "完成率=" + finishingRate + "%");
             DecimalFormat df = new DecimalFormat("0.0");

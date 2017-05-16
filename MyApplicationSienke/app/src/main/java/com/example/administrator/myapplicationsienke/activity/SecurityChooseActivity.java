@@ -470,12 +470,12 @@ public class SecurityChooseActivity extends FragmentActivity {
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                     } else {
-                        ip = "88.88.88.66:";
+                        ip = "192.168.2.201:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                     } else {
-                        port = "8088";
+                        port = "8080";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     url = new URL(httpUrl);
@@ -537,12 +537,12 @@ public class SecurityChooseActivity extends FragmentActivity {
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                     } else {
-                        ip = "88.88.88.66:";
+                        ip = "192.168.2.201:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                     } else {
-                        port = "8088";
+                        port = "8080";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     url = new URL(httpUrl);
@@ -602,12 +602,12 @@ public class SecurityChooseActivity extends FragmentActivity {
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                     } else {
-                        ip = "88.88.88.66:";
+                        ip = "192.168.2.201:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                     } else {
-                        port = "8088";
+                        port = "8080";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     url = new URL(httpUrl);
@@ -667,12 +667,12 @@ public class SecurityChooseActivity extends FragmentActivity {
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                     } else {
-                        ip = "88.88.88.66:";
+                        ip = "192.168.2.201:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
                     } else {
-                        port = "8088";
+                        port = "8080";
                     }
                     String httpUrl = "http://" + ip + port + "/SMDemo/" + method;
                     url = new URL(httpUrl);
