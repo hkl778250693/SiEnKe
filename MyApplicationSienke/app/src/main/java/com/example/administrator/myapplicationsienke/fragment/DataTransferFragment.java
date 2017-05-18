@@ -25,21 +25,31 @@ import android.widget.DatePicker;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.administrator.myapplicationsienke.R;
 import com.example.administrator.myapplicationsienke.activity.UploadActivity;
 import com.example.administrator.myapplicationsienke.adapter.GridviewTypeAdapter;
+import com.example.administrator.myapplicationsienke.adapter.SelectTaskDownAdapter;
+import com.example.administrator.myapplicationsienke.adapter.TaskChooseAdapter;
 import com.example.administrator.myapplicationsienke.mode.MySqliteHelper;
 import com.example.administrator.myapplicationsienke.model.GridviewTypeItem;
 import com.example.administrator.myapplicationsienke.model.GridviewTypeViewholder;
+import com.example.administrator.myapplicationsienke.model.SelectTaskDownViewHolder;
+import com.example.administrator.myapplicationsienke.model.SelectTaskItem;
 import com.example.administrator.myapplicationsienke.model.TaskChoose;
+import com.example.administrator.myapplicationsienke.model.TaskChooseViewHolder;
+import com.example.administrator.myapplicationsienke.model.UserListviewItem;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,11 +67,11 @@ import java.util.List;
  * Created by Administrator on 2017/3/16 0016.
  */
 public class DataTransferFragment extends Fragment {
-    private View view, filterPopup,popupwindowView, uploadView;
+    private View view, filterPopup, popupwindowView, uploadView, selectTaskView;
     private TextView upload, download, progressName, progressPercent, tips;
     private LinearLayout rootLinearlayout, linearlayoutDown;
     private Button finishBtn;
-    private RadioButton cancelRb, saveRb;
+    private RadioButton cancelRb, saveRb, cancelSelect, saveSelect;
     private ImageView downFailed;
     private String taskResult, userResult; //网络请求结果
     private SharedPreferences sharedPreferences, sharedPreferences_login;
@@ -74,7 +84,6 @@ public class DataTransferFragment extends Fragment {
     private JSONObject taskObject, userObject;
     private SQLiteDatabase db;  //数据库
     private int totalCount = 0;  //总户数
-    private List<String> taskNumbList = new ArrayList<>();
     private ProgressBar downloadProgress;  //下载进度条
     private int currentProgress = 0;
     private int currentUserPercent = 0;
@@ -86,14 +95,21 @@ public class DataTransferFragment extends Fragment {
     private TextView endDate;//结束日期选择器
     private RadioButton cancelFilter, downFilter;
     private GridviewTypeAdapter adapter;
+    private SelectTaskDownAdapter taskDownAdapter;
     private List<GridviewTypeItem> gridviewTypeItemList = new ArrayList<>();
+    private List<SelectTaskItem> selectTaskItemList = new ArrayList<>();
+    private List<String> stringTaskList = new ArrayList<>();  //保存本地没有的任务编号
+    private List<String> stringSelectTask = new ArrayList<>();  //保存勾选的任务编号
     private Cursor cursor;
     private GridView gridView;
     private Calendar c; //日历
     private GridviewTypeItem item;
+    private SelectTaskItem taskItem;
     private ArrayList<String> stringList = new ArrayList<>();//保存安检类型编号ID
     private String securityIds = "";  //存放下载数据的url的参数值
     private int res;
+    private Cursor taskCursor;   //用于检查本地是否有相同的任务编号，有的话就不下载了
+    private ListView listview;   //显示选择任务的集合
 
     @Nullable
     @Override
@@ -125,13 +141,8 @@ public class DataTransferFragment extends Fragment {
             switch (v.getId()) {
                 case R.id.upload:
                     upload.setClickable(false);
-                    if (sharedPreferences.getBoolean("have_download", false)) {
-                        createSavePopupwindow();
-                    } else {
-                        Intent intent = new Intent(getActivity(), UploadActivity.class);
-                        startActivity(intent);
-                        upload.setClickable(true);
-                    }
+                    createSavePopupwindow();
+                    upload.setClickable(true);
                     break;
                 case R.id.download:
                     download.setClickable(false);
@@ -145,7 +156,7 @@ public class DataTransferFragment extends Fragment {
     //初始化设置
     private void defaultSetting() {
         sharedPreferences_login = getActivity().getSharedPreferences("login_info", Context.MODE_PRIVATE);
-        sharedPreferences = getActivity().getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
+        sharedPreferences = getActivity().getSharedPreferences(sharedPreferences_login.getString("login_name", "") + "data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         MySqliteHelper helper = new MySqliteHelper(getActivity(), 1);
         db = helper.getWritableDatabase();
@@ -185,7 +196,6 @@ public class DataTransferFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                upload.setClickable(true);
             }
         });
         saveRb.setOnClickListener(new View.OnClickListener() {
@@ -194,7 +204,6 @@ public class DataTransferFragment extends Fragment {
                 popupWindow.dismiss();
                 Intent intent = new Intent(getActivity(), UploadActivity.class);
                 startActivity(intent);
-                upload.setClickable(true);
             }
         });
         popupWindow.update();
@@ -205,7 +214,73 @@ public class DataTransferFragment extends Fragment {
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                upload.setClickable(true);
+                backgroundAlpha(1.0F);
+            }
+        });
+    }
+
+    //弹出下载前选择任务编号popupwindow
+    public void showSelectTaskPoup() {
+        layoutInflater = LayoutInflater.from(getActivity());
+        selectTaskView = layoutInflater.inflate(R.layout.popupwindow_select_task_down, null);
+        popupWindow = new PopupWindow(selectTaskView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        //绑定控件ID
+        cancelSelect = (RadioButton) selectTaskView.findViewById(R.id.cancel_select);
+        saveSelect = (RadioButton) selectTaskView.findViewById(R.id.save_select);
+        listview = (ListView) selectTaskView.findViewById(R.id.listview);
+        //设置点击事件
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SelectTaskDownViewHolder holder = (SelectTaskDownViewHolder) view.getTag();
+                holder.checkBox.toggle();
+                SelectTaskDownAdapter.getIsCheck().put(position, holder.checkBox.isChecked());
+            }
+        });
+        cancelSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelSelect.setClickable(false);
+                popupWindow.dismiss();
+                cancelSelect.setClickable(true);
+            }
+        });
+        saveSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveSelect.setClickable(false);
+                saveSelectTaskInfo();  //保存勾选的任务编号信息
+                if (stringSelectTask.size() != 0) {   //如果任务勾选了
+                    stringTaskList.clear();
+                    for (int i = 0; i < stringSelectTask.size(); i++) {
+                        getTaskData(stringSelectTask.get(i), sharedPreferences_login.getString("login_name", ""));//读取所有安检用户数据
+                        if (taskCursor.getCount() == 0) {   //如果本地不存在本任务信息则将此任务编号添加到下载任务的集合中
+                            stringTaskList.add(stringSelectTask.get(i));
+                        } else {
+                            Toast.makeText(getActivity(), "编号为" + stringSelectTask.get(i) + "的任务本地已存在，不能重复下载哦", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    Log.i("taskNumbList====>", "一共有" + stringTaskList.size() + "个任务");
+                    if(stringTaskList.size() != 0){  //当有需要下载的任务信息时，弹出下载进度条
+                        popupWindow.dismiss();
+                        showPopupwindow(); //弹出下载进度条
+                        downloadProgress.setMax(10 * stringTaskList.size());
+                        setProgress();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "请选择任务编号哦！", Toast.LENGTH_SHORT).show();
+                }
+                saveSelect.setClickable(true);
+            }
+        });
+        popupWindow.update();
+        popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.white_transparent));
+        popupWindow.setAnimationStyle(R.style.camera);
+        backgroundAlpha(0.6F);   //背景变暗
+        popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
                 backgroundAlpha(1.0F);
             }
         });
@@ -261,56 +336,40 @@ public class DataTransferFragment extends Fragment {
         downFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (sharedPreferences.getBoolean("have_download", false)) {
-                    Toast.makeText(getActivity(), "上传数据之后才能再次下载任务哦！", Toast.LENGTH_SHORT).show();
-                } else {
-                    String str1= startDate.getText().toString();
-                    String str2= endDate.getText().toString();
-                    res=str1.compareTo(str2);
-                    Log.i("NewTaskActivity","比较结果:"+res);
-                    if(res <= 0){
-                        saveSecurityTypeInfo();     //保存选中的安检类型编号信息
-                        if(stringList.size() > 1){
-                            popupWindow.dismiss();
-                            showPopupwindow();
-                            //开启支线程进行请求任务信息
-                            new Thread() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        for(int i = 0;i<stringList.size();i++){
-                                            securityIds += stringList.get(i)+",";
-                                        }
-                                        requireMyTask("SafeCheckPlan.do", "safePlanMember=" + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8")
-                                                +"&securityId="+securityIds+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
-                                    } catch (UnsupportedEncodingException e) {
-                                        e.printStackTrace();
-                                    }
-                                    super.run();
+                String str1 = startDate.getText().toString();
+                String str2 = endDate.getText().toString();
+                res = str1.compareTo(str2);
+                Log.i("NewTaskActivity", "比较结果:" + res);
+                if (res <= 0) {
+                    saveSecurityTypeInfo();     //保存选中的安检类型编号信息
+                    if (stringList.size() > 1) {
+                        popupWindow.dismiss();
+                        //开启支线程进行请求任务信息
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                for (int i = 0; i < stringList.size(); i++) {
+                                    securityIds += stringList.get(i) + ",";
                                 }
-                            }.start();
-                        }else if(stringList.size() == 1){
-                            popupWindow.dismiss();
-                            showPopupwindow();
-                            new Thread() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        securityIds = stringList.get(0);
-                                        requireMyTask("SafeCheckPlan.do", "safePlanMember=" + URLEncoder.encode(sharedPreferences_login.getString("user_name", ""), "UTF-8")
-                                                +"&securityId="+securityIds+"&startTime="+startDate.getText().toString()+"&endTime="+endDate.getText().toString());
-                                    } catch (UnsupportedEncodingException e) {
-                                        e.printStackTrace();
-                                    }
-                                    super.run();
-                                }
-                            }.start();
-                        }else {
-                            Toast.makeText(getActivity(), "请选择安检类型和时间哦！", Toast.LENGTH_SHORT).show();
-                        }
-                    }else{
-                        Toast.makeText(getActivity(), "开始时间不能大于结束时间哦！", Toast.LENGTH_SHORT).show();
+                                requireMyTask("SafeCheckPlan.do", "securityId=" + securityIds + "&startTime=" + startDate.getText().toString() + "&endTime=" + endDate.getText().toString());
+                                super.run();
+                            }
+                        }.start();
+                    } else if (stringList.size() == 1) {
+                        popupWindow.dismiss();
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                securityIds = stringList.get(0);
+                                requireMyTask("SafeCheckPlan.do", "securityId=" + securityIds + "&startTime=" + startDate.getText().toString() + "&endTime=" + endDate.getText().toString());
+                                super.run();
+                            }
+                        }.start();
+                    } else {
+                        Toast.makeText(getActivity(), "请选择安检类型和时间哦！", Toast.LENGTH_SHORT).show();
                     }
+                } else {
+                    Toast.makeText(getActivity(), "开始时间不能大于结束时间哦！", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -319,20 +378,20 @@ public class DataTransferFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 GridviewTypeViewholder viewholder = (GridviewTypeViewholder) view.getTag();
                 viewholder.checkBox.toggle();
-                GridviewTypeAdapter.getIsCheck().put(position,viewholder.checkBox.isChecked());
+                GridviewTypeAdapter.getIsCheck().put(position, viewholder.checkBox.isChecked());
             }
         });
         popupWindow.update();
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.color.white_transparent));
         popupWindow.setAnimationStyle(R.style.camera);
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 getSecurityState();
                 if (cursor.getCount() != 0) {
                     handler.sendEmptyMessage(10);
-                }else {
+                } else {
                     handler.sendEmptyMessage(11);
                 }
             }
@@ -354,11 +413,26 @@ public class DataTransferFragment extends Fragment {
         for (int i = 0; i < count; i++) {
             if (GridviewTypeAdapter.getIsCheck().get(i)) {
                 item = gridviewTypeItemList.get((int) adapter.getItemId(i));
-                Log.i("DataTransferFragment", "这次被勾选的安检类型编号是" +item.getTypeId());
+                Log.i("DataTransferFragment", "这次被勾选的安检类型编号是" + item.getTypeId());
                 stringList.add(item.getTypeId());
             }
         }
         Log.i("DataTransferFragment", "安检类型集合长度为：" + stringList.size());
+    }
+
+    //保存选中的任务信息
+    public void saveSelectTaskInfo() {
+        stringSelectTask.clear();
+        int count = taskDownAdapter.getCount();
+        Log.i("count====>", "长度为：" + count);
+        for (int i = 0; i < count; i++) {
+            if (SelectTaskDownAdapter.getIsCheck().get(i)) {
+                taskItem = selectTaskItemList.get((int) adapter.getItemId(i));
+                Log.i("DataTransferFragment", "这次被勾选的任务是" + item.getTypeId());
+                stringSelectTask.add(taskItem.getTaskId());
+            }
+        }
+        Log.i("DataTransferFragment", "任务集合长度为：" + stringSelectTask.size());
     }
 
     //show下载popupwindow
@@ -563,26 +637,17 @@ public class DataTransferFragment extends Fragment {
                     }*/
                     if (!jsonObject.optString("total", "").equals("0")) {
                         //有相应用户数据
-                        if (url.toString().contains(taskNumbList.get(taskNumbList.size()-1))) { //当第最后一个任务有数据的时候就将任务信息保存本地
-                            Log.i("jsonArray==========>", "jsonArray==" + jsonArray.length());
-                            for (int j = 0; j < jsonArray.length(); j++) {
-                                try {
-                                    taskObject = jsonArray.getJSONObject(j);
-                                    insertTaskDataBase();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            for (int i = 0; i < taskNumbList.size(); i++) {
+                        if (url.toString().contains(stringTaskList.get(stringTaskList.size() - 1))) { //当第最后一个任务有数据的时候就将任务信息保存本地
+                            for (int i = 0; i < 5; i++) {
                                 try {
                                     Thread.sleep(200);
-                                    userProgress += 10 * taskNumbList.size() / taskNumbList.size();
-                                    currentUserPercent = (1000 * (i + 1)) / (10 * taskNumbList.size());
+                                    userProgress += 10 * 5 / 5;
+                                    currentUserPercent = (1000 * (i + 1)) / (10 * 5);
                                     Message msg = new Message();
                                     msg.what = 9;
                                     msg.arg1 = userProgress;
                                     msg.arg2 = currentUserPercent;
-                                    Log.i("down_user_progress=>", " 循环次数为" + taskNumbList.size());
+                                    Log.i("down_user_progress=>", " 循环次数为" + 5);
                                     Log.i("down_user_progress=>", " 更新进度条" + userProgress);
                                     Log.i("down_user_progress=>", " 下载进度: " + currentUserPercent);
                                     handler.sendMessage(msg);
@@ -590,19 +655,30 @@ public class DataTransferFragment extends Fragment {
                                     e.printStackTrace();
                                 }
                             }
-                            /*if(sharedPreferences.getBoolean("user_data",true)){    //下载完之后做相应处理
-                                handler.sendEmptyMessage(10);
-                            }*/
+                            Log.i("stringTaskList====>", "下载的任务个数为：" + stringTaskList.size());
+                            for (int i = 0; i < stringTaskList.size(); i++) {
+                                try {
+                                    for(int j = 0; j < jsonArray.length(); j++){
+                                        taskObject = jsonArray.getJSONObject(j);
+                                        if(String.valueOf(taskObject.optInt("safetyplanId", 0)).equals(stringTaskList.get(i))){
+                                            insertTaskDataBase();
+                                            Log.i("stringTaskList====>", "任务插入本地数据库！");
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                         return userResult;
                     } else {
-                        if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
+                        if (url.toString().contains(stringTaskList.get(stringTaskList.size() - 1))) {
                             //没有相应用户数据
                             handler.sendEmptyMessage(4);
                         }
                     }
                 } else {
-                    if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
+                    if (url.toString().contains(stringTaskList.get(stringTaskList.size() - 1))) {
                         handler.sendEmptyMessage(6);
                     }
                 }
@@ -612,7 +688,7 @@ public class DataTransferFragment extends Fragment {
                 e.printStackTrace();
             } catch (IOException e) {
                 Log.i("IOException", "下载用户数据网络请求异常!");
-                if (url.toString().contains(taskNumbList.get(taskNumbList.size() - 1))) {
+                if (url.toString().contains(stringTaskList.get(stringTaskList.size() - 1))) {
                     handler.sendEmptyMessage(3);
                 }
                 e.printStackTrace();
@@ -670,11 +746,11 @@ public class DataTransferFragment extends Fragment {
             public void run() {
                 String url;
                 String httpUrl = "http://" + ip + port + "/SMDemo/" + "getUserCheck.do?" + "safetyPlan=";
-                Log.i("startAsyncTask========>", "任务编号个数为：" + taskNumbList.size());
+                Log.i("startAsyncTask========>", "任务编号个数为：" + stringTaskList.size());
                 currentUserPercent = 0;
-                for (int i = 0; i < taskNumbList.size(); i++) {
+                for (int i = 0; i < stringTaskList.size(); i++) {
                     MyAsyncTask myAsyncTask = new MyAsyncTask();
-                    url = httpUrl + taskNumbList.get(i);
+                    url = httpUrl + stringTaskList.get(i);
                     Log.i("startAsyncTask========>", url);
                     myAsyncTask.execute(url);
                 }
@@ -687,10 +763,10 @@ public class DataTransferFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    for (int i = 0; i < jsonArray.length(); i++) {
+                    for (int i = 0; i < stringTaskList.size(); i++) {
                         Thread.sleep(200);
-                        currentProgress += 10 * jsonArray.length() / jsonArray.length();
-                        currentPercent = (1000 * (i + 1)) / (10 * jsonArray.length());
+                        currentProgress += 10 * stringTaskList.size() / stringTaskList.size();
+                        currentPercent = (1000 * (i + 1)) / (10 * stringTaskList.size());
                         Message msg = new Message();
                         msg.what = 7;
                         msg.arg1 = currentProgress;
@@ -724,22 +800,38 @@ public class DataTransferFragment extends Fragment {
         return false;
     }
 
+    //读取下载到本地的任务数据
+    public void getTaskData(String taskId, String loginName) {
+        taskCursor = db.rawQuery("select * from User where taskId=? and loginName=?", new String[]{taskId, loginName});//查询并获得游标
+        //如果游标为空，则返回空
+        if (cursor.getCount() == 0) {
+            return;
+        }
+        while (cursor.moveToNext()) {
+
+        }
+    }
+
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
                     try {
+                        selectTaskItemList.clear();
                         JSONObject jsonObject = new JSONObject(taskResult);
                         jsonArray = jsonObject.getJSONArray("rows");
-                        downloadProgress.setMax(10 * jsonArray.length());
-                        taskNumbList.clear();
                         for (int j = 0; j < jsonArray.length(); j++) {             //获取到任务的个数，用于后面下载相应的用户数据
-                            taskObject = jsonArray.getJSONObject(j);
-                            taskNumbList.add(taskObject.optInt("safetyplanId", 0) + "");
-                            Log.i("taskNumbList====>", "一共有" + taskNumbList.size() + "个任务");
+                            JSONObject object = jsonArray.getJSONObject(j);
+                            SelectTaskItem item = new SelectTaskItem();
+                            item.setTaskId(object.optInt("safetyplanId", 0) + "");
+                            item.setTaskName(object.optString("safetyPlanName", ""));
+                            selectTaskItemList.add(item);
                         }
-                        setProgress();
+                        showSelectTaskPoup();
+                        taskDownAdapter = new SelectTaskDownAdapter(getActivity(), selectTaskItemList);
+                        taskDownAdapter.notifyDataSetChanged();
+                        listview.setAdapter(taskDownAdapter);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -775,6 +867,7 @@ public class DataTransferFragment extends Fragment {
                     break;
                 case 8:
                     downloadProgress.setProgress(0);
+                    downloadProgress.setMax(50);
                     progressName.setText("用户信息正在下载，请稍等...");
                     progressPercent.setText("0");
                     currentProgress = 0;
@@ -789,15 +882,14 @@ public class DataTransferFragment extends Fragment {
                         linearlayoutDown.setVisibility(View.GONE);
                         finishBtn.setVisibility(View.VISIBLE);
                         downFailed.setVisibility(View.GONE);
-                        editor.putBoolean("have_download", true);   //下载之后必须上传才能再次下载
-                        editor.apply();
                         userProgress = 0;
                         currentUserPercent = 0;
                         download.setClickable(true);
                     }
                     break;
                 case 10:
-                    adapter = new GridviewTypeAdapter(getActivity(),gridviewTypeItemList);
+                    adapter = new GridviewTypeAdapter(getActivity(), gridviewTypeItemList);
+                    adapter.notifyDataSetChanged();
                     gridView.setAdapter(adapter);
                     break;
                 case 11:
@@ -806,7 +898,7 @@ public class DataTransferFragment extends Fragment {
                     item.setTypeName("无");
                     item.setTypeId("");
                     gridviewTypeItemList.add(item);
-                    adapter = new GridviewTypeAdapter(getActivity(),gridviewTypeItemList);
+                    adapter = new GridviewTypeAdapter(getActivity(), gridviewTypeItemList);
                     gridView.setAdapter(adapter);
                     break;
             }
@@ -841,7 +933,7 @@ public class DataTransferFragment extends Fragment {
         values.put("securityType", taskObject.optString("securityName", ""));
         values.put("totalCount", taskObject.optInt("countRs", 0) + "");
         values.put("endTime", taskObject.optString("safetyEnd", ""));
-        values.put("loginName",sharedPreferences_login.getString("login_name",""));
+        values.put("loginName", sharedPreferences_login.getString("login_name", ""));
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
@@ -862,17 +954,19 @@ public class DataTransferFragment extends Fragment {
         values.put("userAddress", userObject.optString("userAdress", ""));
         values.put("taskId", userObject.optInt("safetyPlan", 0) + "");
         values.put("ifChecked", "false");
-        values.put("security_content","");
-        values.put("newMeterNumber","");
-        values.put("remarks","");
-        values.put("security_hidden","");
-        values.put("security_hidden_reason","");
-        values.put("photoNumber","0");
-        values.put("ifUpload","false");
-        values.put("currentTime","");
-        values.put("ifPass","");
-        values.put("loginName",sharedPreferences_login.getString("login_name",""));
-        values.put("security_state","0");
+        values.put("security_content", "");
+        values.put("newMeterNumber", "");
+        values.put("remarks", "");
+        values.put("security_hidden", "");
+        values.put("security_hidden_reason", "");
+        values.put("photoNumber", "0");
+        values.put("ifUpload", "false");
+        values.put("currentTime", "");
+        values.put("ifPass", "");
+        values.put("loginName", sharedPreferences_login.getString("login_name", ""));
+        values.put("security_state", "0");
+        values.put("newUserPhone", "");
+        values.put("newUserAddress", "");
         // 第一个参数:表名称
         // 第二个参数：SQl不允许一个空列，如果ContentValues是空的，那么这一列被明确的指明为NULL值
         // 第三个参数：ContentValues对象
@@ -884,7 +978,10 @@ public class DataTransferFragment extends Fragment {
         super.onDestroy();
         //释放和数据库的连接
         db.close();
-        if(popupWindow != null){
+        if (taskCursor != null) {
+            taskCursor.close(); //游标关闭
+        }
+        if (popupWindow != null) {
             popupWindow.dismiss();
             popupWindow = null;
         }

@@ -54,7 +54,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:hint="可输入姓名/表编号/电话/地址"
+                    android:hint="可输入姓名/表编号//地址"
                     android:maxLines="1"
                     android:drawableLeft="@mipmap/search"
                     android:drawablePadding="3dp"

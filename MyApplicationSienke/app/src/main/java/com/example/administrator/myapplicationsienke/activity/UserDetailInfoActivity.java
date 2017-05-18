@@ -64,7 +64,7 @@ import java.util.List;
 public class UserDetailInfoActivity extends AppCompatActivity {
     private ImageView back;  //返回
     private GridView gridView;
-    private LinearLayout rootLinearlayout;  //添加图片
+    private LinearLayout rootLinearlayout,remarksRoot;
     private RelativeLayout rootRelative;
     private RelativeLayout hiddenTypeRoot, hiddenReasonRoot;
     private TextView securityCheckCase, securityHiddenType, securityHiddenReason;  //安全情况,安全隐患类型，安全隐患原因
@@ -87,7 +87,8 @@ public class UserDetailInfoActivity extends AppCompatActivity {
     private String securityId;
     private String ifChecked;
     private String ifUpload;
-    private TextView userNumber, userName, meterNumber, userAddress, checkType, userPhoneNumber;
+    private EditText meterNumber,userPhoneNumber,userAddress;
+    private TextView userNumber, userName, checkType;
     private GridviewImageAdapter adapter;
     private PopupwindowListAdapter padapter;
     private String cropPhotoPath;  //裁剪的图片路径
@@ -98,13 +99,19 @@ public class UserDetailInfoActivity extends AppCompatActivity {
     private List<PopupwindowListItem> popupwindowListItemList = new ArrayList<>();
     private Cursor cursor1, cursor2, cursor3, cursor4, cursor5, cursor6, cursor7, cursor8;
     private String securityContentItemId, securityHiddenItemId, hiddenReasonItemId;//安检情况类型id,安检隐患类型id,安检隐患原因id
-    private EditText newMeterNumb, remarks;
+    private RadioButton remarksRb1,remarksRb2;
     private String securityContent;
     private String newmeternumber;
     private String remarksContent;
+    private String newPhoneNumber;
+    private String newUserAddress;
     private String securityHidden;
     private String hiddenReason;
     private String photoNumber;
+    private String remarks;
+    String meterNumber1;
+    String userAddress1;
+    String userPhoneNumber1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,17 +131,18 @@ public class UserDetailInfoActivity extends AppCompatActivity {
         securityHiddenReason = (TextView) findViewById(R.id.security_hidden_reason);
         userNumber = (TextView) findViewById(R.id.user_number);
         userName = (TextView) findViewById(R.id.user_name);
-        meterNumber = (TextView) findViewById(R.id.meter_number);
-        userAddress = (TextView) findViewById(R.id.user_address);
+        meterNumber = (EditText) findViewById(R.id.meter_number);
+        userAddress = (EditText) findViewById(R.id.user_address);
         checkType = (TextView) findViewById(R.id.check_type);
-        userPhoneNumber = (TextView) findViewById(R.id.user_phone_number);
-        newMeterNumb = (EditText) findViewById(R.id.new_meter_numb);
-        remarks = (EditText) findViewById(R.id.remarks);
+        userPhoneNumber = (EditText) findViewById(R.id.user_phone_number);
+        remarksRb1 = (RadioButton) findViewById(R.id.remarks_rb1);
+        remarksRb2 = (RadioButton) findViewById(R.id.remarks_rb2);
         hiddenTypeRoot = (RelativeLayout) findViewById(R.id.hidden_type_root);
         hiddenReasonRoot = (RelativeLayout) findViewById(R.id.hidden_reason_root);
         saveBtn = (Button) findViewById(R.id.save_btn);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
         rootRelative = (RelativeLayout) findViewById(R.id.root_relative);
+        remarksRoot = (LinearLayout) findViewById(R.id.remarks_root);
         gridView = (GridView) findViewById(R.id.gridview);
     }
 
@@ -145,6 +153,8 @@ public class UserDetailInfoActivity extends AppCompatActivity {
         securityHiddenType.setOnClickListener(onClickListener);
         securityHiddenReason.setOnClickListener(onClickListener);
         saveBtn.setOnClickListener(onClickListener);
+        remarksRb1.setOnClickListener(onClickListener);
+        remarksRb2.setOnClickListener(onClickListener);
 
         adapter = new GridviewImageAdapter(UserDetailInfoActivity.this, cropPathLists);
         //gridView.setSelector(new ColorDrawable(Color.TRANSPARENT));
@@ -253,6 +263,12 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                         }
                     }.start();
                     break;
+                case R.id.remarks_rb1:
+                    remarks = remarksRb1.getText().toString().trim();
+                    break;
+                case R.id.remarks_rb2:
+                    remarks = remarksRb2.getText().toString().trim();
+                    break;
                 case R.id.save_btn:  //保存
                     createSavePopupwindow();
                     break;
@@ -274,10 +290,10 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             securityId = intent.getStringExtra("security_id");
             String userNumber1 = intent.getStringExtra("user_number");
             String userName1 = intent.getStringExtra("user_name");
-            String meterNumber1 = intent.getStringExtra("meter_number");
-            String userAddress1 = intent.getStringExtra("user_address");
+            meterNumber1 = intent.getStringExtra("meter_number");
+            userAddress1 = intent.getStringExtra("user_address");
+            userPhoneNumber1 = intent.getStringExtra("user_phone_number");
             String checkType1 = intent.getStringExtra("check_type");
-            String userPhoneNumber1 = intent.getStringExtra("user_phone_number");
             ifChecked = intent.getStringExtra("if_checked");
             ifUpload = intent.getStringExtra("if_upload");
 
@@ -305,25 +321,10 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             } else {
                 userName.setText("无");
             }
-            if (!meterNumber1.equals("null")) {
-                meterNumber.setText(meterNumber1);
-            } else {
-                meterNumber.setText("无");
-            }
-            if (!userAddress1.equals("null")) {
-                userAddress.setText(userAddress1);
-            } else {
-                userAddress.setText("无");
-            }
             if (!checkType1.equals("null")) {
                 checkType.setText(checkType1);
             } else {
                 checkType.setText("无");
-            }
-            if (!userPhoneNumber1.equals("null")) {
-                userPhoneNumber.setText(userPhoneNumber1);
-            } else {
-                userPhoneNumber.setText("无");
             }
         }
 
@@ -349,11 +350,15 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                             }
                         }
                     }.start();
-                    if (!newmeternumber.equals("")) {
-                        newMeterNumb.setText(newmeternumber);
-                    }
-                    if (!remarksContent.equals("")) {
-                        remarks.setText(remarksContent);
+                    meterNumber.setText(newmeternumber);
+                    userPhoneNumber.setText(newPhoneNumber);
+                    userAddress.setText(newUserAddress);
+                    if (remarksContent.equals("需要复检")) {
+                        remarksRb1.setChecked(true);
+                        remarks = remarksRb1.getText().toString().trim();
+                    }else {
+                        remarksRb2.setChecked(true);
+                        remarks = remarksRb2.getText().toString().trim();
                     }
                     if (!photoNumber.equals("0")) {
                         new Thread() {
@@ -366,32 +371,47 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                     }
                 } else {
                     Log.i("UserDetailInfoActivity", "显示默认数据！");
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            //显示默认安全情况
-                            getSecurityCheckCase();
-                            if (cursor1.getCount() != 0) {
-                                handler.sendEmptyMessage(5);
-                            } else {
-                                handler.sendEmptyMessage(6);
-                            }
-                            //显示默认安全隐患类型
-                            getSecurityHiddenType();
-                            if (cursor2.getCount() != 0) {
-                                handler.sendEmptyMessage(7);
-                            } else {
-                                handler.sendEmptyMessage(8);
-                            }
-                            //显示默认安全隐患原因
-                            getSecurityHiddenReason("8");
-                            if (cursor3.getCount() != 0) {
-                                handler.sendEmptyMessage(9);
-                            } else {
-                                handler.sendEmptyMessage(10);
-                            }
-                        }
-                    }.start();
+                    if (!meterNumber1.equals("null")) {
+                        meterNumber.setText(meterNumber1);
+                        meterNumber.setSelection(meterNumber.getText().length());
+                    } else {
+                        meterNumber.setText("");
+                    }
+                    if (!userAddress1.equals("null")) {
+                        userAddress.setText(userAddress1);
+                        userAddress.setSelection(userAddress.getText().length());
+                    } else {
+                        userAddress.setText("");
+                    }
+                    if (!userPhoneNumber1.equals("null")) {
+                        userPhoneNumber.setText(userPhoneNumber1);
+                        userPhoneNumber.setSelection(userPhoneNumber.getText().length());
+                    } else {
+                        userPhoneNumber.setText("");
+                    }
+                    //显示默认安全情况
+                    getSecurityCheckCase();
+                    if (cursor1.getCount() != 0) {
+                        handler.sendEmptyMessage(5);
+                    } else {
+                        handler.sendEmptyMessage(6);
+                    }
+                    //显示默认安全隐患类型
+                    getSecurityHiddenType();
+                    if (cursor2.getCount() != 0) {
+                        handler.sendEmptyMessage(7);
+                    } else {
+                        handler.sendEmptyMessage(8);
+                    }
+                    //显示默认安全隐患原因
+                    getSecurityHiddenReason("8");
+                    if (cursor3.getCount() != 0) {
+                        handler.sendEmptyMessage(9);
+                    } else {
+                        handler.sendEmptyMessage(10);
+                    }
+                    remarksRb1.setChecked(true);
+                    remarks = remarksRb1.getText().toString().trim();
                 }
             }
         }.start();
@@ -591,18 +611,16 @@ public class UserDetailInfoActivity extends AppCompatActivity {
 
     //当不是安检合格的时候，显示安全隐患和安全隐患原因
     public void showHiddenTypeAndReason() {
-        if (hiddenTypeRoot.getVisibility() == View.GONE && hiddenReasonRoot.getVisibility() == View.GONE) {
-            hiddenTypeRoot.setVisibility(View.VISIBLE);
-            hiddenReasonRoot.setVisibility(View.VISIBLE);
-        }
+        hiddenTypeRoot.setVisibility(View.VISIBLE);
+        hiddenReasonRoot.setVisibility(View.VISIBLE);
+        remarksRoot.setVisibility(View.VISIBLE);
     }
 
     //当是安检合格的时候，不显示安全隐患和安全隐患原因
     public void noShowHiddenTypeAndReason() {
-        if (hiddenTypeRoot.getVisibility() == View.VISIBLE && hiddenReasonRoot.getVisibility() == View.VISIBLE) {
-            hiddenTypeRoot.setVisibility(View.GONE);
-            hiddenReasonRoot.setVisibility(View.GONE);
-        }
+        hiddenTypeRoot.setVisibility(View.GONE);
+        hiddenReasonRoot.setVisibility(View.GONE);
+        remarksRoot.setVisibility(View.GONE);
     }
 
     //弹出安全隐患类型popupwindow
@@ -856,6 +874,8 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                         }
                     }
                     tempUri = null;
+                    cropPathLists.add(cropPhotoPath);
+                    Log.i("startCropPhoto===>", "图片集合长度为：" + cropPathLists.size() + "路径为" + cropPhotoPath);
                     handler.sendEmptyMessage(1);
                     break;
                 case 500:
@@ -1176,11 +1196,11 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             // 设置裁剪
             intent.putExtra("crop", "true");
             // aspectX aspectY 是宽高的比例
-            intent.putExtra("aspectX", 1);
-            intent.putExtra("aspectY", 1.3);
+            intent.putExtra("aspectX", 9);
+            intent.putExtra("aspectY", 16);
             // outputX outputY 是裁剪图片宽高
-            intent.putExtra("outputX", 500);
-            intent.putExtra("outputY", 650);
+            intent.putExtra("outputX", 360);
+            intent.putExtra("outputY", 640);
             intent.putExtra("noFaceDetection", true);//取消人脸识别功能
             // 当图片的宽高不足时，会出现黑边，去除黑边
             intent.putExtra("scale", true);
@@ -1190,8 +1210,6 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             intent.putExtra(MediaStore.EXTRA_OUTPUT, cropPhotoUri);
             startActivityForResult(intent, CROP_SMALL_PICTURE);cropPhotoPath = cropPhotoUri.getPath();
             Log.i("startCropPhoto", "图片裁剪的地址为：" + cropPhotoPath);
-            cropPathLists.add(cropPhotoPath);
-            Log.i("startCropPhoto===>", "图片集合长度为：" + cropPathLists.size() + "路径为" + cropPhotoPath);
         }else {
             Log.i("startCropPhoto", "传过来的uri为空！");
             Toast.makeText(UserDetailInfoActivity.this, "拍照失败，请重试！", Toast.LENGTH_SHORT).show();
@@ -1234,6 +1252,9 @@ public class UserDetailInfoActivity extends AppCompatActivity {
      */
     private void updateUserInfo() {
         ContentValues values = new ContentValues();
+        values.put("newMeterNumber", meterNumber.getText().toString().trim());
+        values.put("newUserPhone", userPhoneNumber.getText().toString().trim());
+        values.put("newUserAddress", userAddress.getText().toString().trim());
         if (securityContentItemId != null) {
             values.put("security_content", securityContentItemId);
             Log.i("insertUserInfo", "安检情况ID是：" + securityContentItemId);
@@ -1241,14 +1262,8 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             values.put("security_content", "");
             Log.i("insertUserInfo", "安检情况ID空的情况：" + securityContentItemId);
         }
-        if (!newMeterNumb.getText().toString().trim().equals("")) {
-            values.put("newMeterNumber", newMeterNumb.getText().toString().trim());
-            Log.i("insertUserInfo", "输入的新表编号是：" + newMeterNumb.getText().toString().trim());
-        }
-        if (!remarks.getText().toString().trim().equals("")) {
-            values.put("remarks", remarks.getText().toString().trim());
-            Log.i("insertUserInfo", "备注是：" + remarks.getText().toString().trim());
-        }
+        values.put("remarks", remarks);
+        Log.i("insertUserInfo", "备注是：" + remarks);
         if (!(securityCheckCase.getText().toString().equals("合格") || securityCheckCase.getText().toString().equals("复检合格"))) { // 如果是合格或者复检合格，则插入空的隐患类型和原因
             if(securityCheckCase.getText().toString().equals("安全隐患")){
                 values.put("security_state", "2");
@@ -1309,8 +1324,12 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             securityContent = cursor.getString(11);   //获取上次安检情况的ID
             Log.i("querySecurityContent", "上次安检情况为：" + cursor.getString(11));
             newmeternumber = cursor.getString(12); //设置上次输入的表编号，有就有，无就无
-            Log.i("querySecurityContent", "上次安检输入表编号为：" + cursor.getString(12));
-            remarksContent = cursor.getString(13);  //设置上次输入的备注，有就有，无就无
+            Log.i("querySecurityContent", "上次安检输入的新表编号为：" + cursor.getString(12));
+            newPhoneNumber = cursor.getString(22); //设置上次输入的手机号
+            Log.i("querySecurityContent", "上次安检输入的新手机号为：" + cursor.getString(22));
+            newUserAddress = cursor.getString(23); //设置上次输入的手机号
+            Log.i("querySecurityContent", "上次安检输入的新地址为：" + cursor.getString(23));
+            remarksContent = cursor.getString(13);  //设置上次选择的备注
             Log.i("querySecurityContent", "上次安检备注信息为：" + cursor.getString(13));
             securityHidden = cursor.getString(14);
             Log.i("querySecurityContent", "上次隐患类型为：" + cursor.getString(14));

@@ -15,6 +15,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.myapplicationsienke.R;
@@ -45,6 +46,7 @@ public class MobileSecurityLoginActivity extends Activity {
     private SharedPreferences.Editor editor;
     private String ip, port;  //接口ip地址   端口
     private LinearLayout rootLinearlayout;
+    private TextView ipTextView;
 
     //强制竖屏
     @Override
@@ -74,6 +76,7 @@ public class MobileSecurityLoginActivity extends Activity {
         editmobilePsw = (EditText) findViewById(R.id.edit_mobile_psw);
         remindMe = (CheckBox) findViewById(R.id.remind_me);
         rootLinearlayout = (LinearLayout) findViewById(R.id.root_linearlayout);
+        ipTextView = (TextView) findViewById(R.id.ip);
     }
 
     //初始化设置
@@ -101,6 +104,7 @@ public class MobileSecurityLoginActivity extends Activity {
     private void setViewClickListener() {
         logonBtn.setOnClickListener(clickListener);
         cancel_btn.setOnClickListener(clickListener);
+        ipTextView.setOnClickListener(clickListener);
         remindMe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -121,6 +125,10 @@ public class MobileSecurityLoginActivity extends Activity {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
+                case R.id.ip:
+                    Intent intent = new Intent(MobileSecurityLoginActivity.this, IpSettingActivity.class);
+                    startActivity(intent);
+                    break;
                 case R.id.logon_btn:
                     logonBtn.setClickable(false);
                     if (editMobileUser.getText().toString().equals("") && editmobilePsw.getText().toString().equals("")) {

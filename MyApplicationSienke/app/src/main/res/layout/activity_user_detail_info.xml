@@ -44,11 +44,9 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
+                android:layout_height="45dp"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="10dp">
+                android:paddingRight="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -82,11 +80,9 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
+                android:layout_height="45dp"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="10dp">
+                android:paddingRight="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -120,11 +116,9 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
+                android:layout_height="45dp"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="10dp">
+                android:paddingRight="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -137,15 +131,19 @@
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
 
-                <TextView
+                <EditText
                     android:id="@+id/meter_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:text=""
+                    android:hint="添加表编号"
                     android:textColor="@color/text_gray"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:background="@null"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:paddingLeft="15dp"/>
 
             </RelativeLayout>
 
@@ -158,11 +156,9 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
+                android:layout_height="45dp"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="10dp">
+                android:paddingRight="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -175,15 +171,19 @@
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
 
-                <TextView
+                <EditText
                     android:id="@+id/user_phone_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:text=""
+                    android:hint="添加电话号码"
                     android:textColor="@color/text_gray"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:background="@null"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:paddingLeft="15dp"/>
 
             </RelativeLayout>
 
@@ -196,11 +196,9 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
+                android:layout_height="45dp"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="10dp">
+                android:paddingRight="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -213,15 +211,19 @@
                     android:textColor="@color/text_black"
                     android:textSize="14sp" />
 
-                <TextView
+                <EditText
                     android:id="@+id/user_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:text=""
+                    android:hint="添加地址"
                     android:textColor="@color/text_gray"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:background="@null"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:paddingLeft="15dp"/>
 
             </RelativeLayout>
 
@@ -234,11 +236,9 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
+                android:layout_height="45dp"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="10dp">
+                android:paddingRight="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -372,35 +372,6 @@
                     android:paddingRight="8dp"/>
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp">
-
-                <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/remarks"
-                    android:textColor="@color/text_black"
-                    android:textSize="14sp"/>
-
-                <EditText
-                    android:id="@+id/remarks"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/linearlayout_shape"
-                    android:hint="备注信息(选填)"
-                    android:textColor="@color/text_gray"
-                    android:textSize="12sp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"/>
-            </LinearLayout>
-
             <RelativeLayout
                 android:id="@+id/hidden_type_root"
                 android:layout_width="match_parent"
@@ -408,6 +379,7 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:visibility="visible">
 
                 <TextView
@@ -441,6 +413,7 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:visibility="visible">
 
                 <TextView
@@ -466,6 +439,71 @@
                     android:text=""
                     android:textColor="@color/text_gray" />
             </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/remarks_root"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/remarks"
+                    android:textColor="@color/text_black"
+                    android:textSize="14sp"/>
+
+                <!--<EditText
+                    android:id="@+id/remarks"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/linearlayout_shape"
+                    android:hint="备注信息(选填)"
+                    android:textColor="@color/text_gray"
+                    android:textSize="12sp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"/>-->
+                <RadioGroup
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+                    <RadioButton
+                        android:id="@+id/remarks_rb1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:button="@null"
+                        android:padding="8dp"
+                        android:text="需要复检"
+                        android:drawableLeft="@drawable/radio_drawable_selector"
+                        android:textColor="@drawable/radio_text_selector"
+                        android:textSize="14sp"
+                        android:gravity="center_vertical"
+                        android:drawablePadding="20dp"/>
+                    <RadioButton
+                        android:id="@+id/remarks_rb2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:button="@null"
+                        android:text="现场已整改"
+                        android:padding="8dp"
+                        android:gravity="center_vertical"
+                        android:drawableLeft="@drawable/radio_drawable_selector"
+                        android:textColor="@drawable/radio_text_selector"
+                        android:textSize="14sp"
+                        android:drawablePadding="20dp"/>
+                </RadioGroup>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

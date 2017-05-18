@@ -181,7 +181,7 @@ public class SecurityStatisticsActivity extends Activity {
         }
         notChecked = totalUserNumber - checkedUserNumber;
         notCheckedNumber.setText(String.valueOf(notChecked));
-        if (sharedPreferences.getInt("totalCount", 0) != 0) {
+        if (totalUserNumber != 0) {
             double checkedNumber = (double) checkedUserNumber* 100;
             double totalCount = (double) totalUserNumber;
             double finishingRate = checkedNumber/totalCount;  //完成率
@@ -212,7 +212,7 @@ public class SecurityStatisticsActivity extends Activity {
         }
         notChecked = taskTotalUserNumber - checkedUserNumber;
         notCheckedNumber.setText(String.valueOf(notChecked));
-        if (sharedPreferences.getInt("taskTotalUserNumber", 0) != 0) {
+        if (taskTotalUserNumber != 0) {
             double checkedNumber = (double) checkedUserNumber* 100;
             double totalCount = (double) taskTotalUserNumber;
             double finishingRate = checkedNumber/totalCount;  //完成率
