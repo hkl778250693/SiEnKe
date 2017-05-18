@@ -93,8 +93,22 @@
                 android:textColor="@android:color/white"
                 android:paddingRight="5dp"
                 android:paddingTop="5dp"
-                android:paddingBottom="5dp"/>
+                android:paddingBottom="5dp"
+                android:textSize="12sp"/>
         </LinearLayout>
+        <TextView
+            android:id="@+id/ip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@mipmap/ip"
+            android:drawablePadding="10dp"
+            android:layout_alignParentRight="true"
+            android:padding="5dp"
+            android:gravity="center_vertical"
+            android:text="设置IP、端口号"
+            android:layout_centerVertical="true"
+            android:textColor="@drawable/mobile_text_selector"
+            android:textSize="12sp" />
     </RelativeLayout>
 
     <RelativeLayout

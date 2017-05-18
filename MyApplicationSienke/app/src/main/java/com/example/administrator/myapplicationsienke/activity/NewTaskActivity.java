@@ -435,6 +435,8 @@ public class NewTaskActivity extends Activity {
         values.put("ifPass","");
         values.put("loginName",sharedPreferences_login.getString("login_name",""));
         values.put("security_state","0");
+        values.put("newUserPhone", "");
+        values.put("newUserAddress", "");
         db.insert("User", null, values);
     }
 

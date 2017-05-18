@@ -134,18 +134,18 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
 
         if (userListviewList != null) {
             if (searchContent != null) {
-                String phoneNumber = userListviewItem.getPhoneNumber();
+                String userId = userListviewItem.getUserId();
                 String name = userListviewItem.getUserName();
                 String address = userListviewItem.getAdress();
                 String meter_number = userListviewItem.getNumber();
                 SpannableStringBuilder style = null;
-                if (phoneNumber.contains(searchContent)) {
-                    style = new SpannableStringBuilder(phoneNumber);
+                if (userId.contains(searchContent)) {
+                    style = new SpannableStringBuilder(userId);
                     style.setSpan(new ForegroundColorSpan(Color.parseColor("#4EA0DC")),
-                            phoneNumber.indexOf(searchContent),
-                            phoneNumber.indexOf(searchContent) + searchContent.length(),
+                            userId.indexOf(searchContent),
+                            userId.indexOf(searchContent) + searchContent.length(),
                             Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-                    viewHolder.phone_number.setText(style);
+                    viewHolder.user_id.setText(style);
                 } else if (name.contains(searchContent)) {
                     style = new SpannableStringBuilder(name);
                     style.setSpan(new ForegroundColorSpan(Color.parseColor("#4EA0DC")),
@@ -207,7 +207,7 @@ public class UserListviewAdapter extends BaseAdapter implements Filterable {
                 list = new ArrayList<>();
                 list.clear();
                 for (UserListviewItem item : backList) {
-                    if (item.getPhoneNumber().contains(constraint) || item.getUserName().contains(constraint) || item.getNumber().contains(constraint) || item.getAdress().contains(constraint)) {
+                    if (item.getUserId().contains(constraint) || item.getUserName().contains(constraint) || item.getNumber().contains(constraint) || item.getAdress().contains(constraint)) {
                         list.add(item);
                     }
                 }

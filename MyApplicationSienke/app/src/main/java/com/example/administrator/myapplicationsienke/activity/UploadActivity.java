@@ -179,29 +179,24 @@ public class UploadActivity extends Activity {
                                     Log.i("UploadActivity", "得到的任务编号为：" + map.get("taskId" + integers.get(j)).toString());
                                 }
                                 Log.i("getUploadUserTotalNumb", "上传成功的用户数量为：" + uploadNumber);
-                                new Thread() {
-                                    @Override
-                                    public void run() {
-                                        if(sharedPreferences.getBoolean("upload_success",true)){
-                                            if (uploadNumber != 0) {
-                                                if (uploadProgress.getProgress() == maxProgress * 10) {
-                                                    Log.i("uploadProgress", "上传的进度为：" + uploadProgress.getProgress());
-                                                    handler.sendEmptyMessage(4);
-                                                }
-                                            } else {
-                                                Log.i("up_load==========", "点击上传时记录的未安检户数为：" + noCheckNumber);
-                                                if (noCheckNumber == 0 && "保存成功".equals(httpUtils.result)) {   //说明当前勾选的任务用户数据已经全部上传
-                                                    handler.sendEmptyMessage(6);
-                                                } else {
-                                                    Message msg = new Message();
-                                                    msg.what = 7;
-                                                    msg.arg1 = noCheckNumber;
-                                                    handler.sendMessage(msg);
-                                                }
-                                            }
+                                if(sharedPreferences.getBoolean("upload_success",true)){
+                                    if (uploadNumber != 0) {
+                                        if (uploadProgress.getProgress() == maxProgress * 10) {
+                                            Log.i("uploadProgress", "上传的进度为：" + uploadProgress.getProgress());
+                                            handler.sendEmptyMessage(4);
+                                        }
+                                    } else {
+                                        Log.i("up_load==========", "点击上传时记录的未安检户数为：" + noCheckNumber);
+                                        if (noCheckNumber == 0 && "保存成功".equals(httpUtils.result)) {   //说明当前勾选的任务用户数据已经全部上传
+                                            handler.sendEmptyMessage(6);
+                                        } else {
+                                            Message msg = new Message();
+                                            msg.what = 7;
+                                            msg.arg1 = noCheckNumber;
+                                            handler.sendMessage(msg);
                                         }
                                     }
-                                }.start();
+                                }
                             }
                         }.start();
                         saveCheckStateInfo();//保存选中状态，将信息写入preference保存以备下一次读取使用
@@ -318,7 +313,7 @@ public class UploadActivity extends Activity {
 
     //读取本地安检用户数据，并上传服务器
     public void getUserDataAndPost(final String taskId) {
-        Cursor cursor = db.rawQuery("select * from User where taskId=?", new String[]{taskId});//查询并获得游标
+        Cursor cursor = db.rawQuery("select * from User where taskId=? and loginName=?", new String[]{taskId,sharedPreferences_login.getString("login_name","")});//查询并获得游标
         map1 = new HashMap<String, Object>();
         while (cursor.moveToNext()) {
             if (cursor.getString(10).equals("true")) {  //判断是否为安检过的，未安检的不上传
@@ -359,6 +354,14 @@ public class UploadActivity extends Activity {
                     Log.i("getUserData=>", "安检状态是：" + cursor.getString(21));
                     map1.put("c_safety_inspection_member", sharedPreferences_login.getString("user_name", ""));
                     Log.i("getUserData=>", "安检人员是：" + sharedPreferences_login.getString("user_name", ""));
+                    map1.put("c_user_id", cursor.getString(7));
+                    Log.i("getUserData=>", "新用户ID是：" + cursor.getString(7));
+                    map1.put("c_meter_number", cursor.getString(12));
+                    Log.i("getUserData=>", "新表编号是：" + cursor.getString(12));
+                    map1.put("c_user_phone", cursor.getString(22));
+                    Log.i("getUserData=>", "新手机号码是：" + cursor.getString(22));
+                    map1.put("c_user_address", cursor.getString(23));
+                    Log.i("getUserData=>", "新地址是：" + cursor.getString(23));
                     getPhotoData(securityNumber);
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
@@ -411,12 +414,12 @@ public class UploadActivity extends Activity {
     }
 
     /**
-     * 将拍的照片张数保存到本地数据库安检图片表
+     * 更新用户表上传状态
      */
     private void updateUserUploadState(String securityNumber) {
         ContentValues values = new ContentValues();
         values.put("ifUpload", "true");
-        db.update("User", values, "securityNumber=?", new String[]{securityNumber});
+        db.update("User", values, "securityNumber=? and loginName=?", new String[]{securityNumber,sharedPreferences_login.getString("login_name","")});
     }
 
     //show上传popupwindow
@@ -463,9 +466,9 @@ public class UploadActivity extends Activity {
         UploadActivity.this.getWindow().setAttributes(lp);
     }
 
-    //读取下载到本地的图片数据，并上传服务器
+    //读取保存到本地的图片数据，并上传服务器
     public void getPhotoData(String securityId) {
-        Cursor cursor = db.rawQuery("select * from security_photo where securityNumber=?", new String[]{securityId});//查询并获得游标
+        Cursor cursor = db.rawQuery("select * from security_photo where securityNumber=? and loginName=?", new String[]{securityId,sharedPreferences_login.getString("login_name","")});//查询并获得游标
         fileMap = new HashMap<String, File>();
         File file = null;
         while (cursor.moveToNext()) {
@@ -503,6 +506,7 @@ public class UploadActivity extends Activity {
                     Log.i("handleMessage", "当前的进度为：" + currentProgress + "当前的进度百分比为：" + currentPercent);
                     break;
                 case 4:
+                    Log.i("handleMessage", "上传完成了！" );
                     progressPercent.setText("100");
                     String uploadResult;
                     if (noCheckNumber == 0) {
