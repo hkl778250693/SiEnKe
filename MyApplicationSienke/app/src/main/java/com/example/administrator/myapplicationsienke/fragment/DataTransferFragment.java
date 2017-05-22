@@ -100,7 +100,7 @@ public class DataTransferFragment extends Fragment {
     private List<SelectTaskItem> selectTaskItemList = new ArrayList<>();
     private List<String> stringTaskList = new ArrayList<>();  //保存本地没有的任务编号
     private List<String> stringSelectTask = new ArrayList<>();  //保存勾选的任务编号
-    private Cursor cursor;
+    private Cursor cursor,taskTotalCursor;
     private GridView gridView;
     private Calendar c; //日历
     private GridviewTypeItem item;
@@ -141,13 +141,18 @@ public class DataTransferFragment extends Fragment {
             switch (v.getId()) {
                 case R.id.upload:
                     upload.setClickable(false);
-                    createSavePopupwindow();
+                    getTaskData();
+                    if(taskTotalCursor.getCount() != 0){
+                        createSavePopupwindow();
+                    }else {
+                        Intent intent = new Intent(getActivity(), UploadActivity.class);
+                        startActivity(intent);
+                    }
                     upload.setClickable(true);
                     break;
                 case R.id.download:
                     download.setClickable(false);
                     showFilterPopup();
-                    download.setClickable(true);
                     break;
             }
         }
@@ -240,9 +245,8 @@ public class DataTransferFragment extends Fragment {
         cancelSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancelSelect.setClickable(false);
                 popupWindow.dismiss();
-                cancelSelect.setClickable(true);
+                download.setClickable(true);
             }
         });
         saveSelect.setOnClickListener(new View.OnClickListener() {
@@ -265,12 +269,13 @@ public class DataTransferFragment extends Fragment {
                         popupWindow.dismiss();
                         showPopupwindow(); //弹出下载进度条
                         downloadProgress.setMax(10 * stringTaskList.size());
-                        setProgress();
+                        startAsyncTask();//开启异步任务获取所有任务编号的用户数据
                     }
                 } else {
                     Toast.makeText(getActivity(), "请选择任务编号哦！", Toast.LENGTH_SHORT).show();
                 }
                 saveSelect.setClickable(true);
+                download.setClickable(true);
             }
         });
         popupWindow.update();
@@ -331,6 +336,7 @@ public class DataTransferFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
+                download.setClickable(true);
             }
         });
         downFilter.setOnClickListener(new View.OnClickListener() {
@@ -401,6 +407,7 @@ public class DataTransferFragment extends Fragment {
             @Override
             public void onDismiss() {
                 backgroundAlpha(1.0F);
+                download.setClickable(true);
             }
         });
     }
@@ -637,7 +644,8 @@ public class DataTransferFragment extends Fragment {
                     }*/
                     if (!jsonObject.optString("total", "").equals("0")) {
                         //有相应用户数据
-                        if (url.toString().contains(stringTaskList.get(stringTaskList.size() - 1))) { //当第最后一个任务有数据的时候就将任务信息保存本地
+                        if (url.toString().contains(stringTaskList.get(stringTaskList.size() - 1))) {
+                            setProgress();//当第最后一个任务有数据的时候就将任务信息保存本地
                             for (int i = 0; i < 5; i++) {
                                 try {
                                     Thread.sleep(200);
@@ -750,7 +758,7 @@ public class DataTransferFragment extends Fragment {
                 currentUserPercent = 0;
                 for (int i = 0; i < stringTaskList.size(); i++) {
                     MyAsyncTask myAsyncTask = new MyAsyncTask();
-                    url = httpUrl + stringTaskList.get(i);
+                    url = httpUrl + stringTaskList.get(i)+"&safetyState=0";
                     Log.i("startAsyncTask========>", url);
                     myAsyncTask.execute(url);
                 }
@@ -759,30 +767,24 @@ public class DataTransferFragment extends Fragment {
     }
 
     public void setProgress() {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    for (int i = 0; i < stringTaskList.size(); i++) {
-                        Thread.sleep(200);
-                        currentProgress += 10 * stringTaskList.size() / stringTaskList.size();
-                        currentPercent = (1000 * (i + 1)) / (10 * stringTaskList.size());
-                        Message msg = new Message();
-                        msg.what = 7;
-                        msg.arg1 = currentProgress;
-                        msg.arg2 = currentPercent;
-                        handler.sendMessage(msg);
-                        Log.i("down_task_progress=>", " 更新进度条" + currentProgress);
-                        Log.i("down_task_progress=>", " 下载进度: " + currentPercent);
-                    }
-                    Thread.sleep(500);
-                    handler.sendEmptyMessage(8);
-                    startAsyncTask();//开启异步任务获取所有任务编号的用户数据
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        try {
+            for (int i = 0; i < stringTaskList.size(); i++) {
+                Thread.sleep(200);
+                currentProgress += 10 * stringTaskList.size() / stringTaskList.size();
+                currentPercent = (1000 * (i + 1)) / (10 * stringTaskList.size());
+                Message msg = new Message();
+                msg.what = 7;
+                msg.arg1 = currentProgress;
+                msg.arg2 = currentPercent;
+                handler.sendMessage(msg);
+                Log.i("down_task_progress=>", " 更新进度条" + currentProgress);
+                Log.i("down_task_progress=>", " 下载进度: " + currentPercent);
             }
-        }.start();
+            Thread.sleep(1000);
+            handler.sendEmptyMessage(8);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -802,7 +804,7 @@ public class DataTransferFragment extends Fragment {
 
     //读取下载到本地的任务数据
     public void getTaskData(String taskId, String loginName) {
-        taskCursor = db.rawQuery("select * from User where taskId=? and loginName=?", new String[]{taskId, loginName});//查询并获得游标
+        taskCursor = db.rawQuery("select * from Task where taskId=? and loginName=?", new String[]{taskId, loginName});//查询并获得游标
         //如果游标为空，则返回空
         if (cursor.getCount() == 0) {
             return;
@@ -832,22 +834,26 @@ public class DataTransferFragment extends Fragment {
                         taskDownAdapter = new SelectTaskDownAdapter(getActivity(), selectTaskItemList);
                         taskDownAdapter.notifyDataSetChanged();
                         listview.setAdapter(taskDownAdapter);
+                        download.setClickable(true);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
                 case 2:
                     popupWindow.dismiss();
+                    download.setClickable(true);
                     Toast.makeText(getActivity(), "没有任务下载哦！", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
                     popupWindow.dismiss();
+                    download.setClickable(true);
                     Toast.makeText(getActivity(), "网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
                 case 4:
-                    progressName.setText("没有相应的用户数据哦！");
+                    progressName.setText("此任务首次安检已完成，您可以下载其他任务去安检哦！");
                     linearlayoutDown.setVisibility(View.GONE);
                     downloadProgress.setVisibility(View.GONE);
+                    downFailed.setImageResource(R.mipmap.smile);
                     downFailed.setVisibility(View.VISIBLE);
                     finishBtn.setVisibility(View.VISIBLE);
                     //Toast.makeText(getActivity(), "没有相应的用户数据！", Toast.LENGTH_SHORT).show();
@@ -908,21 +914,14 @@ public class DataTransferFragment extends Fragment {
 
     //读取下载到本地的任务数据
     public void getTaskData() {
-        Cursor cursor = db.query("Task", null, null, null, null, null, null);//查询并获得游标
+        taskTotalCursor = db.rawQuery("select * from Task where loginName=?", new String[]{sharedPreferences_login.getString("login_name", "")});//查询并获得游标
         //如果游标为空，则显示没有数据图片
-        if (cursor.getCount() == 0) {
+        if (taskTotalCursor.getCount() == 0) {
             return;
         }
-        while (cursor.moveToNext()) {
-            TaskChoose taskChoose = new TaskChoose();
-            taskChoose.setTaskName(cursor.getString(1));
-            taskChoose.setTaskNumber(cursor.getString(2));
-            taskChoose.setCheckType(cursor.getString(3));
-            taskChoose.setTotalUserNumber(cursor.getString(4));
-            taskChoose.setEndTime(cursor.getString(5));
+        while (taskTotalCursor.moveToNext()) {
+
         }
-        //cursor游标操作完成以后,一定要关闭
-        cursor.close();
     }
 
     //任务数据存到本地数据库任务表
@@ -980,6 +979,12 @@ public class DataTransferFragment extends Fragment {
         db.close();
         if (taskCursor != null) {
             taskCursor.close(); //游标关闭
+        }
+        if(taskTotalCursor != null){
+            taskTotalCursor.close();
+        }
+        if(cursor != null){
+            cursor.close();
         }
         if (popupWindow != null) {
             popupWindow.dismiss();

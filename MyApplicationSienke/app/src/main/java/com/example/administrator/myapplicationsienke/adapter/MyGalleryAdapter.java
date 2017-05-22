@@ -68,8 +68,4 @@ public class MyGalleryAdapter extends BaseAdapter {
     class ViewHolder {
         ImageView imageView;
     }
-
-    public void removePhoto(){
-        file.delete();
-    }
 }

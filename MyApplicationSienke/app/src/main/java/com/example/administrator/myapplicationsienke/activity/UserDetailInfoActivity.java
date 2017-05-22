@@ -162,6 +162,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                gridView.setClickable(false);
                 currentPosition = position;
                 if (!adapter.getDeleteShow() && (adapter.getCount() - 1 != position)) {
                     Intent intent = new Intent(UserDetailInfoActivity.this, MyPhotoGalleryActivity.class);
@@ -169,6 +170,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                     intent.putStringArrayListExtra("cropPathLists", cropPathLists);
                     Log.i("UserDetailInfoActivity", "点击图片跳转进来到预览详情页面的图片数量为：" + cropPathLists.size());
                     startActivityForResult(intent, 500);
+                    gridView.setClickable(true);
                 }
                 // 如果单击时删除按钮处在显示状态，则隐藏它
                 if (adapter.getDeleteShow()) {
@@ -184,7 +186,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                 }
             }
         });
-        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        /*gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!(position == cropPathLists.size())) {
@@ -197,7 +199,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                 // 返回true，停止事件向下传播
                 return true;
             }
-        });
+        });*/
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -215,6 +217,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                     finish();
                     break;
                 case R.id.security_check_case:
+                    securityCheckCase.setClickable(false);
                     createSecurityCasePopupwindow();
                     //弹出框显示就开启线程去加载安检情况所有列表数据
                     new Thread() {
@@ -231,6 +234,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                     }.start();
                     break;
                 case R.id.security_hidden_type:
+                    securityHiddenType.setClickable(false);
                     createSecurityHiddenTypePopupwindow();
                     //弹出框显示就开启线程去加载安全隐患所有列表数据
                     new Thread() {
@@ -247,6 +251,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                     }.start();
                     break;
                 case R.id.security_hidden_reason:
+                    securityHiddenReason.setClickable(false);
                     createSecurityHiddenReasonPopupwindow();
                     //弹出框显示就开启线程去加载安全隐患原因对应的列表数据
                     new Thread() {
@@ -404,7 +409,8 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                         handler.sendEmptyMessage(8);
                     }
                     //显示默认安全隐患原因
-                    getSecurityHiddenReason("8");
+                    cursor2.moveToPosition(0);
+                    getSecurityHiddenReason(cursor2.getString(1));
                     if (cursor3.getCount() != 0) {
                         handler.sendEmptyMessage(9);
                     } else {
@@ -474,6 +480,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 takePhoto.setClickable(false);
                 popupWindow.dismiss();
+                gridView.setClickable(true);
                 if (Tools.hasSdcard()) {
                     openCamera();//拍照
                 }else {
@@ -486,6 +493,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
+                gridView.setClickable(true);
             }
         });
         popupWindow.setFocusable(true);
@@ -499,6 +507,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             @Override
             public void onDismiss() {
                 backgroundAlpha(1.0F);
+                gridView.setClickable(true);
             }
         });
     }
@@ -564,6 +573,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                 PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
                 securityCheckCase.setText(item.getItemName());  //点击之后，设置对应的名称
                 popupWindow.dismiss();
+                securityCheckCase.setClickable(true);
                 securityContentItemId = item.getItemId();    //获得当前用户点击的安检情况itemID
                 Log.i("createSecurityCasePopu", "选中的安检情况ID" + securityContentItemId);
                 if (!(securityCheckCase.getText().equals("合格") || securityCheckCase.getText().equals("复检合格"))) {
@@ -605,6 +615,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             @Override
             public void onDismiss() {
                 backgroundAlpha(1.0F);
+                securityCheckCase.setClickable(true);
             }
         });
     }
@@ -636,6 +647,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                 PopupwindowListItem item = popupwindowListItemList.get((int) parent.getAdapter().getItemId(position));
                 securityHiddenType.setText(item.getItemName());
                 popupWindow.dismiss();
+                securityHiddenType.setClickable(true);
                 securityHiddenItemId = item.getItemId();   //获得当前用户点击的安全隐患itemID
                 new Thread() {
                     @Override
@@ -663,6 +675,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             @Override
             public void onDismiss() {
                 backgroundAlpha(1.0F);
+                securityHiddenType.setClickable(true);
             }
         });
     }
@@ -681,6 +694,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                 securityHiddenReason.setText(item.getItemName());
                 hiddenReasonItemId = item.getItemId();   //获得当前用户点击的安全隐患原因itemID
                 popupWindow.dismiss();
+                securityHiddenReason.setClickable(true);
             }
         });
         popupWindow.setFocusable(true);
@@ -694,6 +708,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             @Override
             public void onDismiss() {
                 backgroundAlpha(1.0F);
+                securityHiddenReason.setClickable(true);
             }
         });
     }
@@ -1262,9 +1277,9 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             values.put("security_content", "");
             Log.i("insertUserInfo", "安检情况ID空的情况：" + securityContentItemId);
         }
-        values.put("remarks", remarks);
-        Log.i("insertUserInfo", "备注是：" + remarks);
         if (!(securityCheckCase.getText().toString().equals("合格") || securityCheckCase.getText().toString().equals("复检合格"))) { // 如果是合格或者复检合格，则插入空的隐患类型和原因
+            values.put("remarks", remarks);
+            Log.i("insertUserInfo", "备注是：" + remarks);
             if(securityCheckCase.getText().toString().equals("安全隐患")){
                 values.put("security_state", "2");
             }else if(securityCheckCase.getText().toString().equals("拒绝安检")){
@@ -1290,6 +1305,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
             }
             values.put("ifPass", "false");
         } else {
+            values.put("remarks", "");
             values.put("security_hidden", "");
             values.put("security_hidden_reason", "");
             values.put("ifPass", "true");

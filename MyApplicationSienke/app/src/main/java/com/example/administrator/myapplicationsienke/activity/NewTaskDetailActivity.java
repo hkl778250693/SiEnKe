@@ -179,6 +179,7 @@ public class NewTaskDetailActivity extends Activity {
                     NewTaskDetailActivity.this.finish();
                     break;
                 case R.id.filter:
+                    filter.setClickable(false);
                     createfilterPopupwindow();  //筛选框
                     break;
                 case R.id.save:
@@ -211,8 +212,11 @@ public class NewTaskDetailActivity extends Activity {
                                 @Override
                                 public void run() {
                                     try {
+                                        Thread.sleep(2000);
                                         requireMyTask("getCostomer.do", "userName=" + URLEncoder.encode(etSearch.getText().toString().trim(), "UTF-8"));
                                     } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
                                     super.run();
@@ -229,8 +233,11 @@ public class NewTaskDetailActivity extends Activity {
                                 @Override
                                 public void run() {
                                     try {
+                                        Thread.sleep(2000);
                                         requireMyTask("getCostomer.do", "meterNumber=" + URLEncoder.encode(etSearch.getText().toString().trim(), "UTF-8"));
                                     } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
                                     super.run();
@@ -247,8 +254,11 @@ public class NewTaskDetailActivity extends Activity {
                                 @Override
                                 public void run() {
                                     try {
+                                        Thread.sleep(2000);
                                         requireMyTask("getCostomer.do", "userAdress=" + URLEncoder.encode(etSearch.getText().toString().trim(), "UTF-8"));
                                     } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
                                     super.run();
@@ -338,11 +348,10 @@ public class NewTaskDetailActivity extends Activity {
         popupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NEEDED);
         popupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.loading_shape));
-        popupWindow.setAnimationStyle(R.style.dialog);
-        popupWindow.update();
+        popupWindow.setAnimationStyle(R.style.camera);
+        //popupWindow.update();
         popupWindow.showAtLocation(rootLinearlayout, Gravity.CENTER, 0, 0);
         backgroundAlpha(0.6F);   //背景变暗
-        //开始加载动画
         startFrameAnimation();
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
@@ -366,6 +375,7 @@ public class NewTaskDetailActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
+                filter.setClickable(true);
                 filter.setText(notSecurityCheck.getText());
                 if (no_data.getVisibility() == View.VISIBLE) {
                     no_data.setVisibility(View.GONE);
@@ -376,6 +386,7 @@ public class NewTaskDetailActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
+                filter.setClickable(true);
                 filter.setText(passSecurityCheck.getText());
                 if (no_data.getVisibility() == View.VISIBLE) {
                     no_data.setVisibility(View.GONE);
@@ -386,6 +397,7 @@ public class NewTaskDetailActivity extends Activity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
+                filter.setClickable(true);
                 filter.setText(notPassSecurityCheck.getText());
                 if (no_data.getVisibility() == View.VISIBLE) {
                     no_data.setVisibility(View.GONE);
@@ -403,6 +415,7 @@ public class NewTaskDetailActivity extends Activity {
             @Override
             public void onDismiss() {
                 backgroundAlpha(1.0F);
+                filter.setClickable(true);
             }
         });
     }
@@ -469,7 +482,6 @@ public class NewTaskDetailActivity extends Activity {
         animationDrawable = (AnimationDrawable) frameAnimation.getDrawable();
         animationDrawable.start();
     }
-
 
     //请求网络数据
     private void requireMyTask(final String method, final String keyAndValue) {
@@ -556,7 +568,6 @@ public class NewTaskDetailActivity extends Activity {
             switch (msg.what) {
                 case 1:
                     try {
-                        Thread.sleep(2000);
                         JSONObject jsonObject = new JSONObject(result);
                         JSONArray jsonArray = jsonObject.getJSONArray("rows");
                         Log.i("NewTaskDetailActivity", "jsonArray==" + jsonArray.length());
@@ -578,6 +589,7 @@ public class NewTaskDetailActivity extends Activity {
                             listView.setAdapter(newTaskListviewAdapter);
                             newTaskSelectLayout.setVisibility(View.VISIBLE);
                         }
+                        Thread.sleep(500);
                         popupWindow.dismiss();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -587,10 +599,12 @@ public class NewTaskDetailActivity extends Activity {
                     break;
                 case 2:
                     popupWindow.dismiss();
+                    no_data.setVisibility(View.VISIBLE);
                     Toast.makeText(NewTaskDetailActivity.this, "没有相应的数据！", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
                     popupWindow.dismiss();
+                    no_data.setVisibility(View.VISIBLE);
                     Toast.makeText(NewTaskDetailActivity.this, "网络请求超时！", Toast.LENGTH_SHORT).show();
                     break;
             }

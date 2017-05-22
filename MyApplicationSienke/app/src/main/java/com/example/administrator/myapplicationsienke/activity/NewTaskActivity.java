@@ -204,9 +204,11 @@ public class NewTaskActivity extends Activity {
                     save_btn.setClickable(true);
                     break;
                 case R.id.security_type:
+                    securityType.setClickable(false);
                     createSecurityTypePopupwindow();
                     break;
                 case R.id.start_date:
+                    startDate.setClickable(false);
                     //开始时间选择器
                     new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
@@ -214,8 +216,10 @@ public class NewTaskActivity extends Activity {
                             startDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                         }
                     }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+                    startDate.setClickable(true);
                     break;
                 case R.id.end_date:
+                    endDate.setClickable(false);
                     //结束时间选择器
                     new DatePickerDialog(NewTaskActivity.this, new DatePickerDialog.OnDateSetListener() {
                         @Override
@@ -223,6 +227,7 @@ public class NewTaskActivity extends Activity {
                             endDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                         }
                     }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+                    endDate.setClickable(true);
                     break;
             }
         }
@@ -244,6 +249,7 @@ public class NewTaskActivity extends Activity {
                 securityType.setText(item.getItemName());
                 itemId = item.getItemId();
                 popupWindow.dismiss();
+                securityType.setClickable(true);
             }
         });
         popupWindow.update();
@@ -267,6 +273,7 @@ public class NewTaskActivity extends Activity {
             @Override
             public void onDismiss() {
                 backgroundAlpha(1.0F);
+                securityType.setClickable(true);
             }
         });
 
