@@ -194,7 +194,7 @@
                     <EditText
                         android:layout_width="match_parent"
                         android:layout_height="80dp"
-                        android:background="@null"
+                        android:background="@drawable/normal_button_bg_selector"
                         android:gravity="top"
                         android:hint="备注信息（可不填）"
                         android:maxLength="100"
