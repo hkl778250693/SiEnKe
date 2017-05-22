@@ -7,15 +7,18 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/theme_colors">
+        android:layout_height="50dp"
+        android:background="@color/theme_colors"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
 
         <ImageView
             android:id="@+id/back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:padding="16dp"
+            android:padding="10dp"
+            android:background="@drawable/circle_selector"
             android:src="@drawable/back_selector"/>
 
         <TextView
@@ -31,8 +34,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:padding="15dp"
+            android:padding="10dp"
             android:text="上传"
+            android:background="@drawable/circle_selector"
             android:layout_centerVertical="true"
             android:textColor="@android:color/white"
             android:textSize="16dp" />
@@ -62,7 +66,8 @@
                 android:drawableTop="@mipmap/no_data"
                 android:gravity="center_horizontal"
                 android:text="抱歉，本地没有数据上传哦~"
-                android:textColor="@color/text_gray"
+                android:textColor="@color/text_blue"
+                android:textSize="14sp"
                 android:visibility="gone" />
 
             <RelativeLayout

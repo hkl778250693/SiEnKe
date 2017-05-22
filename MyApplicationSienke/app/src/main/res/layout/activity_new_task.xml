@@ -10,15 +10,17 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/theme_colors">
+        android:layout_height="50dp"
+        android:background="@color/theme_colors"
+        android:paddingLeft="5dp">
 
         <ImageView
             android:id="@+id/newtask_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:padding="16dp"
+            android:padding="10dp"
+            android:background="@drawable/circle_selector"
             android:src="@drawable/back_selector" />
 
         <TextView
@@ -65,7 +67,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
-                    android:background="@drawable/linearlayout_shape"
+                    android:background="@drawable/normal_button_bg_selector"
                     android:hint="请输入任务名称"
                     android:padding="11dp"
                     android:textSize="12sp" />
@@ -94,7 +96,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
-                    android:background="@drawable/linearlayout_shape"
+                    android:background="@drawable/normal_button_bg_selector"
                     android:drawableRight="@mipmap/down"
                     android:gravity="center"
                     android:padding="10dp"
@@ -125,7 +127,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
-                    android:background="@drawable/linearlayout_shape"
+                    android:background="@drawable/normal_button_bg_selector"
                     android:drawableRight="@mipmap/down"
                     android:gravity="center"
                     android:padding="10dp"
@@ -157,7 +159,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
-                    android:background="@drawable/linearlayout_shape"
+                    android:background="@drawable/normal_button_bg_selector"
                     android:drawableRight="@mipmap/down"
                     android:gravity="center"
                     android:padding="10dp"

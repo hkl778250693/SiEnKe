@@ -71,7 +71,7 @@ public class IpSettingActivity extends Activity {
                     if(!sharedPreferences.getString("security_ip","").equals("")){
                         ipEdit.setSelection(sharedPreferences.getString("security_ip","").length());//将光标移至文字末尾
                     }else {
-                        ipEdit.setSelection("192.168.2.200:".length());//将光标移至文字末尾
+                        ipEdit.setSelection("192.168.2.201:".length());//将光标移至文字末尾
                     }
                     if(!sharedPreferences.getString("security_port","").equals("")){
                         portEdit.setSelection(sharedPreferences.getString("security_port","").length());//将光标移至文字末尾

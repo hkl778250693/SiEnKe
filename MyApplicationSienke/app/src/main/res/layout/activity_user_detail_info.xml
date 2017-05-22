@@ -11,7 +11,8 @@
     <RelativeLayout
         android:id="@+id/root_relative"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:paddingLeft="5dp"
         android:background="@color/theme_colors">
 
         <ImageView
@@ -19,8 +20,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:padding="16dp"
-            android:src="@mipmap/back1" />
+            android:padding="10dp"
+            android:background="@drawable/circle_selector"
+            android:src="@drawable/back_selector" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -66,6 +68,8 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:text=""
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
                     android:textColor="@color/text_gray"
                     android:textSize="14sp" />
 
@@ -102,6 +106,8 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:text=""
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
                     android:textColor="@color/text_gray"
                     android:textSize="14sp" />
 
@@ -137,13 +143,15 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:hint="添加表编号"
+                    android:hint="添加"
+                    android:gravity="right"
                     android:textColor="@color/text_gray"
                     android:textSize="14sp"
-                    android:background="@null"
+                    android:background="@drawable/normal_button_bg_selector"
                     android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:paddingLeft="15dp"/>
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:paddingBottom="6dp"/>
 
             </RelativeLayout>
 
@@ -177,13 +185,15 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:hint="添加电话号码"
+                    android:hint="添加"
                     android:textColor="@color/text_gray"
                     android:textSize="14sp"
-                    android:background="@null"
+                    android:gravity="right"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:background="@drawable/normal_button_bg_selector"
                     android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:paddingLeft="15dp"/>
+                    android:paddingBottom="6dp"/>
 
             </RelativeLayout>
 
@@ -217,13 +227,15 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:hint="添加地址"
+                    android:hint="添加"
                     android:textColor="@color/text_gray"
                     android:textSize="14sp"
-                    android:background="@null"
+                    android:background="@drawable/normal_button_bg_selector"
+                    android:gravity="right"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
                     android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:paddingLeft="15dp"/>
+                    android:paddingBottom="6dp"/>
 
             </RelativeLayout>
 
@@ -258,6 +270,8 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:text=""
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
                     android:textColor="@color/text_gray"
                     android:textSize="14sp" />
 
@@ -330,7 +344,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:background="@drawable/check_hidden_danger_down_shape"
+                    android:background="@drawable/normal_button_bg_selector"
                     android:drawablePadding="10dp"
                     android:drawableRight="@mipmap/down"
                     android:paddingBottom="4dp"
@@ -395,7 +409,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:background="@drawable/check_hidden_danger_down_shape"
+                    android:background="@drawable/normal_button_bg_selector"
                     android:drawablePadding="10dp"
                     android:drawableRight="@mipmap/down"
                     android:paddingBottom="4dp"
@@ -429,7 +443,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:background="@drawable/check_hidden_danger_down_shape"
+                    android:background="@drawable/normal_button_bg_selector"
                     android:drawablePadding="10dp"
                     android:drawableRight="@mipmap/down"
                     android:paddingBottom="4dp"
