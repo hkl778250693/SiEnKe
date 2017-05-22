@@ -228,6 +228,7 @@ public class MobileSecurityLoginActivity extends Activity {
                                 editor.putInt("company_id",jsonObject.optInt("companyid",0));
                                 editor.putString("user_name",jsonObject.optString("userName",""));
                                 editor.apply();
+                                Log.i("MobileSecurityLogin", "当前用户公司ID是："+sharedPreferences_login.getInt("company_id",0));
                                 Log.i("MobileSecurityLogin", "当前用户是："+sharedPreferences_login.getString("user_name",""));
                                 handler.sendEmptyMessage(1);
                             }

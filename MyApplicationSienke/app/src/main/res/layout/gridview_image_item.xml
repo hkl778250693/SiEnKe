@@ -8,6 +8,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_centerHorizontal="true"
+        android:background="@drawable/security_choose_item_selector"
         android:scaleType="centerCrop"/>
     <ImageView
         android:id="@+id/delete"

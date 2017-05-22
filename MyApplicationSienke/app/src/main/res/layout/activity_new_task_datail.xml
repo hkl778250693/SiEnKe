@@ -7,15 +7,19 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/theme_colors">
+        android:layout_height="50dp"
+        android:background="@color/theme_colors"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
 
         <ImageView
             android:id="@+id/back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:padding="16dp"
+            android:padding="10dp"
+            android:background="@drawable/circle_selector"
+            android:layout_alignParentLeft="true"
             android:src="@drawable/back_selector" />
 
         <TextView
@@ -31,9 +35,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:padding="15dp"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
             android:text="保存"
+            android:background="@drawable/circle_selector"
             android:textColor="@android:color/white"
             android:textSize="14dp" />
     </RelativeLayout>
@@ -54,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
-            android:background="@drawable/check_hidden_danger_down_shape"
+            android:background="@drawable/normal_button_bg_selector"
             android:drawablePadding="5dp"
             android:drawableRight="@mipmap/down"
             android:padding="6dp"
@@ -148,7 +153,8 @@
                 android:drawablePadding="10dp"
                 android:gravity="center_horizontal"
                 android:text="请根据条件查询哦~"
-                android:textColor="@color/text_gray"
+                android:textColor="@color/text_blue"
+                android:textSize="14sp"
                 android:visibility="gone" />
 
             <RelativeLayout

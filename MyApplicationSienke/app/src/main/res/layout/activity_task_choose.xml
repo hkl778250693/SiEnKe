@@ -7,7 +7,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:paddingRight="5dp"
         android:background="@color/theme_colors">
 
         <TextView
@@ -23,8 +24,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:padding="15dp"
+            android:padding="10dp"
             android:text="保存"
+            android:layout_centerVertical="true"
+            android:background="@drawable/circle_selector"
             android:textColor="@android:color/white"
             android:textSize="16dp" />
 
@@ -55,7 +58,8 @@
             android:drawableTop="@mipmap/no_data"
             android:gravity="center_horizontal"
             android:text="抱歉，本地没有数据哦~"
-            android:textColor="@color/text_gray"
+            android:textColor="@color/text_blue"
+            android:textSize="14sp"
             android:visibility="gone" />
     </RelativeLayout>
 
