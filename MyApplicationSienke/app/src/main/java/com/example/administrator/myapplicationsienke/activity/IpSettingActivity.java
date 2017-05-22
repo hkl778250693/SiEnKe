@@ -96,6 +96,7 @@ public class IpSettingActivity extends Activity {
                     port = portEdit.getText().toString().trim();
                     editor.putString("security_ip",ip);
                     editor.putString("security_port",port);
+                    editor.putBoolean("ip_port_changed",true);
                     editor.apply();
                     Toast.makeText(IpSettingActivity.this,"保存成功",Toast.LENGTH_SHORT).show();
                     break;

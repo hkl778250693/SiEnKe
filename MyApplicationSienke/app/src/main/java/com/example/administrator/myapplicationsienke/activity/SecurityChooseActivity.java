@@ -111,6 +111,35 @@ public class SecurityChooseActivity extends FragmentActivity {
             editor.putBoolean("clear_data",false);
             editor.apply();
         }
+        if(sharedPreferences.getBoolean("ip_port_changed",false)){
+            checkIpAndPort();
+        }
+    }
+
+    public void checkIpAndPort(){
+        db.delete("SecurityState", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户SecurityState表中的所有数据
+        db.delete("security_content", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户security_content表中的所有数据
+        db.delete("security_hidden", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户security_hidden表中的所有数据
+        db.delete("security_hidden_reason", "loginName=?", new String[]{sharedPreferences_login.getString("login_name","")});  //删除当前用户security_hidden_reason表中的所有数据
+        //设置id从1开始（sqlite默认id从1开始），若没有这一句，id将会延续删除之前的id
+        db.execSQL("update sqlite_sequence set seq=0 where name='SecurityState'");
+        db.execSQL("update sqlite_sequence set seq=0 where name='security_content'");
+        db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden'");
+        db.execSQL("update sqlite_sequence set seq=0 where name='security_hidden_reason'");
+
+        //开启支线程进行请求任务信息
+        new Thread() {
+            @Override
+            public void run() {
+                requireSecurityState("findSecurityState.do "); //安检状态
+                requireSecurityContent("findSecurityContent.do");//安检内容
+                requireSafetyHidden("findSafetyHidden.do");//安检原因类型
+                requireSafetyReason("findSafetyReason.do");//安检原因
+                super.run();
+            }
+        }.start();
+        editor.putBoolean("ip_port_changed",false);
+        editor.apply();
     }
 
     @Override
@@ -336,6 +365,9 @@ public class SecurityChooseActivity extends FragmentActivity {
         sharedPreferences = this.getSharedPreferences(sharedPreferences_login.getString("login_name","")+"data", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         isFirst = sharedPreferences.getBoolean("FIRST",true);
+        if(sharedPreferences.getBoolean("ip_port_changed",false)){
+            checkIpAndPort();
+        }
         if(isFirst){
             Log.i("SecurityChooseActivity", "第一次进入APP");
             editor.putBoolean("FIRST",false);
@@ -467,6 +499,7 @@ public class SecurityChooseActivity extends FragmentActivity {
                 try {
                     URL url;
                     HttpURLConnection httpURLConnection;
+                    Log.i("requireSecurityState", sharedPreferences.getString("security_ip", ""));
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                     } else {
@@ -490,8 +523,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                     //传回的数据解析成String
                     if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
                         InputStream inputStream = httpURLConnection.getInputStream();
-                        Log.i("start_inputStream==>", "" + inputStream);
-                        Log.i("mid_inputStream==>", "" + inputStream);
                         InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                         StringBuilder stringBuilder = new StringBuilder();
@@ -499,9 +530,8 @@ public class SecurityChooseActivity extends FragmentActivity {
                         while ((str = bufferedReader.readLine()) != null) {
                             stringBuilder.append(str);
                         }
-                        Log.i("end_inputStream==>", "" + inputStream);
                         stateResult = stringBuilder.toString();
-                        Log.i("taskResult=====>", stateResult);
+                        Log.i("stateResult=====>", stateResult);
                         JSONObject jsonObject = new JSONObject(stateResult);
                         if (!jsonObject.optString("total", "").equals("0")) {
                             handler.sendEmptyMessage(2);
@@ -557,8 +587,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                     //传回的数据解析成String
                     if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
                         InputStream inputStream = httpURLConnection.getInputStream();
-                        Log.i("start_inputStream==>", "" + inputStream);
-                        Log.i("mid_inputStream==>", "" + inputStream);
                         InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                         StringBuilder stringBuilder = new StringBuilder();
@@ -566,9 +594,8 @@ public class SecurityChooseActivity extends FragmentActivity {
                         while ((str = bufferedReader.readLine()) != null) {
                             stringBuilder.append(str);
                         }
-                        Log.i("end_inputStream==>", "" + inputStream);
                         contentResult = stringBuilder.toString();
-                        Log.i("taskResult=====>", contentResult);
+                        Log.i("contentResult=====>", contentResult);
                         JSONObject jsonObject = new JSONObject(contentResult);
                         if (!jsonObject.optString("total", "").equals("0")) {
                             handler.sendEmptyMessage(4);
@@ -622,8 +649,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                     //传回的数据解析成String
                     if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
                         InputStream inputStream = httpURLConnection.getInputStream();
-                        Log.i("start_inputStream==>", "" + inputStream);
-                        Log.i("mid_inputStream==>", "" + inputStream);
                         InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                         StringBuilder stringBuilder = new StringBuilder();
@@ -631,9 +656,8 @@ public class SecurityChooseActivity extends FragmentActivity {
                         while ((str = bufferedReader.readLine()) != null) {
                             stringBuilder.append(str);
                         }
-                        Log.i("end_inputStream==>", "" + inputStream);
                         hiddenResult = stringBuilder.toString();
-                        Log.i("taskResult=====>", hiddenResult);
+                        Log.i("hiddenResult=====>", hiddenResult);
                         JSONObject jsonObject = new JSONObject(hiddenResult);
                         if (!jsonObject.optString("total", "").equals("0")) {
                             handler.sendEmptyMessage(6);
@@ -687,8 +711,6 @@ public class SecurityChooseActivity extends FragmentActivity {
                     //传回的数据解析成String
                     if ((responseCode = httpURLConnection.getResponseCode()) == 200) {
                         InputStream inputStream = httpURLConnection.getInputStream();
-                        Log.i("start_inputStream==>", "" + inputStream);
-                        Log.i("mid_inputStream==>", "" + inputStream);
                         InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                         StringBuilder stringBuilder = new StringBuilder();
@@ -696,9 +718,8 @@ public class SecurityChooseActivity extends FragmentActivity {
                         while ((str = bufferedReader.readLine()) != null) {
                             stringBuilder.append(str);
                         }
-                        Log.i("end_inputStream==>", "" + inputStream);
                         reasonResult = stringBuilder.toString();
-                        Log.i("taskResult=====>", reasonResult);
+                        Log.i("reasonResult=====>", reasonResult);
                         JSONObject jsonObject = new JSONObject(reasonResult);
                         if (!jsonObject.optString("total", "").equals("0")) {
                             handler.sendEmptyMessage(8);
