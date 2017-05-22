@@ -295,7 +295,7 @@ public class NewTaskActivity extends Activity {
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                     } else {
-                        ip = "192.168.2.201:";
+                        ip = "88.88.88.31:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
@@ -452,7 +452,7 @@ public class NewTaskActivity extends Activity {
                     if (!sharedPreferences.getString("security_ip", "").equals("")) {
                         ip = sharedPreferences.getString("security_ip", "");
                     } else {
-                        ip = "192.168.2.201:";
+                        ip = "88.88.88.31:";
                     }
                     if (!sharedPreferences.getString("security_port", "").equals("")) {
                         port = sharedPreferences.getString("security_port", "");
