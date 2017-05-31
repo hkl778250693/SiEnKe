@@ -53,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:src="@mipmap/lock" />
+            android:src="@mipmap/lock5" />
 
         <EditText
             android:id="@+id/edit_mobile_psw"

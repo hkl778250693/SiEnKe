@@ -172,7 +172,7 @@ public class UserDetailInfoActivity extends AppCompatActivity {
                     startActivityForResult(intent, 500);
                     gridView.setClickable(true);
                 }
-                // 如果单击时删除按钮处在显示状态，则隐藏它
+                // 如果单击时删除按钮z处在显示状态，则隐藏它
                 if (adapter.getDeleteShow()) {
                     adapter.setDeleteShow(false);
                     adapter.notifyDataSetChanged();

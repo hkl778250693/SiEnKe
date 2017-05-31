@@ -42,17 +42,6 @@
         android:text="设置IP、端口号"
         android:textColor="@color/text_black"
         android:textSize="16sp" />
-    <!--<TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="列表每页设置条数"
-        android:textSize="16sp"
-        android:textColor="@color/text_black"
-        android:drawableLeft="@mipmap/list"
-        android:background="@android:color/white"
-        android:padding="10dp"
-        android:drawablePadding="10dp"
-        android:layout_marginTop="10dp"/>-->
 
     <TextView
         android:id="@+id/clear_data"
